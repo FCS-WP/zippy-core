@@ -13,6 +13,9 @@ Copyright 2024
 
 */
 
+namespace Zippy_Core;
+
+
 defined('ABSPATH') or die('°_°’');
 
 /* ------------------------------------------
@@ -20,27 +23,26 @@ defined('ABSPATH') or die('°_°’');
  ------------------------------------------------------------------------ */
 /* Set plugin version constant. */
 
-if (!defined('Zippy_Custom_WP_Core_Version')) {
-	define('Zippy_Custom_WP_Core_Version', '1.1.8');
+if (!defined('ZIPPY_CORE_VERSION')) {
+	define('ZIPPY_CORE_VERSION', '1.1.8');
 }
 
 /* Set plugin name. */
 
-if (!defined('Zippy_Custom_WP_Core_Name')) {
-	define('Zippy_Custom_WP_Core_Name', 'ZippySG Core');
+if (!defined('ZIPPY_CORE_NAME')) {
+	define('ZIPPY_CORE_NAME', 'ZippySG Core');
 }
 
 /* Set constant path to the plugin directory. */
 
-if (!defined('Zippy_Custom_WP_Core')) {
-	define('Zippy_Custom_WP_Core', plugin_dir_path(__FILE__));
+if (!defined('ZIPPY_CORE_DIR_PATH')) {
+	define('ZIPPY_CORE_DIR_PATH', plugin_dir_path(__FILE__));
 }
 
 /* Set constant url to the plugin directory. */
 
-if (!defined('Zippy_Custom_Dir_Url')) {
-	define('Zippy_Custom_Dir_Url', plugin_dir_url(__FILE__));
-
+if (!defined('ZIPPY_CORE_URL')) {
+	define('ZIPPY_CORE_URL', plugin_dir_url(__FILE__));
 }
 
 /* ------------------------------------------
@@ -52,7 +54,12 @@ load_plugin_textdomain('zippy-sg-core', false, basename(dirname(__FILE__)) . '/l
 /* ------------------------------------------
 // Includes
  --------------------------- --------------------------------------------- */
+require ZIPPY_CORE_DIR_PATH . '/includes/autoload.php';
 
-require_once Zippy_Custom_WP_Core . 'includes/class-zippy-change-wp-admin-login.php';
+use	Zippy_Core\Src\Admin\Zippy_Admin_Url;
 
-require_once Zippy_Custom_WP_Core . 'includes/class-zippy-custom-core.php';
+use Zippy_Core\Src\Core\Zippy_Core;
+
+Zippy_Admin_Url::get_instance();
+
+Zippy_Core::get_instance();
