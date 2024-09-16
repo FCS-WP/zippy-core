@@ -6,6 +6,7 @@ use Zippy_Core\Src\Core\Zippy_Admin;
 use Zippy_Core\Src\Core\Zippy_Optimise;
 use Zippy_Core\Src\Core\Zippy_Settings;
 
+
 defined('ABSPATH') or die();
 
 class Zippy_Core
@@ -29,6 +30,7 @@ class Zippy_Core
     new Zippy_Settings;
     new Zippy_Admin;
     new Zippy_Optimise;
+
 
     add_action('phpmailer_init', array($this, 'setup_phpmailer_init'));
 
