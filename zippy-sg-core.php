@@ -60,6 +60,14 @@ use	Zippy_Core\Src\Admin\Zippy_Admin_Url;
 
 use Zippy_Core\Src\Core\Zippy_Core;
 
+use Zippy_Core\Src\User\Zippy_Custom_Consent;
+
+use Zippy_Core\Src\User\Zippy_User_Account_Expiry;
+
 Zippy_Admin_Url::get_instance();
 
 Zippy_Core::get_instance();
+
+Zippy_Custom_Consent::get_instance();
+
+Zippy_User_Account_Expiry::get_instance();
