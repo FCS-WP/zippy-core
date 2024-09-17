@@ -1,7 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
 // Init Config Webpack
-require("dotenv-extended").load();
 // Css extraction and minification
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
@@ -14,7 +13,7 @@ const destChildTheme = "./";
 
 // Define Work path
 const destFileCss = destChildTheme + "/assets/sass/app.scss";
-const destFileJs = destChildTheme + "/assets/js/app.js";
+const destFileJs = destChildTheme + "/assets/js/index.js";
 const destOutput = destChildTheme + "/assets/dist";
 
 module.exports = [
@@ -76,6 +75,9 @@ module.exports = [
         },
       ],
     },
+    // externals: {
+    //   react: "React",
+    // },
     plugins: [
       // Get ENV Variables
       // clear out build directories on each build

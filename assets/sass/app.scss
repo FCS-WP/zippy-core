@@ -1,0 +1,22 @@
+#zippy-root {
+@import "bootstrap/scss/bootstrap";
+
+  position: relative;
+  margin-left: -20px;
+  margin-top: 20px;
+  #zippy-content{
+    padding: 0 20px;
+    .card{
+      max-width: none;
+      padding: 0;
+    }
+  }
+  #woocommerce-embedded-root {
+    position: absolute;
+    h1 {
+      font-size: 1.2em;
+    }
+  }
+}
+
+
