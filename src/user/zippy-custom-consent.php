@@ -17,14 +17,14 @@ class Zippy_Custom_Consent
     /**
      * @return Zippy_Custom_Consent
      */
-  
     public static function get_instance()
     {
-      if (is_null(self::$_instance)) {
-        self::$_instance = new self();
-      }
-      return self::$_instance;
+        if (is_null(self::$_instance)) {
+            self::$_instance = new self();
+        }
+        return self::$_instance;
     }
+
     public function __construct()
     {
         $this->set_hooks();
@@ -43,6 +43,7 @@ class Zippy_Custom_Consent
         add_action('edit_user_profile', [$this, 'show_consent_in_user_profile']);
         add_action('personal_options_update', [$this, 'save_consent_in_user_profile']);
         add_action('edit_user_profile_update', [$this, 'save_consent_in_user_profile']);
+        add_action('woocommerce_edit_account_form', [$this, 'add_consent_status_to_account_details']);
     }
 
     public function custom_consent_settings_init()
@@ -85,12 +86,12 @@ class Zippy_Custom_Consent
     public function privacy_policy_link_shortcode()
     {
         $privacy_policy_page_id = get_option('wp_page_for_privacy_policy');
-        
+
         if (!$privacy_policy_page_id) {
             return 'Privacy policy page is not set.';
         }
         $privacy_policy_url = get_permalink($privacy_policy_page_id);
-        
+
         if (!$privacy_policy_url) {
             return 'Privacy policy page link is not available.';
         }
@@ -114,7 +115,7 @@ class Zippy_Custom_Consent
     public function custom_consent_description_callback()
     {
         $site_name = get_bloginfo('name');
-        $description = get_option('custom_consent_description', "By using this site, you consent to the collection and use of your personal data by $site_name in accordance with our <a href='privacy-policy' target='_blank'>Privacy Policy</a> .");
+        $description = get_option('custom_consent_description', "$site_name may collect, use and disclose your personal data, which you have provided in this form, for providing marketing material that you have agreed to receive, in accordance with the Personal Data Protection Act 2012 and our data protection policy.");
 
         echo '<textarea name="custom_consent_description" rows="3" cols="50">' . esc_html($description) . '</textarea>';
     }
@@ -140,9 +141,9 @@ class Zippy_Custom_Consent
 
     public function disable_submit_if_consent_not_checked()
     {
-        ?>
+?>
         <script type="text/javascript">
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 var consentCheckbox = document.getElementById('custom_consent');
                 var submitButton = document.querySelector('button[name="register"]');
 
@@ -172,33 +173,83 @@ class Zippy_Custom_Consent
     {
         if (isset($_POST['custom_consent'])) {
             update_user_meta($customer_id, 'custom_consent', 'yes');
+            update_user_meta($customer_id, 'marketing_consent', 'yes');
         } else {
             update_user_meta($customer_id, 'custom_consent', 'no');
+            update_user_meta($customer_id, 'marketing_consent', 'no');
         }
     }
 
     public function show_consent_in_user_profile($user)
     {
         if (!current_user_can('administrator')) {
-            return;
-        }
-
-        $consent = get_user_meta($user->ID, 'custom_consent', true);
+            // Display read-only fields for non-admin users
+            $consent = get_user_meta($user->ID, 'custom_consent', true);
+            $marketing_consent = get_user_meta($user->ID, 'marketing_consent', true);
         ?>
-        <h3><?php _e("User Consent Information", "custom-consent"); ?></h3>
-
-        <table class="form-table">
-            <tr>
-                <th><label for="custom_consent"><?php _e("Consent Status"); ?></label></th>
-                <td>
-                    <select name="custom_consent" id="custom_consent">
-                        <option value="yes" <?php selected($consent, 'yes'); ?>><?php _e('Yes', 'custom-consent'); ?></option>
-                        <option value="no" <?php selected($consent, 'no'); ?>><?php _e('No', 'custom-consent'); ?></option>
-                    </select>
-                </td>
-            </tr>
-        </table>
+            <h3><?php _e("User Consent Information", "custom-consent"); ?></h3>
+            <table class="form-table custom-consent-table" style="width: 30%;">
+                <tr>
+                    <th>
+                        <label for="custom_consent" style="font-weight: bold;"><?php _e("PDPA Consent", 'custom-consent'); ?></label>
+                    </th>
+                    <th>
+                        <label for="marketing_consent" style="font-weight: bold;"><?php _e("Marketing Materials Consent", 'custom-consent'); ?></label>
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <p><?php echo esc_html($consent === 'yes' ? 'Yes' : 'No'); ?></p>
+                    </td>
+                    <td>
+                        <p><?php echo esc_html($marketing_consent === 'yes' ? 'Yes' : 'No'); ?></p>
+                    </td>
+                </tr>
+            </table>
         <?php
+        } else {
+            // Display editable fields for administrators
+            $consent = get_user_meta($user->ID, 'custom_consent', true);
+            $marketing_consent = get_user_meta($user->ID, 'marketing_consent', true);
+        ?>
+            <h3><?php _e("User Consent Information", "custom-consent"); ?></h3>
+            <table class="form-table custom-consent-table" style="width: 30%;">
+                <tr>
+                    <th>
+                        <label for="custom_consent" style="font-weight: bold;"><?php _e("PDPA Consent", 'custom-consent'); ?></label>
+                    </th>
+                    <th>
+                        <label for="marketing_consent" style="font-weight: bold;"><?php _e("Marketing Materials Consent", 'custom-consent'); ?></label>
+                    </th>
+                </tr>
+                <tr>
+                    <td>
+                        <select name="custom_consent" id="custom_consent">
+                            <option value="yes" <?php selected($consent, 'yes'); ?>><?php _e('Yes', 'custom-consent'); ?></option>
+                            <option value="no" <?php selected($consent, 'no'); ?>><?php _e('No', 'custom-consent'); ?></option>
+                        </select>
+                    </td>
+                    <td>
+                        <select name="marketing_consent" id="marketing_consent">
+                            <option value="yes" <?php selected($marketing_consent, 'yes'); ?>><?php _e('Yes', 'custom-consent'); ?></option>
+                            <option value="no" <?php selected($marketing_consent, 'no'); ?>><?php _e('No', 'custom-consent'); ?></option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <script type="text/javascript">
+                document.addEventListener('DOMContentLoaded', function() {
+                    var customConsent = document.getElementById('custom_consent');
+                    var marketingConsent = document.getElementById('marketing_consent');
+
+                    // Sync Marketing Consent with Custom Consent
+                    customConsent.addEventListener('change', function() {
+                        marketingConsent.value = customConsent.value;
+                    });
+                });
+            </script>
+        <?php
+        }
     }
 
     public function save_consent_in_user_profile($user_id)
@@ -209,9 +260,50 @@ class Zippy_Custom_Consent
 
         if (isset($_POST['custom_consent'])) {
             update_user_meta($user_id, 'custom_consent', sanitize_text_field($_POST['custom_consent']));
+            update_user_meta($user_id, 'marketing_consent', sanitize_text_field($_POST['custom_consent']));
         }
     }
+    public function add_consent_status_to_account_details()
+    {
+        $user_id = get_current_user_id();
+        $consent = get_user_meta($user_id, 'custom_consent', true);
+        $marketing_consent = get_user_meta($user_id, 'marketing_consent', true);
+
+        ?>
+        <h3><?php _e('Consent Information', 'custom-consent'); ?></h3>
+        <table class="woocommerce-consent-table" style="width: 50%;">
+            <tr>
+                <th><?php _e('PDPA Consent', 'custom-consent'); ?></th>
+                <th><?php _e('Marketing Materials Consent', 'custom-consent'); ?></th>
+            </tr>
+            <tr>
+                <td><?php echo esc_html($consent === 'yes' ? 'Yes' : 'No'); ?></td>
+                <td><?php echo esc_html($marketing_consent === 'yes' ? 'Yes' : 'No'); ?></td>
+            </tr>
+        </table>
+        <style>
+            .woocommerce-consent-table {
+                border-collapse: collapse;
+                margin: 20px 0;
+            }
+
+            .woocommerce-consent-table th,
+            .woocommerce-consent-table td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+                color: black;
+            }
+
+            .woocommerce-consent-table td {
+                text-align: center;
+            }
+
+            .woocommerce-consent-table th,
+            .woocommerce-consent-table td {
+                background-color: #fff !important;
+            }
+        </style>
+<?php
+    }
 }
-
-
-?>
