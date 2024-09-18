@@ -1,30 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { Row, Col, Card, CardBody } from "react-bootstrap";
-import MainChart from "../Charts/MainChart";
-import RightChart from "../Charts/RightChart";
+import MainChart from "../Charts/MainChart/MainChart";
+import RightChart from "../Charts/RightChart/RightChart";
 
+import ReportFilter from "../Filter/ReportFilter";
 function Content() {
+  const [periodFilter, setPeriodFilter] = useState("week");
+  const [activeFilter, setActiveFilter] = useState("week");
+  const clickFilter = (key) => {
+    setPeriodFilter(key);
+    setActiveFilter(key);
+  };
+
   return (
     <div id="zippy-content">
       <Row>
         <Col sm="12">
-          <CardBody>Filter</CardBody>
+          <ReportFilter activeFilter={activeFilter} onClick={clickFilter} />
         </Col>
       </Row>
       <Row>
-        <Col sm="8">
-          <MainChart />
+        <Col sm="6">
+          <MainChart filterParams={periodFilter} />
         </Col>
-        <Col sm="4">
+        <Col sm="6">
           <Row>
             <Col>
               <Card>
-                <CardBody>Total Transaction</CardBody>
+                <CardBody>Orders</CardBody>
               </Card>
             </Col>
             <Col>
               <Card>
-                <CardBody>Details of Order</CardBody>
+                <CardBody>Products Sold</CardBody>
               </Card>
             </Col>
           </Row>

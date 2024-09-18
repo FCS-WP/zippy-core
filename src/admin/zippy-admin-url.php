@@ -4,6 +4,8 @@ namespace Zippy_Core\Src\Admin;
 
 defined('ABSPATH') or die();
 
+use WP;
+
 
 class Zippy_Admin_Url
 {
@@ -102,7 +104,7 @@ class Zippy_Admin_Url
     register_activation_hook($this->basename(), array($this, 'activate'));
     register_uninstall_hook($this->basename(), array('Change_WP_Admin_Login', 'uninstall'));
 
-    add_action('admin_init', array($this, 'admin_init'));
+    add_action('admin_init', array($this, 'zippy_admin_init'));
     add_action('admin_notices', array($this, 'admin_notices'));
     add_action('network_admin_notices', array($this, 'admin_notices'));
 
@@ -192,7 +194,7 @@ class Zippy_Admin_Url
     }
   }
 
-  public function admin_init()
+  public function zippy_admin_init()
   {
     global $pagenow;
 

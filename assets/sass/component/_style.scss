@@ -1,0 +1,9 @@
+#zippy-root {
+  .spinner-border {
+    position: absolute;
+    left: calc(50% - 16px);
+    top: calc(50% + 32px);
+
+    // transform: translateX(-50%, -50%);
+  }
+}

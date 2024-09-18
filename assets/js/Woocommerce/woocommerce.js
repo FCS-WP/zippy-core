@@ -1,45 +1,14 @@
-import axios from "axios";
+import { makeRequest } from "../axios";
 
+makeRequest;
 export const Woocommerce = {
   async getTotalSales(params) {
-    return await makeRequest("sales", params);
+    return await makeRequest("/wc/v3/reports/sales", params);
   },
-};
-
-export const makeRequest = async (endpoint, params = {}, method = "GET") => {
-  const baseURL = "https://epos.theshin.info/wp-json/wc/v3/reports";
-  const consumer_key = "ck_cc7d6a3636d9bb3739710d1afec4ed1fb5dce20b";
-  const consumer_secret = "cs_81e2dec732c1befa846a740525fefa04ea92d4c2";
-
-  const api = axios.create({
-    baseURL: baseURL,
-    auth: {
-      username: consumer_key,
-      password: consumer_secret,
-    },
-  });
-  let res = null;
-
-  const config = {
-    url: endpoint,
-    params: params,
-    method: method,
-  };
-  try {
-    let res = null;
-
-    res = await api.request(config);
-    const data = res.data[0];
-    return { data };
-  } catch {
-    (error) => {
-      if (!error?.response) {
-        console.error("❗Error", error.message);
-        return { ...error, catchedError: error };
-      }
-
-      console.error(error.response.statusText);
-      return error;
-    };
+  async getCategoriesSale(params){
+    return await makeRequest("/wc-analytics/reports/categories", params);
+  },
+  async getOrderData(params){
+    return await makeRequest("/wc-analytics/reports/products/stats", params);
   }
 };
