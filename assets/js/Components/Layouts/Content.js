@@ -120,7 +120,11 @@ const Content = () => {
         per_page: 100,
       });
     }
-
+    setOrderParams({
+      interval: "day",
+      after: dateParams.date_start,
+      before: dateParams.bedate_endfore,
+    });
     setDateSelected({
       name: "",
       type: "",
