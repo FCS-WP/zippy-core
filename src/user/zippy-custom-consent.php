@@ -43,7 +43,6 @@ class Zippy_Custom_Consent
         add_action('edit_user_profile', [$this, 'show_consent_in_user_profile']);
         add_action('personal_options_update', [$this, 'save_consent_in_user_profile']);
         add_action('edit_user_profile_update', [$this, 'save_consent_in_user_profile']);
-        add_action('woocommerce_edit_account_form', [$this, 'add_consent_status_to_account_details']);
     }
 
     public function custom_consent_settings_init()
@@ -125,13 +124,13 @@ class Zippy_Custom_Consent
         $consent_description = get_option('custom_consent_description', 'I consent to the terms and conditions.');
         $checkbox_label = get_option('custom_consent_checkbox_label', 'I have read and agree with the terms and conditions.');
 
-        return '<p class="form-row terms">
+        return '<div class="form-row terms custom-consent">
              <div class="description"> ' . esc_html($consent_description) . '</div>
             <label class="woocommerce-form__label woocommerce-form__label-for-checkbox checkbox">
                 <input type="checkbox" class="woocommerce-form__input woocommerce-form__input-checkbox input-checkbox" name="custom_consent" id="custom_consent" value="1" /> 
                 <span>' . esc_html($checkbox_label) . '</span>
             </label>
-        </p>';
+        </div>';
     }
 
     public function add_consent_checkbox_to_registration_form()
@@ -158,6 +157,17 @@ class Zippy_Custom_Consent
                 });
             });
         </script>
+        <style>
+            .custom-consent .description {
+               margin-bottom: 1rem; 
+            }
+            .custom-consent label{
+                margin: 10px 0;
+            }
+            .woocommerce-privacy-policy-text{
+                display: none;
+            }
+        </style>
         <?php
     }
 
@@ -263,47 +273,5 @@ class Zippy_Custom_Consent
             update_user_meta($user_id, 'marketing_consent', sanitize_text_field($_POST['custom_consent']));
         }
     }
-    public function add_consent_status_to_account_details()
-    {
-        $user_id = get_current_user_id();
-        $consent = get_user_meta($user_id, 'custom_consent', true);
-        $marketing_consent = get_user_meta($user_id, 'marketing_consent', true);
 
-        ?>
-        <h3><?php _e('Consent Information', 'custom-consent'); ?></h3>
-        <table class="woocommerce-consent-table" style="width: 50%;">
-            <tr>
-                <th><?php _e('PDPA Consent', 'custom-consent'); ?></th>
-                <th><?php _e('Marketing Materials Consent', 'custom-consent'); ?></th>
-            </tr>
-            <tr>
-                <td><?php echo esc_html($consent === 'yes' ? 'Yes' : 'No'); ?></td>
-                <td><?php echo esc_html($marketing_consent === 'yes' ? 'Yes' : 'No'); ?></td>
-            </tr>
-        </table>
-        <style>
-            .woocommerce-consent-table {
-                border-collapse: collapse;
-                margin: 20px 0;
-            }
-
-            .woocommerce-consent-table th,
-            .woocommerce-consent-table td {
-                border: 1px solid #ddd;
-                padding: 8px;
-                text-align: left;
-                color: black;
-            }
-
-            .woocommerce-consent-table td {
-                text-align: center;
-            }
-
-            .woocommerce-consent-table th,
-            .woocommerce-consent-table td {
-                background-color: #fff !important;
-            }
-        </style>
-<?php
-    }
 }
