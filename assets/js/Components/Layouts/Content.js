@@ -7,6 +7,7 @@ import TopTotal from "../Charts/RightChart/TopTotal";
 import { DateHelper } from "../../helper/date-helper";
 import MainChartTitle from "../Charts/MainChart/MainChartTitle";
 import { Woocommerce } from "../../Woocommerce/woocommerce";
+import ViewType from "../Charts/MainChart/ViewType";
 const Content = () => {
   const [periodFilter, setPeriodFilter] = useState("week");
 
@@ -50,7 +51,11 @@ const Content = () => {
     setPeriodFilter(key);
     const date = DateHelper.getDate(key);
     setDateParams(date);
-
+    setOrderParams({
+      interval: "day",
+      after: date.date_start,
+      before: date.bedate_endfore,
+    });
     setActiveFilter(key);
 
     setMainChartParams((prev) => ({
@@ -124,6 +129,17 @@ const Content = () => {
   };
 
   const onClickViewType = (type) => {
+    setOrderParams({
+      interval: "day",
+      after: dateParams.date_start,
+      before: dateParams.bedate_endfore,
+    });
+    setCategoriesParams({
+      after: dateParams.date_start,
+      before: dateParams.bedate_endfore,
+      extended_info: true,
+      orderby: "net_revenue",
+    });
     setMainChartParams((prev) => ({ ...prev, interval: type }));
     setViewTypeSelected(type);
     setcurrentView("");
@@ -188,10 +204,6 @@ const Content = () => {
       <Row>
         <Col sm="12">
           <ReportFilter
-            viewTypeSelected={viewTypeSelected}
-            onClickViewType={onClickViewType}
-            onClearDate={onClearDate}
-            dateSelected={dateSelected}
             activeFilter={activeFilter}
             onClick={clickFilter}
             handleCustomDate={handleCustomDate}
@@ -201,9 +213,13 @@ const Content = () => {
       <Row>
         <Col sm="6">
           <Card className="mt-0">
-            <CardBody className="border-bottom">
-              <MainChartTitle netSales={netSales} totalSale={totalSale} />
-            </CardBody>
+            <MainChartTitle netSales={netSales} totalSale={totalSale} />
+            <ViewType
+              onClearDate={onClearDate}
+              viewTypeSelected={viewTypeSelected}
+              onClickViewType={onClickViewType}
+              dateSelected={dateSelected}
+            />
             <MainChart
               onClearDate={onClearDate}
               dateSelected={dateSelected}

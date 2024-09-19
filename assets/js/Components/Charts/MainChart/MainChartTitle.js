@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Col, Row } from "react-bootstrap";
+import { CardBody, Col, Row } from "react-bootstrap";
 const MainChartTitle = ({
   netSales,
   totalSale,
@@ -8,6 +8,8 @@ const MainChartTitle = ({
   ...props
 }) => {
   return (
+    <CardBody className="border-bottom">
+
     <Row>
       <Col sm="6">
         <h4>Total Sales</h4>
@@ -23,6 +25,7 @@ const MainChartTitle = ({
         <h5>${netSales}</h5>
       </Col>
     </Row>
+    </CardBody>
   );
 };
 export default MainChartTitle;

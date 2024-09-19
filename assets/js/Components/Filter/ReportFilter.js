@@ -5,10 +5,6 @@ import { Badge, DropdownButton, DropdownItem } from "react-bootstrap/esm";
 import DatePicker from "react-datepicker";
 import { DateHelper } from "../../helper/date-helper";
 const ReportFilter = ({
-  onClickViewType,
-  viewTypeSelected,
-  onClearDate,
-  dateSelected,
   onClick,
   activeFilter,
   handleCustomDate,
@@ -34,21 +30,6 @@ const ReportFilter = ({
     {
       title: "Custom",
       key: "custom",
-    },
-  ];
-
-  const viewTypes = [
-    {
-      title: "By Day",
-      key: "day",
-    },
-    {
-      title: "By Week",
-      key: "week",
-    },
-    {
-      title: "By Month",
-      key: "month",
     },
   ];
 
@@ -78,7 +59,7 @@ const ReportFilter = ({
       <Col md="12">
         <div className="reportFilter">
           <Row>
-            <Col sm="6">
+            <Col sm="12">
               <ButtonGroup className="mb-0 date-filter-button align-items-center">
                 {filters.map((filter) => (
                   <Button
@@ -116,7 +97,6 @@ const ReportFilter = ({
                       endDate={endDate}
                       minDate={startDate}
                       maxDate={new Date()}
-
                     />
                     <Button
                       className="ml-3 go-btn"
@@ -128,47 +108,6 @@ const ReportFilter = ({
                   </>
                 )}
               </ButtonGroup>
-            </Col>
-            <Col md="6" className="d-flex align-items-center justify-content-between w-100">
-                <Row className="w-100">
-                  <Col sm="6" className="d-flex w-100 align-items-center">
-                    <span> Currently viewing By:</span>
-
-                    {dateSelected?.name && (
-                      <div className="font-weight-bold small">
-                        <Badge
-                          variant="dark"
-                          className="badge-dark inline-block align-items-center ml-2 pl-2 pr-2 d-flex"
-                          onClick={()=>onClearDate(dateSelected.type)}
-                        >
-                          <p className="select-bage"> {dateSelected.name}</p>
-                          <button
-                            className="close-btn"
-                            aria-label="Clear selected date"
-                          >
-                            ×
-                          </button>
-                        </Badge>
-                      </div>
-                    )}
-                  </Col>
-                  <Col sm="6">
-                    <DropdownButton
-                      title={`By ${viewTypeSelected}`}
-                      variant="tranparent"
-                      className="float-right "
-                    >
-                      {viewTypes.map((viewType) => (
-                        <DropdownItem
-                          onClick={() => onClickViewType(viewType.key)}
-                          key={viewType.key}
-                        >
-                          {viewType.title}
-                        </DropdownItem>
-                      ))}
-                    </DropdownButton>
-                  </Col>
-                </Row>
             </Col>
           </Row>
         </div>
