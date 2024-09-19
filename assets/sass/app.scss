@@ -1,0 +1,66 @@
+@import "./component/style";
+
+#zippy-root {
+  @import "bootstrap/scss/bootstrap";
+  position: relative;
+  margin-left: -20px;
+  margin-top: 20px;
+  #zippy-content {
+    padding: 0 20px;
+    .card {
+      max-width: none;
+      padding: 0;
+    }
+  }
+  #woocommerce-embedded-root {
+    position: absolute;
+    h1 {
+      font-size: 1.2em;
+    }
+  }
+  .date-filter-button {
+    border: 1px solid #dae0e5;
+    .btn {
+      background: transparent;
+      padding: 10px 20px;
+      &.active {
+        border-color: #007cba !important;
+        color: #007cba !important;
+        background-color: transparent !important;
+      }
+    }
+    .btn:focus,
+    .btn:hover {
+      background: none;
+      box-shadow: none !important;
+      border-radius: 0px;
+      border-color: #007cba;
+      color: #007cba;
+    }
+  }
+  .reportFilter {
+    margin-bottom: -2px;
+    border: 1px solid #dae0e5;
+
+    .date-filter-button {
+      border: none;
+
+      .btn {
+        padding: 12px 20px;
+        font-size: 14px;
+        color: #007cba !important;
+        font-weight: bold;
+        border: none;
+        border-right: 1px solid #dae0e5;
+        &:last-child {
+          border-right: 0px;
+        }
+        &.active {
+          border-color: #fff !important;
+          color: #007cba !important;
+          background-color: #fff !important;
+        }
+      }
+    }
+  }
+}

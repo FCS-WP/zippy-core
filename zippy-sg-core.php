@@ -64,10 +64,19 @@ use Zippy_Core\Src\User\Zippy_Custom_Consent;
 
 use Zippy_Core\Src\User\Zippy_User_Account_Expiry;
 
-Zippy_Admin_Url::get_instance();
+use Zippy_Core\Src\Analytics\Zippy_Analytics;
+
+/**
+ *
+ * Init Zippy Core
+ */
 
 Zippy_Core::get_instance();
+
+Zippy_Admin_Url::get_instance();
 
 Zippy_Custom_Consent::get_instance();
 
 Zippy_User_Account_Expiry::get_instance();
+
+Zippy_Analytics::get_instance();

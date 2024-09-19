@@ -1,0 +1,29 @@
+#zippy-root {
+
+  .spinner-border {
+    position: absolute;
+    left: calc(50% - 16px);
+    top: calc(50% + 32px);
+
+    // transform: translateX(-50%, -50%);
+  }
+  .btn-tranparent {
+    background: #fff !important;
+    color: #3c434a;
+    border-color: #3c434a;
+  }
+  .close-btn {
+    background-color: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+    outline: none;
+    padding-left: 10px;
+    padding-right: 0px;
+  }
+  .badge.badge-dark {
+    background-color: #343a40 !important;
+  }
+}
