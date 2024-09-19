@@ -44,8 +44,6 @@ const MainChart = ({
     []
   );
 
-  const [netSales, setNetSales] = useState(0);
-  const [totalSale, setTotalSale] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [dataTotal, setdataTotal] = useState(null);
@@ -77,14 +75,14 @@ const MainChart = ({
           date_end: interval.date_end,
         },
       }));
-      console.log('shin');
+      // console.log('shin');
       const dataIntervals = dataTotal.map((interval) => interval.labels);
       const dataNetRevenue = data.intervals.map(
         (interval) => interval.subtotals.net_revenue
       );
       setdataTotal(dataTotal);
-      setNetSales(data.totals.net_revenue || 0);
-      setTotalSale(data.totals.net_revenue || 0);
+      // setNetSales(data.totals.net_revenue || 0);
+      // setTotalSale(data.totals.net_revenue || 0);
       setChartData({
         labels: dataIntervals,
         datasets: [
@@ -123,10 +121,6 @@ const MainChart = ({
   };
 
   return (
-    <Card className="mt-0">
-      <CardBody className="border-bottom">
-        <MainChartTitle netSales={netSales} totalSale={totalSale} />
-      </CardBody>
       <CardBody className="">
         {loading && <Spinner animation="border" variant="primary" />}
         {error && <Alert variant="danger">{error}</Alert>}
@@ -137,7 +131,6 @@ const MainChart = ({
           options={options}
         />
       </CardBody>
-    </Card>
   );
 };
 

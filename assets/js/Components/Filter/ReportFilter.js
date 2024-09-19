@@ -139,7 +139,7 @@ const ReportFilter = ({
                         <Badge
                           variant="dark"
                           className="badge-dark inline-block align-items-center ml-2 pl-2 pr-2 d-flex"
-                          onClick={onClearDate}
+                          onClick={()=>onClearDate(dateSelected.type)}
                         >
                           <p className="select-bage"> {dateSelected.name}</p>
                           <button

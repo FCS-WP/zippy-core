@@ -1,17 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useCallback, useState } from "react";
 import { Row, Col, Card, CardBody } from "react-bootstrap";
 import MainChart from "../Charts/MainChart/MainChart";
 import RightChart from "../Charts/RightChart/RightChart";
 import ReportFilter from "../Filter/ReportFilter";
 import TopTotal from "../Charts/RightChart/TopTotal";
 import { DateHelper } from "../../helper/date-helper";
-function Content() {
+import MainChartTitle from "../Charts/MainChart/MainChartTitle";
+import { Woocommerce } from "../../Woocommerce/woocommerce";
+const Content = () => {
   const [periodFilter, setPeriodFilter] = useState("week");
 
   const [activeFilter, setActiveFilter] = useState("last_week");
   const [dateSelected, setDateSelected] = useState();
   const [viewTypeSelected, setViewTypeSelected] = useState("day");
   const [currentView, setcurrentView] = useState("");
+  const [netSales, setNetSales] = useState(0);
+  const [totalSale, setTotalSale] = useState(0);
 
   const last_week = DateHelper.getDate();
 
@@ -46,6 +50,7 @@ function Content() {
     setPeriodFilter(key);
     const date = DateHelper.getDate(key);
     setDateParams(date);
+
     setActiveFilter(key);
 
     setMainChartParams((prev) => ({
@@ -58,6 +63,10 @@ function Content() {
       after: date.date_start,
       before: date.date_end,
     }));
+    setDateSelected({
+      name: "",
+      type: "",
+    });
   };
 
   const onClickChart = (date) => {
@@ -83,31 +92,39 @@ function Content() {
     setcurrentView("day");
   };
 
-  const onClearDate = () => {
-    setOrderParams({
-      interval: "day",
-      after: dateParams.after,
-      before: dateParams.before,
-    });
+  const onClearDate = (type) => {
+    if (type === "day") {
+      setOrderParams({
+        interval: "day",
+        after: dateParams.date_start,
+        before: dateParams.bedate_endfore,
+      });
+      setCategoriesParams({
+        after: dateParams.date_start,
+        before: dateParams.bedate_endfore,
+        extended_info: true,
+        orderby: "net_revenue",
+      });
+    } else {
+      setMainChartParams({
+        interval: viewTypeSelected,
+        after: dateParams.date_start,
+        before: dateParams.bedate_endfore,
+        fields: ["net_revenue", "items_sold"],
+        order: "asc",
+        per_page: 100,
+      });
+    }
+
     setDateSelected({
       name: "",
       type: "",
     });
     setcurrentView("");
-
-    setMainChartParams((prev) => {
-      const { categories, ...restParam } = prev;
-      return restParam;
-    });
-    setCategoriesParams((prev) => {
-      const { categories, ...restParam } = prev;
-      return restParam;
-    });
   };
 
   const onClickViewType = (type) => {
     setMainChartParams((prev) => ({ ...prev, interval: type }));
-
     setViewTypeSelected(type);
     setcurrentView("");
     setDateSelected({
@@ -149,6 +166,22 @@ function Content() {
       before: dateParams.date_end,
     }));
   }, [dateParams]);
+  const fetchData = useCallback(async (params) => {
+    const { data } = await Woocommerce.getOrderData(params);
+    const dataTotal = data.totals;
+    setNetSales(dataTotal.net_revenue || 0);
+    setTotalSale(dataTotal.net_revenue || 0);
+    // setProductSold(dataTotal.items_sold || 0);
+  }, []);
+
+  useEffect(() => {
+    fetchData(categoriesParams);
+  }, [categoriesParams]);
+  // useEffect(() => {
+  //   console.log("main", mainChartParams);
+  //   console.log("cate", categoriesParams);
+  //   console.log("date", dateParams);
+  // }, [mainChartParams, categoriesParams, dateParams]);
 
   return (
     <div id="zippy-content">
@@ -167,12 +200,17 @@ function Content() {
       </Row>
       <Row>
         <Col sm="6">
-          <MainChart
-            onClearDate={onClearDate}
-            dateSelected={dateSelected}
-            mainChartParams={mainChartParams}
-            onClickChart={onClickChart}
-          />
+          <Card className="mt-0">
+            <CardBody className="border-bottom">
+              <MainChartTitle netSales={netSales} totalSale={totalSale} />
+            </CardBody>
+            <MainChart
+              onClearDate={onClearDate}
+              dateSelected={dateSelected}
+              mainChartParams={mainChartParams}
+              onClickChart={onClickChart}
+            />
+          </Card>
         </Col>
         <Col sm="6">
           <Row>
@@ -188,5 +226,5 @@ function Content() {
       </Row>
     </div>
   );
-}
+};
 export default Content;
