@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
 const MainChartTitle = ({ netSales, totalSale, ...props }) => {
+
   return (
     <Row>
       <Col sm="6">

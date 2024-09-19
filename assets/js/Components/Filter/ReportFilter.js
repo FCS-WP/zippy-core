@@ -2,12 +2,14 @@ import { Dropdown } from "bootstrap";
 import React from "react";
 import { Button, Col, Row, ButtonGroup } from "react-bootstrap";
 import { Badge, DropdownButton, DropdownItem } from "react-bootstrap/esm";
+
 const ReportFilter = ({
+  onClickViewType,
+  viewTypeSelected,
   onClearDate,
   dateSelected,
   onClick,
   activeFilter,
-  buttonVariant = "light",
   ...props
 }) => {
   const filters = [
@@ -25,9 +27,29 @@ const ReportFilter = ({
     },
     {
       title: "Last 7 days",
-      key: "week",
+      key: "last_week",
     },
   ];
+
+  const viewTypes = [
+    {
+      title: "By Day",
+      key: "day",
+    },
+    {
+      title: "By Week",
+      key: "week",
+    },
+    {
+      title: "By Month",
+      key: "month",
+    },
+  ];
+
+  const handleFilterDate = (key) => {
+    onClick(key);
+  };
+
   return (
     <Row>
       <Col sm="12">
@@ -38,11 +60,9 @@ const ReportFilter = ({
                 {filters.map((filter) => (
                   <Button
                     key={filter.key}
-                    onClick={() => onClick(filter.key)}
+                    onClick={() => handleFilterDate(filter.key)}
                     variant={
-                      activeFilter === filter.key
-                        ? "light active"
-                        : buttonVariant
+                      activeFilter === filter.key ? "light active" : "light"
                     }
                   >
                     {filter.title}
@@ -55,18 +75,19 @@ const ReportFilter = ({
             <Col sm="4">
               <div>
                 <Row>
-                  <Col sm="6" className="d-flex w-100">
-                    {dateSelected && (
+                  <Col sm="6" className="d-flex w-100 align-items-center">
+                    <span> Currently viewing By:</span>
+
+                    {dateSelected?.name && (
                       <div className="font-weight-bold small">
-                        <span> You are currently viewing:</span>
                         <Badge
                           variant="dark"
                           className="badge-dark inline-block align-items-center ml-2 pl-2 pr-2"
+                          onClick={onClearDate}
                         >
-                          {dateSelected}
+                          <h6 c>  {dateSelected.name}</h6>
                           <button
                             className="close-btn"
-                            onClick={onClearDate}
                             aria-label="Clear selected date"
                           >
                             ×
@@ -77,13 +98,18 @@ const ReportFilter = ({
                   </Col>
                   <Col sm="6">
                     <DropdownButton
-                      title="By day"
+                      title={`By ${viewTypeSelected}`}
                       variant="tranparent"
                       className="float-right "
                     >
-                      <DropdownItem href="#/action-1">By Day</DropdownItem>
-                      <DropdownItem href="#/action-1">By Week</DropdownItem>
-                      <DropdownItem href="#/action-1">By Month</DropdownItem>
+                      {viewTypes.map((viewType) => (
+                        <DropdownItem
+                          onClick={() => onClickViewType(viewType.key)}
+                          key={viewType.key}
+                        >
+                          {viewType.title}
+                        </DropdownItem>
+                      ))}
                     </DropdownButton>
                   </Col>
                 </Row>

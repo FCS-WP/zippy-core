@@ -10,10 +10,10 @@ import MainChartTitle from "./MainChartTitle";
 import { Chart, registerables } from "chart.js";
 import { Woocommerce } from "../../../Woocommerce/woocommerce";
 import { Line, getElementAtEvent } from "react-chartjs-2";
-import { event } from "jquery";
+import { DateHelper } from "../../../helper/date-helper";
 Chart.register(...registerables);
 
-const MainChart = ({ filterParams, onClickChart, ...props }) => {
+const MainChart = ({ mainChartParams, onClickChart, ...props }) => {
   const options = useMemo(
     () => ({
       responsive: true,
@@ -42,6 +42,7 @@ const MainChart = ({ filterParams, onClickChart, ...props }) => {
   const [totalSale, setTotalSale] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [dataTotal, setdataTotal] = useState(null);
 
   const [chartData, setChartData] = useState({
     labels: [],
@@ -55,30 +56,34 @@ const MainChart = ({ filterParams, onClickChart, ...props }) => {
       },
     ],
   });
-
-  const [params, setParams] = useState({
-    date_min: "2024-01-01",
-    date_max: "2024-12-01",
-    period: "week",
-  });
-
   const fetchData = useCallback(async (params) => {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await Woocommerce.getTotalSales(params);
-      const dataTotal = data[0].totals;
-      const dataDate = Object.keys(dataTotal) || [];
-      const salesData = dataDate.map((key) => parseFloat(dataTotal[key].sales));
-
-      setNetSales(data[0].net_sales || 0);
-      setTotalSale(data[0].total_sales || 0);
+      const { data } = await Woocommerce.getOrderData(params);
+      const dataTotal = data.intervals.map((interval) => ({
+        labels: DateHelper.convertDateOutputChart(
+          interval.interval,
+          params.interval
+        ),
+        dates: {
+          date_start: interval.date_start,
+          date_end: interval.date_end,
+        },
+      }));
+      const dataIntervals = dataTotal.map((interval) => interval.labels);
+      const dataNetRevenue = data.intervals.map(
+        (interval) => interval.subtotals.net_revenue
+      );
+      setdataTotal(dataTotal);
+      setNetSales(data.totals.net_revenue || 0);
+      setTotalSale(data.totals.net_revenue || 0);
       setChartData({
-        labels: dataDate,
+        labels: dataIntervals,
         datasets: [
           {
             label: "Monthly Revenue",
-            data: salesData,
+            data: dataNetRevenue,
             borderWidth: 2,
             backgroundColor: "rgba(34, 113, 177, 1)",
             borderColor: "rgba(34, 113, 177, 1)",
@@ -94,33 +99,14 @@ const MainChart = ({ filterParams, onClickChart, ...props }) => {
   }, []);
 
   useEffect(() => {
-    handleFilterChange(filterParams);
-  }, [filterParams]);
-
-  useEffect(() => {
-    fetchData(params);
-  }, [params, fetchData]);
+    fetchData(mainChartParams);
+  }, [mainChartParams,fetchData]);
   const chartRef = useRef(null);
-
-  const handleFilterChange = (filterParams) => {
-    setParams({
-      date_min: "2024-01-01",
-      date_max: "2024-12-01",
-      period: filterParams,
-    });
-  };
 
   const printElementAtEvent = (element) => {
     if (!element.length) return;
-    const { datasetIndex, index } = element[0];
-  
-
-    onClickChart(chartData.labels[index]);
-    // console.log(
-    //   `Sales on ${chartData.labels[index]}: $${chartData.datasets[
-    //     datasetIndex
-    //   ].data[index].toFixed(2)}`
-    // );
+    const { index } = element[0];
+    onClickChart(dataTotal[index].dates);
   };
 
   const handleOnClickChart = (event) => {
