@@ -1,5 +1,6 @@
-#zippy-root {
+@import "react-datepicker/dist/react-datepicker.css";
 
+#zippy-root {
   .spinner-border {
     position: absolute;
     left: calc(50% - 16px);
@@ -25,5 +26,18 @@
   }
   .badge.badge-dark {
     background-color: #343a40 !important;
+  }
+
+  .react-datepicker__current-month {
+    font-size: 1rem !important;
+  }
+  .react-datepicker__input-container {
+    input {
+      max-width: 150px;
+    }
+  }
+  .btn-viewby {
+    border: 1px solid #888888;
+    border-radius: 8px;
   }
 }

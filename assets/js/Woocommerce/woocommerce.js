@@ -8,6 +8,9 @@ export const Woocommerce = {
   async getCategoriesSale(params){
     return await makeRequest("/wc-analytics/reports/categories", params);
   },
+  async getCategories(params){
+    return await makeRequest("/wc-analytics/products/categories", params);
+  },
   async getOrderData(params){
     return await makeRequest("/wc-analytics/reports/products/stats", params);
   }

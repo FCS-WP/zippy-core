@@ -1,93 +1,113 @@
 import { Dropdown } from "bootstrap";
-import React from "react";
+import React, { useState } from "react";
 import { Button, Col, Row, ButtonGroup } from "react-bootstrap";
 import { Badge, DropdownButton, DropdownItem } from "react-bootstrap/esm";
+import DatePicker from "react-datepicker";
+import { DateHelper } from "../../helper/date-helper";
 const ReportFilter = ({
-  onClearDate,
-  dateSelected,
   onClick,
   activeFilter,
-  buttonVariant = "light",
+  handleCustomDate,
   ...props
 }) => {
   const filters = [
-    {
-      title: "Year",
-      key: "year",
-    },
-    {
-      title: "Last month",
-      key: "last_month",
-    },
-    {
-      title: "This Month",
-      key: "month",
-    },
+    // {
+    //   title: "Year",
+    //   key: "year",
+    // },
+    // {
+    //   title: "Last month",
+    //   key: "last_month",
+    // },
+    // {
+    //   title: "This Month",
+    //   key: "month",
+    // },
     {
       title: "Last 7 days",
-      key: "week",
+      key: "last_week",
+    },
+    {
+      title: "Custom",
+      key: "custom",
     },
   ];
+
+  const handleFilterDate = (key) => {
+    onClick(key);
+  };
+
+  const [startDate, setStartDate] = useState(DateHelper.getDayStartMonth());
+  const [endDate, setEndDate] = useState(DateHelper.getDayEndMonth());
+
+  const handleSelectedStartdDay = (date) => {
+    setStartDate(date);
+  };
+  const handleSelectedEndDay = (date) => {
+    setEndDate(date);
+  };
+
+  const handleSubmit = () => {
+    const dataParams = {
+      date_start: startDate,
+      date_end: endDate,
+    };
+    handleCustomDate(dataParams);
+  };
   return (
     <Row>
-      <Col sm="12">
+      <Col md="12">
         <div className="reportFilter">
           <Row>
-            <Col sm="8">
-              <ButtonGroup className="mb-0 date-filter-button">
+            <Col sm="12">
+              <ButtonGroup className="mb-0 date-filter-button align-items-center">
                 {filters.map((filter) => (
                   <Button
                     key={filter.key}
-                    onClick={() => onClick(filter.key)}
+                    onClick={() => handleFilterDate(filter.key)}
                     variant={
-                      activeFilter === filter.key
-                        ? "light active"
-                        : buttonVariant
+                      activeFilter === filter.key ? "light active" : "light"
                     }
                   >
                     {filter.title}
                   </Button>
                 ))}
-
-                <Button variant="light">Custom:</Button>
-              </ButtonGroup>
-            </Col>
-            <Col sm="4">
-              <div>
-                <Row>
-                  <Col sm="6" className="d-flex w-100">
-                    {dateSelected && (
-                      <div className="font-weight-bold small">
-                        <span> You are currently viewing:</span>
-                        <Badge
-                          variant="dark"
-                          className="badge-dark inline-block align-items-center ml-2 pl-2 pr-2"
-                        >
-                          {dateSelected}
-                          <button
-                            className="close-btn"
-                            onClick={onClearDate}
-                            aria-label="Clear selected date"
-                          >
-                            ×
-                          </button>
-                        </Badge>
-                      </div>
-                    )}
-                  </Col>
-                  <Col sm="6">
-                    <DropdownButton
-                      title="By day"
-                      variant="tranparent"
-                      className="float-right "
+                {activeFilter === "custom" && (
+                  <>
+                    <DatePicker
+                      className="ml-3 mr-1"
+                      selected={startDate}
+                      onChange={(date) => handleSelectedStartdDay(date)}
+                      dateFormat="yyyy/MM/dd"
+                      selectsStart
+                      startDate={startDate}
+                      endDate={endDate}
+                      maxDate={endDate}
+                    />
+                    <span className="font-bold"> ~ </span>
+                    <DatePicker
+                      className={
+                        activeFilter === "custom" ? "ml-1 active" : "ml-1"
+                      }
+                      onChange={(date) => handleSelectedEndDay(date)}
+                      dateFormat="yyyy/MM/dd"
+                      selectsEnd
+                      selected={endDate}
+                      startDate={startDate}
+                      endDate={endDate}
+                      minDate={startDate}
+                      maxDate={new Date()}
+                    />
+                    <Button
+                      className="ml-3 go-btn"
+                      variant="success"
+                      onClick={handleSubmit}
                     >
-                      <DropdownItem href="#/action-1">By Day</DropdownItem>
-                      <DropdownItem href="#/action-1">By Week</DropdownItem>
-                      <DropdownItem href="#/action-1">By Month</DropdownItem>
-                    </DropdownButton>
-                  </Col>
-                </Row>
-              </div>
+                      Go
+                    </Button>
+                  </>
+                )}
+              </ButtonGroup>
             </Col>
           </Row>
         </div>

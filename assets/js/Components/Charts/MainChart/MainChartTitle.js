@@ -1,7 +1,15 @@
-import React from "react";
-import { Col, Row } from "react-bootstrap";
-const MainChartTitle = ({ netSales, totalSale, ...props }) => {
+import React, { useEffect } from "react";
+import { CardBody, Col, Row } from "react-bootstrap";
+const MainChartTitle = ({
+  netSales,
+  totalSale,
+  onClearDate,
+  dateSelected,
+  ...props
+}) => {
   return (
+    <CardBody className="border-bottom">
+
     <Row>
       <Col sm="6">
         <h4>Total Sales</h4>
@@ -17,6 +25,7 @@ const MainChartTitle = ({ netSales, totalSale, ...props }) => {
         <h5>${netSales}</h5>
       </Col>
     </Row>
+    </CardBody>
   );
 };
 export default MainChartTitle;
