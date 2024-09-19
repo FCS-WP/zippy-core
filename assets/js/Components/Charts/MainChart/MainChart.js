@@ -1,39 +1,48 @@
-import React, { useEffect, useMemo, useState, useRef, useCallback } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import { Card, CardBody, Spinner, Alert } from "react-bootstrap";
 import MainChartTitle from "./MainChartTitle";
 import { Chart, registerables } from "chart.js";
 import { Woocommerce } from "../../../Woocommerce/woocommerce";
 import { Line, getElementAtEvent } from "react-chartjs-2";
-
+import { event } from "jquery";
 Chart.register(...registerables);
 
-const MainChart = ({ filterParams, ...props }) => {
-  const options = useMemo(() => ({
-    responsive: true,
-    scales: {
-      y: {
-        beginAtZero: true,
+const MainChart = ({ filterParams, onClickChart, ...props }) => {
+  const options = useMemo(
+    () => ({
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true,
+        },
       },
-    },
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        callbacks: {
-          label: (tooltipItem) => {
-            return `Sales: $${tooltipItem.raw.toFixed(2)}`;
+      plugins: {
+        legend: {
+          display: false,
+        },
+        tooltip: {
+          callbacks: {
+            label: (tooltipItem) => {
+              return `Sales: $${tooltipItem.raw.toFixed(2)}`;
+            },
           },
         },
       },
-    },
-  }), []);
+    }),
+    []
+  );
 
   const [netSales, setNetSales] = useState(0);
   const [totalSale, setTotalSale] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const [chartData, setChartData] = useState({
     labels: [],
     datasets: [
@@ -60,19 +69,21 @@ const MainChart = ({ filterParams, ...props }) => {
       const { data } = await Woocommerce.getTotalSales(params);
       const dataTotal = data[0].totals;
       const dataDate = Object.keys(dataTotal) || [];
-      const salesData = dataDate.map(key => parseFloat(dataTotal[key].sales));
+      const salesData = dataDate.map((key) => parseFloat(dataTotal[key].sales));
 
       setNetSales(data[0].net_sales || 0);
       setTotalSale(data[0].total_sales || 0);
       setChartData({
         labels: dataDate,
-        datasets: [{
-          label: "Monthly Revenue",
-          data: salesData,
-          borderWidth: 2,
-          backgroundColor: "rgba(34, 113, 177, 1)",
-          borderColor: "rgba(34, 113, 177, 1)",
-        }],
+        datasets: [
+          {
+            label: "Monthly Revenue",
+            data: salesData,
+            borderWidth: 2,
+            backgroundColor: "rgba(34, 113, 177, 1)",
+            borderColor: "rgba(34, 113, 177, 1)",
+          },
+        ],
       });
     } catch (err) {
       setError("Failed to fetch data");
@@ -89,7 +100,6 @@ const MainChart = ({ filterParams, ...props }) => {
   useEffect(() => {
     fetchData(params);
   }, [params, fetchData]);
-
   const chartRef = useRef(null);
 
   const handleFilterChange = (filterParams) => {
@@ -103,10 +113,17 @@ const MainChart = ({ filterParams, ...props }) => {
   const printElementAtEvent = (element) => {
     if (!element.length) return;
     const { datasetIndex, index } = element[0];
-    console.log(`Sales on ${chartData.labels[index]}: $${chartData.datasets[datasetIndex].data[index].toFixed(2)}`);
+  
+
+    onClickChart(chartData.labels[index]);
+    // console.log(
+    //   `Sales on ${chartData.labels[index]}: $${chartData.datasets[
+    //     datasetIndex
+    //   ].data[index].toFixed(2)}`
+    // );
   };
 
-  const onClickChart = (event) => {
+  const handleOnClickChart = (event) => {
     const { current: chart } = chartRef;
     if (!chart) return;
     printElementAtEvent(getElementAtEvent(chart, event));
@@ -123,7 +140,7 @@ const MainChart = ({ filterParams, ...props }) => {
         <Line
           ref={chartRef}
           data={chartData}
-          onClick={onClickChart}
+          onClick={handleOnClickChart}
           options={options}
         />
       </CardBody>
