@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Row, Col, Card, CardBody } from "react-bootstrap";
 import MainChart from "../Charts/MainChart/MainChart";
 import RightChart from "../Charts/RightChart/RightChart";
@@ -6,41 +6,58 @@ import ReportFilter from "../Filter/ReportFilter";
 import TopTotal from "../Charts/RightChart/TopTotal";
 import { DateHelper } from "../../helper/date-helper";
 function Content() {
+  const [periodFilter, setPeriodFilter] = useState("week");
+
   const [activeFilter, setActiveFilter] = useState("last_week");
   const [dateSelected, setDateSelected] = useState();
   const [viewTypeSelected, setViewTypeSelected] = useState("day");
   const [currentView, setcurrentView] = useState("");
 
-  const currentDate = new Date();
-  const after = new Date(currentDate);
-  after.setMonth(currentDate.getMonth() - 7);
-  const before = new Date(currentDate);
-  before.setHours(23, 59, 59, 999);
+  const last_week = DateHelper.getDate();
+
+  const [dateParams, setDateParams] = useState({
+    after: last_week.date_start,
+    before: last_week.date_end,
+  });
 
   const [orderParams, setOrderParams] = useState({
     interval: "day",
-    after: after.toISOString(),
-    before: before.toISOString(),
+    after: dateParams.after,
+    before: dateParams.before,
   });
 
   const [categoriesParams, setCategoriesParams] = useState({
-    after: after.toISOString(),
-    before: before.toISOString(),
+    after: dateParams.after,
+    before: dateParams.before,
     extended_info: true,
     orderby: "net_revenue",
   });
 
   const [mainChartParams, setMainChartParams] = useState({
     interval: "day",
-    after: after.toISOString(),
-    before: before.toISOString(),
+    after: dateParams.after,
+    before: dateParams.before,
     fields: ["net_revenue", "items_sold"],
     order: "asc",
     per_page: 100,
   });
+
   const clickFilter = (key) => {
     setPeriodFilter(key);
+    const date = DateHelper.getDate(key);
+    setDateParams(date);
     setActiveFilter(key);
+
+    setMainChartParams((prev) => ({
+      ...prev,
+      after: date.date_start,
+      before: date.date_end,
+    }));
+    setCategoriesParams((prev) => ({
+      ...prev,
+      after: date.date_start,
+      before: date.date_end,
+    }));
   };
 
   const onClickChart = (date) => {
@@ -69,40 +86,28 @@ function Content() {
   const onClearDate = () => {
     setOrderParams({
       interval: "day",
-      after: after.toISOString(),
-      before: before.toISOString(),
+      after: dateParams.after,
+      before: dateParams.before,
     });
     setDateSelected({
       name: "",
       type: "",
     });
     setcurrentView("");
-    setCategoriesParams({
-      after: after.toISOString(),
-      before: before.toISOString(),
-      extended_info: true,
-      orderby: "net_revenue",
+
+    setMainChartParams((prev) => {
+      const { categories, ...restParam } = prev;
+      return restParam;
     });
-    setMainChartParams({
-      interval: "day",
-      after: after.toISOString(),
-      before: before.toISOString(),
-      fields: ["net_revenue", "items_sold"],
-      order: "asc",
-      per_page: 100,
-    })
+    setCategoriesParams((prev) => {
+      const { categories, ...restParam } = prev;
+      return restParam;
+    });
   };
 
   const onClickViewType = (type) => {
-    setMainChartParams({
-      interval: type,
-      after: after.toISOString(),
-      before: before.toISOString(),
-      fields: ["net_revenue", "items_sold"],
-      order: "asc",
-      per_page: 100,
-    });
-    
+    setMainChartParams((prev) => ({ ...prev, interval: type }));
+
     setViewTypeSelected(type);
     setcurrentView("");
     setDateSelected({
@@ -115,28 +120,36 @@ function Content() {
       return;
     }
 
-    setOrderParams({
-      interval: "day",
-      after: after.toISOString(),
-      before: before.toISOString(),
-      categories: cate_id,
-
-    });
-    setMainChartParams({
-      interval: "day",
-      after: after.toISOString(),
-      before: before.toISOString(),
-      fields: ["net_revenue", "items_sold"],
-      order: "asc",
-      categories: cate_id,
-      per_page: 100,
-    });
+    setOrderParams((prev) => ({ ...prev, categories: cate_id }));
+    setMainChartParams((prev) => ({ ...prev, categories: cate_id }));
     setDateSelected({
       name: name,
       type: "category",
     });
     setcurrentView("category");
   };
+
+  const handleCustomDate = (date) => {
+    setDateParams((prev) => ({
+      ...prev,
+      date_start: DateHelper.getDateToString(date.date_start, "23:59:00"),
+      date_end: DateHelper.getDateToString(date.date_end, "00:00:00"),
+    }));
+  };
+
+  useEffect(() => {
+    setMainChartParams((prev) => ({
+      ...prev,
+      after: dateParams.date_start,
+      before: dateParams.date_end,
+    }));
+    setCategoriesParams((prev) => ({
+      ...prev,
+      after: dateParams.date_start,
+      before: dateParams.date_end,
+    }));
+  }, [dateParams]);
+
   return (
     <div id="zippy-content">
       <Row>
@@ -148,12 +161,15 @@ function Content() {
             dateSelected={dateSelected}
             activeFilter={activeFilter}
             onClick={clickFilter}
+            handleCustomDate={handleCustomDate}
           />
         </Col>
       </Row>
       <Row>
         <Col sm="6">
           <MainChart
+            onClearDate={onClearDate}
+            dateSelected={dateSelected}
             mainChartParams={mainChartParams}
             onClickChart={onClickChart}
           />

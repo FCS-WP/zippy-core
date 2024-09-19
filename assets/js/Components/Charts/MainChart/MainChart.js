@@ -13,7 +13,13 @@ import { Line, getElementAtEvent } from "react-chartjs-2";
 import { DateHelper } from "../../../helper/date-helper";
 Chart.register(...registerables);
 
-const MainChart = ({ mainChartParams, onClickChart, ...props }) => {
+const MainChart = ({
+  mainChartParams,
+  onClickChart,
+  onClearDate,
+  dateSelected,
+  ...props
+}) => {
   const options = useMemo(
     () => ({
       responsive: true,
@@ -61,16 +67,17 @@ const MainChart = ({ mainChartParams, onClickChart, ...props }) => {
     setError(null);
     try {
       const { data } = await Woocommerce.getOrderData(params);
-      const dataTotal = data.intervals.map((interval) => ({
+      const dataTotal = data?.intervals.map((interval) => ({
         labels: DateHelper.convertDateOutputChart(
-          interval.interval,
-          params.interval
+          interval?.interval,
+          params?.interval
         ),
         dates: {
           date_start: interval.date_start,
           date_end: interval.date_end,
         },
       }));
+      console.log('shin');
       const dataIntervals = dataTotal.map((interval) => interval.labels);
       const dataNetRevenue = data.intervals.map(
         (interval) => interval.subtotals.net_revenue
@@ -100,7 +107,7 @@ const MainChart = ({ mainChartParams, onClickChart, ...props }) => {
 
   useEffect(() => {
     fetchData(mainChartParams);
-  }, [mainChartParams,fetchData]);
+  }, [mainChartParams, fetchData]);
   const chartRef = useRef(null);
 
   const printElementAtEvent = (element) => {

@@ -1,7 +1,12 @@
 import React, { useEffect } from "react";
 import { Col, Row } from "react-bootstrap";
-const MainChartTitle = ({ netSales, totalSale, ...props }) => {
-
+const MainChartTitle = ({
+  netSales,
+  totalSale,
+  onClearDate,
+  dateSelected,
+  ...props
+}) => {
   return (
     <Row>
       <Col sm="6">

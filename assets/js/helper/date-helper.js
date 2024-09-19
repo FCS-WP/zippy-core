@@ -131,19 +131,63 @@ export const DateHelper = {
 
     return dates;
   },
-  getLast7DaysRange() {
-    const today = new Date();
+  getDate(type) {
+    switch (type) {
+      case "custom":
+        const startOfMonth = `${this.getDayStartMonth()} 00:00:00`;
+        const endOfMonth = `${this.getDayEndMonth()} 23:59:00`;
+        return { date_end: endOfMonth, date_start: startOfMonth };
 
-    const startDate = new Date(today);
-    startDate.setDate(today.getDate() - 6); // 6 days before today
+      default:
+        const today = new Date();
 
-    const endDate = today;
+        const startDate = new Date(today);
+        startDate.setDate(today.getDate() - 6); // 6 days before today
 
-    const formatDate = (date) => date.toISOString().split("T")[0];
+        const endDate = today;
 
-    return {
-      date_start: formatDate(startDate),
-      date_end: formatDate(endDate),
-    };
+        const formatDate = (date) => date.toISOString().split("T")[0];
+
+        return {
+          date_start: `${formatDate(startDate)} 00:00:00`,
+          date_end: `${formatDate(endDate)} 23:59:00`,
+        };
+    }
+  },
+  getDayStartMonth() {
+    const now = new Date();
+
+    // Create a new Date object for the start of the current month
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // Format the date as DD/MM/YYYY
+    const day = String(startOfMonth.getDate()).padStart(2, "0");
+    const month = String(startOfMonth.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const year = startOfMonth.getFullYear();
+
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate;
+  },
+
+  getDayEndMonth() {
+    const now = new Date();
+
+    // Create a new Date object for the start of the current month
+    // Format the date as DD/MM/YYYY
+    const day = String(now.getDate()).padStart(2, "0");
+    const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const year = now.getFullYear();
+
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate;
+  },
+
+  getDateToString(date, time) {
+    const DayObject = new Date(date);
+    const day = String(DayObject.getDate()).padStart(2, "0");
+    const month = String(DayObject.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
+    const year = DayObject.getFullYear();
+
+    return `${year}-${month}-${day} ${time}`;
   },
 };
