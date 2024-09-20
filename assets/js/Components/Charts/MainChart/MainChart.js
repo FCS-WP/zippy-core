@@ -17,7 +17,6 @@ const MainChart = ({
   mainChartParams,
   onClickChart,
   onClearDate,
-  dateSelected,
   ...props
 }) => {
   const options = useMemo(
@@ -57,6 +56,7 @@ const MainChart = ({
         fill: false,
         borderColor: "rgba(34, 113, 177, 1)",
         tension: 0.1,
+        aspectRatio: 16 / 9,
       },
     ],
   });
@@ -75,10 +75,9 @@ const MainChart = ({
           date_end: interval.date_end,
         },
       }));
-      // console.log('shin');
       const dataIntervals = dataTotal.map((interval) => interval.labels);
       const dataNetRevenue = data.intervals.map(
-        (interval) => interval.subtotals.net_revenue
+        (interval) => interval.subtotals.net_revenue 
       );
       setdataTotal(dataTotal);
       // setNetSales(data.totals.net_revenue || 0);
@@ -121,16 +120,18 @@ const MainChart = ({
   };
 
   return (
-      <CardBody className="">
-        {loading && <Spinner animation="border" variant="primary" />}
-        {error && <Alert variant="danger">{error}</Alert>}
-        <Line
-          ref={chartRef}
-          data={chartData}
-          onClick={handleOnClickChart}
-          options={options}
-        />
-      </CardBody>
+    <CardBody className="">
+      {loading && <Spinner animation="border" variant="primary" />}
+      {error && <Alert variant="danger">{error}</Alert>}
+      <Line
+        height={430}
+        width={780}
+        ref={chartRef}
+        data={chartData}
+        onClick={handleOnClickChart}
+        options={options}
+      />
+    </CardBody>
   );
 };
 
