@@ -135,11 +135,21 @@ const Content = () => {
   };
 
   const onClickViewType = (type) => {
-    setOrderParams({
-      interval: "day",
-      after: dateParams.date_start,
-      before: dateParams.bedate_endfore,
-    });
+    if (currentView != "category") {
+      setcurrentView("");
+      setCurrentViewBy({
+        name: "",
+        type: "",
+      });
+      setOrderParams({
+        interval: "day",
+        after: dateParams.date_start,
+        before: dateParams.bedate_endfore,
+      });
+    } else {
+      setOrderParams(orderParams);
+    }
+
     setCategoriesParams({
       after: dateParams.date_start,
       before: dateParams.bedate_endfore,
@@ -148,11 +158,6 @@ const Content = () => {
     });
     setMainChartParams((prev) => ({ ...prev, interval: type }));
     setViewTypeSelected(type);
-    setcurrentView("");
-    setCurrentViewBy({
-      name: "",
-      type: "",
-    });
   };
   const onClickBarCallback = (cate_id, name, index) => {
     if (currentView == "day") {

@@ -72,17 +72,17 @@ class Zippy_User_Account_Expiry
         <h3><?php _e('Account Details', 'zippy-core-sg'); ?></h3>
         <table class="form-table">
             <tr>
-                <th><label for="creation_date"><?php _e('Account creation date', 'zippy-core-sg'); ?></label></th>
+                <th><label for="creation_date"><?php _e('Date Joined', 'zippy-core-sg'); ?></label></th>
                 <td>
                     <p class="form-control-static"><?php echo esc_html($formatted_creation_date); ?></p>
                 </td>
             </tr>
             <tr>
-                <th><label for="expiry_date"><?php _e('Account expiry date', 'zippy-core-sg'); ?></label></th>
+                <th><label for="expiry_date"><?php _e('Retention due date', 'zippy-core-sg'); ?></label></th>
                 <td>
                     <?php if ($is_admin) : ?>
                         <input type="text" name="expiry_date" id="expiry_date" value="<?php echo esc_attr($formatted_expiry_date); ?>" class="regular-text datepicker" />
-                        <p class="description"><?php _e('Set the expiry date for this user\'s account. Format: dd/mm/yyyy', 'zippy-core-sg'); ?></p>
+                        <p class="description"><?php _e('Set the retention due date for this user\'s account. Format: dd/mm/yyyy', 'zippy-core-sg'); ?></p>
                     <?php else : ?>
                         <p class="form-control-static"><?php echo esc_html($formatted_expiry_date); ?></p>
                     <?php endif; ?>
