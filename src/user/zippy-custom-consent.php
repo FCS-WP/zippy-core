@@ -8,6 +8,7 @@
 
 namespace Zippy_Core\Src\User;
 
+
 defined('ABSPATH') or die();
 
 class Zippy_Custom_Consent
@@ -62,6 +63,7 @@ class Zippy_Custom_Consent
             'custom_consent_section'
         );
 
+
         add_settings_field(
             'custom_consent_checkbox_label',
             __('Checkbox Label', 'custom-consent'),
@@ -69,6 +71,20 @@ class Zippy_Custom_Consent
             'general',
             'custom_consent_section'
         );
+
+        add_settings_field(
+            'custom_consent_time',
+            __('Default retention period', 'custom-consent'),
+            [$this, 'custom_consent_time_callback'],
+            'general',
+            'custom_consent_section'
+        );
+
+        register_setting('general', 'custom_consent_time', array(
+            'type' => 'string',
+            'sanitize_callback' => 'sanitize_textarea_field',
+            'default' => '5_year'
+        ));
 
         register_setting('general', 'custom_consent_description', array(
             'type' => 'string',
@@ -100,6 +116,25 @@ class Zippy_Custom_Consent
         );
     }
 
+
+    public function custom_consent_time_callback($user)
+    {
+
+        $retention_period = get_option('custom_consent_time');
+?>
+
+        <select name="custom_consent_time" id="custom_consent_time">
+            <option value="">Choose Year</option>
+            <?php
+            for ($i = 1; $i <= 10; $i++) {
+                echo '<option' . selected($retention_period, $i)  . ' value=' . $i . '>' . $i . ' Year' . '</option>';
+            } ?>
+
+        </select>
+
+
+    <?php
+    }
     public function custom_consent_section_callback()
     {
         echo '<p>' . __('Customize the consent description text and checkbox label.', 'custom-consent') . '</p>';
@@ -140,7 +175,7 @@ class Zippy_Custom_Consent
 
     public function disable_submit_if_consent_not_checked()
     {
-?>
+    ?>
         <script type="text/javascript">
             document.addEventListener('DOMContentLoaded', function() {
                 var consentCheckbox = document.getElementById('custom_consent');
@@ -159,12 +194,14 @@ class Zippy_Custom_Consent
         </script>
         <style>
             .custom-consent .description {
-               margin-bottom: 1rem; 
+                margin-bottom: 1rem;
             }
-            .custom-consent label{
+
+            .custom-consent label {
                 margin: 10px 0;
             }
-            .woocommerce-privacy-policy-text{
+
+            .woocommerce-privacy-policy-text {
                 display: none;
             }
         </style>
@@ -247,18 +284,7 @@ class Zippy_Custom_Consent
                     </td>
                 </tr>
             </table>
-            <script type="text/javascript">
-                document.addEventListener('DOMContentLoaded', function() {
-                    var customConsent = document.getElementById('custom_consent');
-                    var marketingConsent = document.getElementById('marketing_consent');
-
-                    // Sync Marketing Consent with Custom Consent
-                    customConsent.addEventListener('change', function() {
-                        marketingConsent.value = customConsent.value;
-                    });
-                });
-            </script>
-        <?php
+<?php
         }
     }
 
@@ -268,10 +294,9 @@ class Zippy_Custom_Consent
             return false;
         }
 
-        if (isset($_POST['custom_consent'])) {
+        if (isset($_POST['custom_consent']) && isset($_POST['marketing_consent'])) {
             update_user_meta($user_id, 'custom_consent', sanitize_text_field($_POST['custom_consent']));
-            update_user_meta($user_id, 'marketing_consent', sanitize_text_field($_POST['custom_consent']));
+            update_user_meta($user_id, 'marketing_consent', sanitize_text_field($_POST['marketing_consent']));
         }
     }
-
 }

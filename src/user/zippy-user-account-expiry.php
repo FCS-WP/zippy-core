@@ -11,13 +11,13 @@ class Zippy_User_Account_Expiry
     /**
      * @return Zippy_User_Account_Expiry
      */
-  
+
     public static function get_instance()
     {
-      if (is_null(self::$_instance)) {
-        self::$_instance = new self();
-      }
-      return self::$_instance;
+        if (is_null(self::$_instance)) {
+            self::$_instance = new self();
+        }
+        return self::$_instance;
     }
 
     public function __construct()
@@ -46,8 +46,10 @@ class Zippy_User_Account_Expiry
 
         add_action('template_redirect', [$this, 'show_account_expired_message']);
         add_action('wp_head', [$this, 'add_inline_css_for_account_expired_message']);
-        
+
         add_action('admin_footer', [$this, 'initialize_datepicker']);
+
+        date_default_timezone_set('Asia/Singapore');
     }
 
     public function add_expiry_date_field($user)
@@ -61,28 +63,28 @@ class Zippy_User_Account_Expiry
         $creation_date = get_the_author_meta('user_registered', $user->ID);
         $formatted_creation_date = date('d/m/Y', strtotime($creation_date));
 
-        ?>
-        <h3><?php _e('Account Details', 'textdomain'); ?></h3>
+?>
+        <h3><?php _e('Account Details', 'zippy-core-sg'); ?></h3>
         <table class="form-table">
             <tr>
-                <th><label for="creation_date"><?php _e('Account creation date', 'textdomain'); ?></label></th>
+                <th><label for="creation_date"><?php _e('Account creation date', 'zippy-core-sg'); ?></label></th>
                 <td>
                     <p class="form-control-static"><?php echo esc_html($formatted_creation_date); ?></p>
                 </td>
             </tr>
             <tr>
-                <th><label for="expiry_date"><?php _e('Account expiry date', 'textdomain'); ?></label></th>
+                <th><label for="expiry_date"><?php _e('Account expiry date', 'zippy-core-sg'); ?></label></th>
                 <td>
                     <?php if ($is_admin) : ?>
                         <input type="text" name="expiry_date" id="expiry_date" value="<?php echo esc_attr($formatted_expiry_date); ?>" class="regular-text datepicker" />
-                        <p class="description"><?php _e('Set the expiry date for this user\'s account. Format: dd/mm/yyyy', 'textdomain'); ?></p>
+                        <p class="description"><?php _e('Set the expiry date for this user\'s account. Format: dd/mm/yyyy', 'zippy-core-sg'); ?></p>
                     <?php else : ?>
                         <p class="form-control-static"><?php echo esc_html($formatted_expiry_date); ?></p>
                     <?php endif; ?>
                 </td>
             </tr>
         </table>
-        <?php
+    <?php
     }
 
     public function save_expiry_date_field($user_id)
@@ -99,19 +101,21 @@ class Zippy_User_Account_Expiry
 
     public function set_expiry_date_on_registration($user_id)
     {
-        $expiry_date = date('Y-m-d', strtotime('+5 years'));
+        $retention_period = get_option('custom_consent_time');
+
+        $expiry_date = date('Y-m-d', strtotime('+' . $retention_period . 'years'));
         update_user_meta($user_id, 'expiry_date', $expiry_date);
     }
 
     public function add_creation_date_column($columns)
     {
-        $columns['creation_date'] = __('Creation Date', 'textdomain');
+        $columns['creation_date'] = __('Date Joined', 'zippy-core-sg');
         return $columns;
     }
 
     public function add_expiry_date_column($columns)
     {
-        $columns['expiry_date'] = __('Expiry Date', 'textdomain');
+        $columns['expiry_date'] = __('Retention due date', 'zippy-core-sg');
         return $columns;
     }
 
@@ -131,7 +135,7 @@ class Zippy_User_Account_Expiry
             $expiry_date = get_user_meta($user_id, 'expiry_date', true);
             $formatted_expiry_date = $expiry_date ? date('d/m/Y', strtotime($expiry_date)) : '';
             if ($expiry_date && strtotime($expiry_date) < time()) {
-                return __('Expired', 'textdomain');
+                return __('Expired', 'zippy-core-sg');
             } else {
                 return esc_html($formatted_expiry_date);
             }
@@ -146,7 +150,7 @@ class Zippy_User_Account_Expiry
 
     public function initialize_datepicker()
     {
-        ?>
+    ?>
         <script type="text/javascript">
             jQuery(document).ready(function($) {
                 $('.datepicker').datepicker({
@@ -154,7 +158,7 @@ class Zippy_User_Account_Expiry
                 });
             });
         </script>
-        <?php
+<?php
     }
 
     public function check_user_expiry_date($user_login, $user)
@@ -173,7 +177,7 @@ class Zippy_User_Account_Expiry
     public function show_account_expired_message()
     {
         if (isset($_GET['account_status']) && $_GET['account_status'] === 'expired') {
-            $message = __('Your account has expired. Please contact the administrator for further details.', 'textdomain');
+            $message = __('Your account has expired. Please contact the administrator for further details.', 'zippy-core-sg');
             echo '<div class="account-expired-message">' . esc_html($message) . '</div>';
         }
     }
@@ -198,4 +202,3 @@ class Zippy_User_Account_Expiry
         }
     }
 }
-

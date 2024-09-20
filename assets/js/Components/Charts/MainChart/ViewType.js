@@ -30,7 +30,7 @@ const ViewType = ({
   return (
     <CardBody className="reportFilter">
       <Row>
-        <Col md="6" className="d-flex align-items-center">
+        <Col md="6" xs="6" className="d-flex view-type">
           <span> Currently viewing By:</span>
 
           {dateSelected?.name && (
@@ -48,7 +48,7 @@ const ViewType = ({
             </div>
           )}
         </Col>
-        <Col md="6">
+        <Col md="6" xs="6">
           <DropdownButton
             title={`By ${viewTypeSelected}`}
             variant="tranparent"

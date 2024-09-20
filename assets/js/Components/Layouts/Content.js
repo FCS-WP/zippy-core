@@ -48,6 +48,8 @@ const Content = () => {
   });
 
   const clickFilter = (key) => {
+    setcurrentView("");
+
     setPeriodFilter(key);
     const date = DateHelper.getDate(key);
     setDateParams(date);
@@ -197,12 +199,6 @@ const Content = () => {
   useEffect(() => {
     fetchData(categoriesParams);
   }, [categoriesParams]);
-  // useEffect(() => {
-  //   console.log("main", mainChartParams);
-  //   console.log("cate", categoriesParams);
-  //   console.log("date", dateParams);
-  // }, [mainChartParams, categoriesParams, dateParams]);
-
   return (
     <div id="zippy-content">
       <Row>
@@ -233,9 +229,9 @@ const Content = () => {
           </Card>
         </Col>
         <Col sm="6">
-          <Row>
+          <Row className="right-chart">
             <TopTotal params={orderParams} />
-            <Col>
+            <Col sm="12">
               <RightChart
                 onClickCallback={onClickBarCallback}
                 categoriesParams={categoriesParams}
