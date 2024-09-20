@@ -60,7 +60,7 @@ const ReportFilter = ({
         <div className="reportFilter">
           <Row>
             <Col sm="12">
-              <ButtonGroup className="mb-0 date-filter-button align-items-center">
+              <ButtonGroup className="mb-0 flex-wrap gap-1 date-filter-button align-items-center">
                 {filters.map((filter) => (
                   <Button
                     key={filter.key}
@@ -73,7 +73,7 @@ const ReportFilter = ({
                   </Button>
                 ))}
                 {activeFilter === "custom" && (
-                  <>
+                  <div className="date-picker">
                     <DatePicker
                       className="ml-3 mr-1"
                       selected={startDate}
@@ -105,7 +105,7 @@ const ReportFilter = ({
                     >
                       Go
                     </Button>
-                  </>
+                  </div>
                 )}
               </ButtonGroup>
             </Col>

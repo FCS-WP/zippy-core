@@ -9,22 +9,21 @@ const MainChartTitle = ({
 }) => {
   return (
     <CardBody className="border-bottom">
+      <Row>
+        <Col sm="6">
+          <h4>Total Sales</h4>
+        </Col>
+        <Col sm="3" xs="6">
+          <label>Total Sales</label>
 
-    <Row>
-      <Col sm="6">
-        <h4>Total Sales</h4>
-      </Col>
-      <Col sm="3">
-        <label>Total Sales</label>
+          <h5>${totalSale}</h5>
+        </Col>
+        <Col sm="3" xs="6">
+          <label>Net Sales</label>
 
-        <h5>${totalSale}</h5>
-      </Col>
-      <Col sm="3">
-        <label>Net Sales</label>
-
-        <h5>${netSales}</h5>
-      </Col>
-    </Row>
+          <h5>${netSales}</h5>
+        </Col>
+      </Row>
     </CardBody>
   );
 };

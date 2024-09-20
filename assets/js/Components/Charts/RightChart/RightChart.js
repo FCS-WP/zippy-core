@@ -95,9 +95,6 @@ const RightChart = ({ categoriesParams, onClickCallback }) => {
     printElementAtEvent(getElementAtEvent(chart, event));
   };
 
-  // const onClick = () =>{
-
-  // }
   return (
     <Card className="mt-0">
       <CardBody>

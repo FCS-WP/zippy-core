@@ -18,7 +18,7 @@ const TopTotal = ({ params, ...props }) => {
 
   return (
     <>
-      <Col sm="6">
+      <Col >
         <Card className="mt-0">
           <CardBody>
             <label>Orders</label>
@@ -26,7 +26,7 @@ const TopTotal = ({ params, ...props }) => {
           </CardBody>
         </Card>
       </Col>
-      <Col sm="6">
+      <Col>
         <Card className="mt-0">
           <CardBody>
             <label>Products Sold</label>
