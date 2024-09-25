@@ -12,7 +12,7 @@ const Content = () => {
   const [periodFilter, setPeriodFilter] = useState("week");
 
   const [activeFilter, setActiveFilter] = useState("last_week");
-  const [dateSelected, setDateSelected] = useState();
+  const [currentViewBy, setCurrentViewBy] = useState();
   const [viewTypeSelected, setViewTypeSelected] = useState("day");
   const [currentView, setcurrentView] = useState("");
   const [netSales, setNetSales] = useState(0);
@@ -70,7 +70,7 @@ const Content = () => {
       after: date.date_start,
       before: date.date_end,
     }));
-    setDateSelected({
+    setCurrentViewBy({
       name: "",
       type: "",
     });
@@ -92,7 +92,7 @@ const Content = () => {
       interval: "day",
     });
     const dataSelected = DateHelper.getDateOutputSelect(date, viewTypeSelected);
-    setDateSelected({
+    setCurrentViewBy({
       name: dataSelected,
       type: "day",
     });
@@ -127,7 +127,7 @@ const Content = () => {
       after: dateParams.date_start,
       before: dateParams.bedate_endfore,
     });
-    setDateSelected({
+    setCurrentViewBy({
       name: "",
       type: "",
     });
@@ -135,11 +135,21 @@ const Content = () => {
   };
 
   const onClickViewType = (type) => {
-    setOrderParams({
-      interval: "day",
-      after: dateParams.date_start,
-      before: dateParams.bedate_endfore,
-    });
+    if (currentView != "category") {
+      setcurrentView("");
+      setCurrentViewBy({
+        name: "",
+        type: "",
+      });
+      setOrderParams({
+        interval: "day",
+        after: dateParams.date_start,
+        before: dateParams.bedate_endfore,
+      });
+    } else {
+      setOrderParams(orderParams);
+    }
+
     setCategoriesParams({
       after: dateParams.date_start,
       before: dateParams.bedate_endfore,
@@ -148,23 +158,20 @@ const Content = () => {
     });
     setMainChartParams((prev) => ({ ...prev, interval: type }));
     setViewTypeSelected(type);
-    setcurrentView("");
-    setDateSelected({
-      name: "",
-      type: "",
-    });
   };
-  const onClickBarCallback = (cate_id, name) => {
+  const onClickBarCallback = (cate_id, name, index) => {
     if (currentView == "day") {
       return;
     }
 
     setOrderParams((prev) => ({ ...prev, categories: cate_id }));
     setMainChartParams((prev) => ({ ...prev, categories: cate_id }));
-    setDateSelected({
+    setCurrentViewBy({
       name: name,
       type: "category",
+      index: index,
     });
+
     setcurrentView("category");
   };
 
@@ -188,17 +195,17 @@ const Content = () => {
       before: dateParams.date_end,
     }));
   }, [dateParams]);
+
   const fetchData = useCallback(async (params) => {
     const { data } = await Woocommerce.getOrderData(params);
     const dataTotal = data.totals;
     setNetSales(dataTotal.net_revenue || 0);
     setTotalSale(dataTotal.net_revenue || 0);
-    // setProductSold(dataTotal.items_sold || 0);
   }, []);
 
   useEffect(() => {
-    fetchData(categoriesParams);
-  }, [categoriesParams]);
+    fetchData(orderParams);
+  }, [orderParams]);
   return (
     <div id="zippy-content">
       <Row>
@@ -218,11 +225,10 @@ const Content = () => {
               onClearDate={onClearDate}
               viewTypeSelected={viewTypeSelected}
               onClickViewType={onClickViewType}
-              dateSelected={dateSelected}
+              currentViewBy={currentViewBy}
             />
             <MainChart
               onClearDate={onClearDate}
-              dateSelected={dateSelected}
               mainChartParams={mainChartParams}
               onClickChart={onClickChart}
             />
@@ -233,6 +239,7 @@ const Content = () => {
             <TopTotal params={orderParams} />
             <Col sm="12">
               <RightChart
+                currentViewBy={currentViewBy}
                 onClickCallback={onClickBarCallback}
                 categoriesParams={categoriesParams}
               />

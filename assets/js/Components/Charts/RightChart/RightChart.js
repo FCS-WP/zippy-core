@@ -9,8 +9,9 @@ import { Card, CardBody, Spinner, Alert } from "react-bootstrap";
 import { Bar } from "react-chartjs-2";
 import { Woocommerce } from "../../../Woocommerce/woocommerce";
 import { Line, getElementAtEvent } from "react-chartjs-2";
+import { type } from "jquery";
 
-const RightChart = ({ categoriesParams, onClickCallback }) => {
+const RightChart = ({ categoriesParams, onClickCallback, currentViewBy }) => {
   const options = useMemo(
     () => ({
       responsive: true,
@@ -27,7 +28,6 @@ const RightChart = ({ categoriesParams, onClickCallback }) => {
     }),
     []
   );
-
   const [chartData, setChartData] = useState({
     labels: [],
     datasets: [
@@ -35,6 +35,8 @@ const RightChart = ({ categoriesParams, onClickCallback }) => {
         label: "Net Revenue",
         data: [],
         tension: 0.1,
+        aspectRatio: 16 / 9,
+        backgroundColor: "rgba(26, 174, 248, 1.0)",
       },
     ],
   });
@@ -77,6 +79,21 @@ const RightChart = ({ categoriesParams, onClickCallback }) => {
   }, []);
 
   useEffect(() => {
+    if (typeof currentViewBy == "undefined") return;
+    setChartData((prev) => ({
+      ...prev,
+      datasets: prev.datasets.map((dataset) => ({
+        ...dataset,
+        backgroundColor: (context) => {
+          const index = context.dataIndex;
+          return index === currentViewBy.index
+            ? "rgba(0, 124, 186, 1)"
+            : "rgba(26, 174, 248, 1.0)";
+        },
+      })),
+    }));
+  }, [currentViewBy]);
+  useEffect(() => {
     if (categoriesParams) {
       fetchData(categoriesParams);
     }
@@ -85,8 +102,7 @@ const RightChart = ({ categoriesParams, onClickCallback }) => {
   const printElementAtEvent = async (element) => {
     if (!element.length) return;
     const { index } = element[0];
-
-    onClickCallback(data[index].category_id, chartData.labels[index]);
+    onClickCallback(data[index].category_id, chartData.labels[index], index);
   };
 
   const handleOnClickChart = (event) => {
@@ -101,6 +117,8 @@ const RightChart = ({ categoriesParams, onClickCallback }) => {
         {loading && <Spinner animation="border" variant="primary" />}
         {error && <Alert variant="danger">{error}</Alert>}
         <Bar
+          height={450}
+          width={800}
           ref={chartRef}
           data={chartData}
           options={options}

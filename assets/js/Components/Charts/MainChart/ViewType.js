@@ -10,7 +10,7 @@ import {
 const ViewType = ({
   viewTypeSelected,
   onClickViewType,
-  dateSelected,
+  currentViewBy,
   onClearDate,
 }) => {
   const viewTypes = [
@@ -33,14 +33,14 @@ const ViewType = ({
         <Col md="6" xs="6" className="d-flex view-type">
           <span> Currently viewing By:</span>
 
-          {dateSelected?.name && (
+          {currentViewBy?.name && (
             <div className="font-weight-bold small">
               <Badge
                 variant="dark"
                 className="badge-dark inline-block align-items-center ml-2 pl-2 pr-2 d-flex"
-                onClick={() => onClearDate(dateSelected.type)}
+                onClick={() => onClearDate(currentViewBy.type)}
               >
-                <p className="select-bage"> {dateSelected.name}</p>
+                <p className="select-bage"> {currentViewBy.name}</p>
                 <button className="close-btn" aria-label="Clear selected date">
                   ×
                 </button>
