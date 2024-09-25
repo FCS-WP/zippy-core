@@ -40,10 +40,10 @@ class Zippy_Custom_Consent
         add_action('wp_footer', [$this, 'disable_submit_if_consent_not_checked']);
         add_filter('woocommerce_registration_errors', [$this, 'validate_consent_checkbox'], 10, 3);
         add_action('woocommerce_created_customer', [$this, 'save_consent_checkbox_data']);
-        add_action('show_user_profile', [$this, 'show_consent_in_user_profile']);
+        add_action('show_user_profile', [$this, 'show_consent_in_user_profile'],19,2);
         add_action('edit_user_profile', [$this, 'show_consent_in_user_profile'],19,2);
-        add_action('personal_options_update', [$this, 'save_consent_in_user_profile']);
-        add_action('edit_user_profile_update', [$this, 'save_consent_in_user_profile']);
+        add_action('personal_options_update', [$this, 'save_consent_in_user_profile'],19,2);
+        add_action('edit_user_profile_update', [$this, 'save_consent_in_user_profile'],19,2);
     }
 
     public function custom_consent_settings_init()

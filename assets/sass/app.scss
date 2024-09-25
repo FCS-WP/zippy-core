@@ -1,12 +1,25 @@
 @import "./component/mixins";
 @import "./component/style";
+html {
+  margin: 0px !important;
+}
+body.woocommerce_page_admin-page-wc-zippy-dashboard {
+  margin: 0px !important;
+  padding: 0 !important;
+  max-width: none !important;
+  border: 0px !important;
+}
 #zippy-root {
   @import "bootstrap/scss/bootstrap";
 }
 #zippy-root {
-  position: relative;
-  margin-left: -20px;
-  margin-top: 20px;
+  #zippy-authentication,
+  #zippy-main {
+    position: relative;
+    margin-left: -20px;
+    margin-top: 20px;
+  }
+
   #zippy-content {
     padding: 0 20px;
     .card {

@@ -73,6 +73,14 @@ module.exports = [
             filename: destOutput + "/build/img/[name][ext]",
           },
         },
+        //load svg
+        {
+          test: /\.svg$/,
+          use:  ['@svgr/webpack'],
+          issuer: {
+              and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
+          },
+        }
       ],
     },
     // externals: {
