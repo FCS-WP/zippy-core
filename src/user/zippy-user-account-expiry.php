@@ -3,7 +3,7 @@
 namespace Zippy_Core\Src\User;
 
 defined('ABSPATH') or die();
-
+use Zippy_Core\Utils\Zippy_Utils_Core;
 class Zippy_User_Account_Expiry
 {
     protected static $_instance = null;
@@ -68,28 +68,14 @@ class Zippy_User_Account_Expiry
         $creation_date = get_the_author_meta('user_registered', $user->ID);
         $formatted_creation_date = date('d/m/Y', strtotime($creation_date));
 
-?>
-        <h3><?php _e('Account Details', 'zippy-core-sg'); ?></h3>
-        <table class="form-table">
-            <tr>
-                <th><label for="creation_date"><?php _e('Date Joined', 'zippy-core-sg'); ?></label></th>
-                <td>
-                    <p class="form-control-static"><?php echo esc_html($formatted_creation_date); ?></p>
-                </td>
-            </tr>
-            <tr>
-                <th><label for="expiry_date"><?php _e('Retention due date', 'zippy-core-sg'); ?></label></th>
-                <td>
-                    <?php if ($is_admin) : ?>
-                        <input type="text" name="expiry_date" id="expiry_date" value="<?php echo esc_attr($formatted_expiry_date); ?>" class="regular-text datepicker" />
-                        <p class="description"><?php _e('Set the retention due date for this user\'s account. Format: dd/mm/yyyy', 'zippy-core-sg'); ?></p>
-                    <?php else : ?>
-                        <p class="form-control-static"><?php echo esc_html($formatted_expiry_date); ?></p>
-                    <?php endif; ?>
-                </td>
-            </tr>
-        </table>
-    <?php
+        echo Zippy_Utils_Core::get_template('admin-user-account-expiry.php', [
+            'current_user' =>   $current_user,
+            'is_admin' =>   $is_admin,
+            'expiry_date' =>   $expiry_date,
+            'creation_date' =>   $creation_date,
+            'formatted_expiry_date' =>   $formatted_expiry_date,
+            'formatted_creation_date' =>   $formatted_creation_date
+        ], dirname(__FILE__), '/templates');
     }
 
     public function save_expiry_date_field($user_id)
@@ -106,7 +92,7 @@ class Zippy_User_Account_Expiry
 
     public function set_expiry_date_on_registration($user_id)
     {
-        $retention_period = get_option('custom_consent_time');
+        $retention_period = get_option('mpda_consent_time');
 
         $expiry_date = date('Y-m-d', strtotime('+' . $retention_period . 'years'));
         update_user_meta($user_id, 'expiry_date', $expiry_date);
