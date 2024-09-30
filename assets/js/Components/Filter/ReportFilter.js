@@ -1,9 +1,8 @@
-import { Dropdown } from "bootstrap";
 import React, { useState } from "react";
 import { Button, Col, Row, ButtonGroup } from "react-bootstrap";
-import { Badge, DropdownButton, DropdownItem } from "react-bootstrap/esm";
 import DatePicker from "react-datepicker";
 import { DateHelper } from "../../helper/date-helper";
+
 const ReportFilter = ({
   onClick,
   activeFilter,
@@ -11,18 +10,18 @@ const ReportFilter = ({
   ...props
 }) => {
   const filters = [
-    // {
-    //   title: "Year",
-    //   key: "year",
-    // },
-    // {
-    //   title: "Last month",
-    //   key: "last_month",
-    // },
-    // {
-    //   title: "This Month",
-    //   key: "month",
-    // },
+    {
+      title: "Year",
+      key: "year",
+    },
+    {
+      title: "Last month",
+      key: "last_month",
+    },
+    {
+      title: "This Month",
+      key: "this_month",
+    },
     {
       title: "Last 7 days",
       key: "last_week",

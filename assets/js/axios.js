@@ -18,7 +18,6 @@ export const makeRequest = async (endpoint, params = {}, method = "GET") => {
 
     res = await api.request(config);
     const data = res.data;
-    console.log(data)
     return { data };
   } catch {
     (error) => {

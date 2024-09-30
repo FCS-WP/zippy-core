@@ -80,8 +80,6 @@ const MainChart = ({
         (interval) => interval.subtotals.net_revenue 
       );
       setdataTotal(dataTotal);
-      // setNetSales(data.totals.net_revenue || 0);
-      // setTotalSale(data.totals.net_revenue || 0);
       setChartData({
         labels: dataIntervals,
         datasets: [

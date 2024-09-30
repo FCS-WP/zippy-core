@@ -1,23 +1,22 @@
+import {
+  formatISO,
+  startOfDay,
+  endOfDay,
+  startOfMonth,
+  setDay,
+  endOfMonth,
+  format,
+  parseISO,
+  startOfYear,
+  addWeeks,
+} from "date-fns";
+
 export const DateHelper = {
-  convertDateToRange(dateString) {
-    const date = new Date(dateString);
-
-    const date_start = new Date(date);
-    date_start.setHours(0, 0, 0, 0);
-
-    const date_end = new Date(date);
-    date_end.setHours(23, 59, 59, 999);
-
-    return {
-      date_start: date_start.toISOString(),
-      date_end: date_end.toISOString(),
-    };
-  },
   getDateOutputSelect(dateData, type) {
     const { date_start, date_end } = dateData;
 
     const removeTimeFromDate = (dateString) => {
-      return dateString.split(" ")[0]; // Split by space and return the date part
+      return dateString.split(" ")[0];
     };
 
     switch (type) {
@@ -36,31 +35,25 @@ export const DateHelper = {
   convertDateOutputChart(dateData, type) {
     switch (type) {
       case "week":
-        const [yearDataWeek, weekDataWeek] = dateData.split("-");
+        const [yearDataOfWeek, dateDataOfWeek] = dateData
+          .split("-")
+          .map(Number);
 
-        // Create a date object for the first day of the year
-        const date = new Date(yearDataWeek, 0, 1);
+        const start = startOfYear(new Date(yearDataOfWeek, 0, 1));
 
-        // Calculate the first day of the specified week (1 = Monday)
-        const daysOffset = (weekDataWeek - 1) * 7 - date.getDay() + 1;
-        date.setDate(date.getDate() + daysOffset);
+        const date = addWeeks(start, dateDataOfWeek - 1);
 
-        // Format the date to DD-MM-YYYY
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
-        const formattedDate = `${yearDataWeek}-${month}-${day}`;
+        return format(date, "yyyy-MMM-dd");
 
-        return formattedDate;
       case "month":
-        const [yearDataMonth, monthDataMonth] = dateData.split("-");
-
-        const monthDate = `${yearDataMonth}-${monthDataMonth}`;
-
-        return monthDate;
+        return format(parseISO(dateData), "yyyy-MMM");
       default:
-        return dateData;
+        return format(parseISO(dateData), "yyyy-MMM-dd");
     }
   },
+
+  // Get Date
+
   getWeekStartAndEnd(dateData) {
     const date = new Date(dateData);
     const dayOfWeek = date.getDay(); // 0 (Sunday) to 6 (Saturday)
@@ -134,60 +127,41 @@ export const DateHelper = {
   getDate(type) {
     switch (type) {
       case "custom":
-        const startOfMonth = `${this.getDayStartMonth()} 00:00:00`;
-        const endOfMonth = `${this.getDayEndMonth()} 23:59:00`;
-        return { date_end: endOfMonth, date_start: startOfMonth };
-
-      default:
-        const today = new Date();
-
-        const startDate = new Date(today);
-        startDate.setDate(today.getDate() - 6); // 6 days before today
-
-        const endDate = today;
-
-        const formatDate = (date) => date.toISOString().split("T")[0];
-
+        return { date_start: this.getDayStartMonth(), date_end: this.getNow() };
+      case "this_month":
         return {
-          date_start: `${formatDate(startDate)} 00:00:00`,
-          date_end: `${formatDate(endDate)} 23:59:00`,
+          date_start: this.getDayStartMonth(),
+          date_end: this.getDayEndMonth(),
+        };
+      default:
+        return {
+          date_start: this.getLast7Days(),
+          date_end: this.getNow(),
         };
     }
   },
+  getLast7Days() {
+    const result = formatISO(startOfDay(setDay(new Date(), -6)));
+    return result;
+  },
   getDayStartMonth() {
-    const now = new Date();
-
-    // Create a new Date object for the start of the current month
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-    // Format the date as DD/MM/YYYY
-    const day = String(startOfMonth.getDate()).padStart(2, "0");
-    const month = String(startOfMonth.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
-    const year = startOfMonth.getFullYear();
-
-    const formattedDate = `${year}-${month}-${day}`;
-    return formattedDate;
+    const result = formatISO(startOfMonth(new Date()));
+    return result;
   },
 
   getDayEndMonth() {
-    const now = new Date();
-
-    // Create a new Date object for the start of the current month
-    // Format the date as DD/MM/YYYY
-    const day = String(now.getDate()).padStart(2, "0");
-    const month = String(now.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
-    const year = now.getFullYear();
-
-    const formattedDate = `${year}-${month}-${day}`;
-    return formattedDate;
+    const result = formatISO(endOfDay(endOfMonth(new Date())));
+    return result;
   },
 
-  getDateToString(date, time) {
-    const DayObject = new Date(date);
-    const day = String(DayObject.getDate()).padStart(2, "0");
-    const month = String(DayObject.getMonth() + 1).padStart(2, "0"); // Months are zero-indexed
-    const year = DayObject.getFullYear();
-
-    return `${year}-${month}-${day} ${time}`;
+  getNow() {
+    const result = formatISO(endOfDay(new Date()));
+    return result;
+  },
+  startOfDateToString(date) {
+    return formatISO(startOfDay(new Date(date)));
+  },
+  endOfDateToString(date) {
+    return formatISO(endOfDay(new Date(date)));
   },
 };
