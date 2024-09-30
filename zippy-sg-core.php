@@ -34,7 +34,7 @@ if (!defined('ZIPPY_CORE_NAME')) {
 }
 
 if (!defined('ZIPPY_CORE_PREFIX')) {
-	define('ZIPPY_CORE_PREFIX', 'zippy_core');
+	define('ZIPPY_CORE_PREFIX', 'zippysg_core');
 }
 
 /* Set constant path to the plugin directory. */
@@ -65,7 +65,7 @@ use	Zippy_Core\Src\Admin\Zippy_Admin_Url;
 
 use Zippy_Core\Src\Core\Zippy_Core;
 
-use Zippy_Core\Src\User\Zippy_Custom_Consent;
+use Zippy_Core\Src\User\Zippy_MPDA_Consent;
 
 use Zippy_Core\Src\User\Zippy_User_Account_Expiry;
 
@@ -82,7 +82,7 @@ Zippy_Core::get_instance();
 
 Zippy_Admin_Url::get_instance();
 
-Zippy_Custom_Consent::get_instance();
+Zippy_MPDA_Consent::get_instance();
 
 Zippy_User_Account_Expiry::get_instance();
 

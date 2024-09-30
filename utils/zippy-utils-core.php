@@ -68,8 +68,8 @@ class Zippy_Utils_Core
   public static function divider()
   {
     return array(
-      'id'          => PREFIX . '_divider',
-      'name'       => __('', PREFIX . 'woocommerce-settings-tab'),
+      'id'          => ZIPPY_CORE_PREFIX . '_divider',
+      'name'       => __('', ZIPPY_CORE_PREFIX . 'woocommerce-settings-tab'),
       'type'        => 'title',
       'desc' => '<hr>'
     );
@@ -195,12 +195,12 @@ class Zippy_Utils_Core
     $template = $absolute_path . $relative_path . $template_name;
 
     //check for template in plugin's folder `includes/`
-    if (file_exists(ZIPPY_PAY_DIR_PATH . $relative_path . $template_name)) {
-      $template = ZIPPY_PAY_DIR_PATH . $relative_path . $template_name;
+    if (file_exists(ZIPPY_CORE_DIR_PATH . $relative_path . $template_name)) {
+      $template = ZIPPY_CORE_DIR_PATH . $relative_path . $template_name;
     }
 
-    $template = apply_filters_deprecated(PREFIX . '\util\get_template\path_file', [$template, $vars], '1.0.0', PREFIX . '\util\get_template\template');
-    $template = apply_filters(PREFIX . '\util\get_template\template', $template, $template_name, $absolute_path, $relative_path);
+    $template = apply_filters_deprecated(ZIPPY_CORE_PREFIX . '\util\get_template\path_file', [$template, $vars], '1.0.0', ZIPPY_CORE_PREFIX . '\util\get_template\template');
+    $template = apply_filters(ZIPPY_CORE_PREFIX . '\util\get_template\template', $template, $template_name, $absolute_path, $relative_path);
 
     if (file_exists($template)) {
 
