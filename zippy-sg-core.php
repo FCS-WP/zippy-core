@@ -59,6 +59,7 @@ load_plugin_textdomain('zippy-sg-core', false, basename(dirname(__FILE__)) . '/l
 // Includes
  --------------------------- --------------------------------------------- */
 require ZIPPY_CORE_DIR_PATH . '/includes/autoload.php';
+require ZIPPY_CORE_DIR_PATH . '/vendor/autoload.php';
 
 use	Zippy_Core\Src\Admin\Zippy_Admin_Url;
 
@@ -69,6 +70,8 @@ use Zippy_Core\Src\User\Zippy_MPDA_Consent;
 use Zippy_Core\Src\User\Zippy_User_Account_Expiry;
 
 use Zippy_Core\Src\Analytics\Zippy_Analytics;
+
+use Zippy_Core\Src\Woocommerce\Zippy_Woocommerce;
 
 /**
  *
@@ -84,3 +87,5 @@ Zippy_MPDA_Consent::get_instance();
 Zippy_User_Account_Expiry::get_instance();
 
 Zippy_Analytics::get_instance();
+
+Zippy_Woocommerce::get_instance();

@@ -1,17 +1,27 @@
-import { makeRequest } from "../axios";
+import { makeRequest, wooAuthentication } from "../axios";
+import { fetchCredentials } from "../axios";
 
-makeRequest;
 export const Woocommerce = {
   async getTotalSales(params) {
     return await makeRequest("/wc/v3/reports/sales", params);
   },
-  async getCategoriesSale(params){
+  async getCategoriesSale(params) {
     return await makeRequest("/wc-analytics/reports/categories", params);
   },
-  async getCategories(params){
+  async getCategories(params) {
     return await makeRequest("/wc-analytics/products/categories", params);
   },
-  async getOrderData(params){
+  async getOrderData(params) {
     return await makeRequest("/wc-analytics/reports/products/stats", params);
-  }
+  },
+
+  async getCredentials(params) {
+    return await fetchCredentials(
+      "/wc-analytics/reports/products/stats",
+      params
+    );
+  },
+  async wooAuthentication(params) {
+    return await wooAuthentication("/", params);
+  },
 };

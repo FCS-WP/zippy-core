@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../Header/Header";
-import Content from "./Content";
+import Content from "../Layouts/Content";
 function Dashboard() {
   return (
     <>

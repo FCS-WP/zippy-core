@@ -49,4 +49,42 @@
       align-items: center;
     }
   }
+
+  #zippy-authentication {
+    background: #fff;
+    padding: 35px 0px;
+
+    @include tablet {
+      padding: 75px 0px;
+
+    }
+    .authen-thumnail {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      @include tablet {
+        gap: 50px;
+      }
+      img {
+        object-fit: scale-down;
+        max-width: 120px;
+        max-height: 60px;
+
+        @include tablet {
+          max-width: 150px;
+        }
+      }
+    }
+
+    .btn-auth{
+      min-width: 150px;
+      padding: 10px 10px;
+      border-radius: 32px;
+    }
+    .content-wrapper{
+      max-width: 750px;
+      margin: 0 auto;
+    }
+  }
 }
