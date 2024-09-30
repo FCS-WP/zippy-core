@@ -13,6 +13,28 @@ defined('ABSPATH') or die();
 class Zippy_Utils_Core
 {
 
+  public static function encrypt_data_input($input)
+  {
+    $encryption_key = ZIPPY_CORE_PREFIX;
+    $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+    $input_data = openssl_encrypt($input, 'aes-256-cbc', $encryption_key, 0, $iv);
+    $input_data_with_iv = base64_encode($iv . '::' . $input_data);
+    return $input_data_with_iv;
+  }
+
+  public static function decrypt_data_input($data_encryption)
+  {
+
+    if (!isset($data_encryption) || empty($data_encryption)) return false;
+
+    $encryption_key = ZIPPY_CORE_PREFIX; 
+
+    list($iv, $data) = explode('::', base64_decode($data_encryption), 2);
+
+    $data_descypt = openssl_decrypt($data, 'aes-256-cbc', $encryption_key, 0, $iv);
+
+    return $data_descypt;
+  }
 
   /**
    * Recursive sanitation for an array

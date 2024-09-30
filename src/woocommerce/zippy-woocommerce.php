@@ -19,6 +19,8 @@ class Zippy_Woocommerce
    */
   public static function get_instance()
   {
+    if (!is_plugin_active('woocommerce/woocommerce.php')) return;
+
     if (is_null(self::$_instance)) {
       self::$_instance = new self();
     }

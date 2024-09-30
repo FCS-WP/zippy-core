@@ -200,7 +200,7 @@ const Content = () => {
     const { data } = await Woocommerce.getOrderData(params);
     const dataTotal = data.totals;
     setNetSales(dataTotal.net_revenue || 0);
-    setTotalSale(dataTotal.net_revenue || 0);
+    setTotalSale(dataTotal.gross_sales || 0);
   }, []);
 
   useEffect(() => {

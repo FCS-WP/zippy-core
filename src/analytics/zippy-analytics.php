@@ -14,6 +14,8 @@ use WP_REST_Response;
 use WP_REST_Request;
 use Zippy_Core\Src\Api\Zippy_Core_Api;
 
+use Zippy_Core\Utils\Zippy_Utils_Core;
+
 class Zippy_Analytics
 {
 
@@ -25,6 +27,7 @@ class Zippy_Analytics
 
   public static function get_instance()
   {
+    if (!is_plugin_active('woocommerce/woocommerce.php')) return;
     if (is_null(self::$_instance)) {
       self::$_instance = new self();
     }
@@ -111,9 +114,9 @@ class Zippy_Analytics
 
     if (!isset($data)) return new WP_REST_Response($data, 400);
 
-    $consumer_key = $data['consumer_key'];
+    $consumer_key = Zippy_Utils_Core::encrypt_data_input($data['consumer_key']);
 
-    $consumer_secret = $data['consumer_secret'];
+    $consumer_secret = Zippy_Utils_Core::encrypt_data_input($data['consumer_secret']);
 
     $keys = array(
       'consumer_key' => $consumer_key,

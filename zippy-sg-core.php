@@ -33,6 +33,10 @@ if (!defined('ZIPPY_CORE_NAME')) {
 	define('ZIPPY_CORE_NAME', 'ZippySG Core');
 }
 
+if (!defined('ZIPPY_CORE_PREFIX')) {
+	define('ZIPPY_CORE_PREFIX', 'zippy_core');
+}
+
 /* Set constant path to the plugin directory. */
 
 if (!defined('ZIPPY_CORE_DIR_PATH')) {
@@ -73,9 +77,6 @@ use Zippy_Core\Src\Woocommerce\Zippy_Woocommerce;
  *
  * Init Zippy Core
  */
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 Zippy_Core::get_instance();
 
@@ -84,8 +85,6 @@ Zippy_Admin_Url::get_instance();
 Zippy_Custom_Consent::get_instance();
 
 Zippy_User_Account_Expiry::get_instance();
-
-Zippy_Analytics::get_instance();
 
 Zippy_Analytics::get_instance();
 

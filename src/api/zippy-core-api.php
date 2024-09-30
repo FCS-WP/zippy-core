@@ -13,9 +13,10 @@ defined('ABSPATH') or die();
 use WC_Admin_Settings;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
+
+use Zippy_Core\Utils\Zippy_Utils_Core;
 
 class Zippy_Core_Api
 {
@@ -28,15 +29,15 @@ class Zippy_Core_Api
 
     $zippy_woocommerce_key =  WC_Admin_Settings::get_option('_zippy_woocommerce_key');
 
-    $this->consumer_key = $zippy_woocommerce_key['consumer_key'];
+    $this->consumer_key =  $zippy_woocommerce_key['consumer_key'];
     $this->consumer_secret = $zippy_woocommerce_key['consumer_secret'];
 
     $handler = new \GuzzleHttp\Handler\CurlHandler();
     $stack = HandlerStack::create($handler);
 
     $middleware = new Oauth1([
-      'consumer_key'    => $this->consumer_key,
-      'consumer_secret' => $this->consumer_secret,
+      'consumer_key'    => Zippy_Utils_Core::decrypt_data_input($this->consumer_key),
+      'consumer_secret' => Zippy_Utils_Core::decrypt_data_input($this->consumer_secret),
       'token_secret'    => '',
       'token'           => '',
       'request_method' => Oauth1::REQUEST_METHOD_QUERY,
