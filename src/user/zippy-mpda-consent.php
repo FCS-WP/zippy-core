@@ -165,11 +165,14 @@ class Zippy_MPDA_Consent
 
     public function add_consent_checkbox_to_registration_form()
     {
+        if (is_account_page()) {
         echo do_shortcode('[mpda_consent_checkbox]');
+        }
     }
 
     public function disable_submit_if_consent_not_checked()
     {
+        if (is_account_page()) {
 ?>
         <script type="text/javascript">
             document.addEventListener('DOMContentLoaded', function() {
@@ -201,6 +204,7 @@ class Zippy_MPDA_Consent
             }
         </style>
 <?php
+        }
     }
 
     public function validate_consent_checkbox($errors, $username, $email)
