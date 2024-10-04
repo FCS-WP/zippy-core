@@ -27,7 +27,6 @@ class Zippy_Analytics
 
   public static function get_instance()
   {
-    if (!is_plugin_active('woocommerce/woocommerce.php')) return;
     if (is_null(self::$_instance)) {
       self::$_instance = new self();
     }
@@ -36,26 +35,25 @@ class Zippy_Analytics
 
   public function __construct()
   {
-    // $screen = get_current_screen();
+    if (!function_exists('is_plugin_active')) {
+
+      include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+    }
+    if (!is_plugin_active('woocommerce/woocommerce.php')) return;
 
     add_action('rest_api_init', array($this, 'zippy_init_api'));
 
-    // if ($screen->id || $page_id) return;
-
     add_action('admin_enqueue_scripts', array($this, 'analytics_assets'));
-
-    // add_filter('woocommerce_analytics_report_menu_items', array($this, 'analytics_menu'));
 
     add_action('admin_menu',  array($this, 'zippy_dashboard'));
 
-
-    // add_action('rest_api_init', array($this, 'rest_api_rest_init_fun'));
   }
 
   /**
    *
    * Assests Resource
    */
+
 
   public function analytics_assets()
   {

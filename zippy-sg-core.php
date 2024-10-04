@@ -56,11 +56,16 @@ if (!defined('ZIPPY_CORE_URL')) {
 
 load_plugin_textdomain('zippy-sg-core', false, basename(dirname(__FILE__)) . '/languages');
 
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 /* ------------------------------------------
 // Includes
  --------------------------- --------------------------------------------- */
 require ZIPPY_CORE_DIR_PATH . '/includes/autoload.php';
 require ZIPPY_CORE_DIR_PATH . '/vendor/autoload.php';
+
+use	Zippy_Core\Src\Admin\Zippy_Admin_Setting;
 
 use	Zippy_Core\Src\Admin\Zippy_Admin_Url;
 
@@ -74,10 +79,15 @@ use Zippy_Core\Src\Analytics\Zippy_Analytics;
 
 use Zippy_Core\Src\Woocommerce\Zippy_Woocommerce;
 
+use Zippy_Core\Src\Woocommerce\Zippy_Postal_code;
+
+
 /**
  *
  * Init Zippy Core
  */
+
+Zippy_Admin_Setting::get_instance();
 
 Zippy_Core::get_instance();
 
@@ -90,3 +100,5 @@ Zippy_User_Account_Expiry::get_instance();
 Zippy_Analytics::get_instance();
 
 Zippy_Woocommerce::get_instance();
+
+Zippy_Postal_code::get_instance();

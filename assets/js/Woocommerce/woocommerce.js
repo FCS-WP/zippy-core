@@ -1,5 +1,5 @@
-import { makeRequest, wooAuthentication } from "../axios";
-import { fetchCredentials } from "../axios";
+import { makeRequest, wooAuthentication } from "../axios-woo";
+import { fetchCredentials } from "../axios-woo";
 
 export const Woocommerce = {
   async getTotalSales(params) {

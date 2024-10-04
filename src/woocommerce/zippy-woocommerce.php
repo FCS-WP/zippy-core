@@ -19,7 +19,7 @@ class Zippy_Woocommerce
    */
   public static function get_instance()
   {
-    if (!is_plugin_active('woocommerce/woocommerce.php')) return;
+
 
     if (is_null(self::$_instance)) {
       self::$_instance = new self();
@@ -28,6 +28,12 @@ class Zippy_Woocommerce
   }
   public function __construct()
   {
+    if (!function_exists('is_plugin_active')) {
+
+      include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+    }
+    if (!is_plugin_active('woocommerce/woocommerce.php')) return;
+
     //load all class in here
     $this->set_hooks();
   }
@@ -36,6 +42,7 @@ class Zippy_Woocommerce
   {
     add_filter('wc_get_template_part', array($this, 'override_woocommerce_template_part'), 1, 3);
     add_filter('woocommerce_locate_template', array($this, 'override_woocommerce_template'), 1, 3);
+
   }
 
 
@@ -76,4 +83,5 @@ class Zippy_Woocommerce
 
     return file_exists($path) ? $path : $template;
   }
+ 
 }
