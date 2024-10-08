@@ -4,165 +4,215 @@
 
   $(document).ready(function() {
     const postCode = $('#billing_postcode');
+    let isLoading = false;
 
-    const endpoint = 'https://www.streetdirectory.com/api/';
+    // Create the results container
 
-    const searchAddress = $('#search_address_button_field');
-
-    const selectAddress = $('#billing_select_address');
-
-    const buldingField = $('#billing_address_2');
-
-    const streetField = $('#billing_address_1');
-
-    //Init Button Search
-    initSearchButton(postCode.val)
-
+    // Event listener for input changes
     postCode.on('input', function(e) {
-      setTimeout(function() {
-        initSearchButton(this.val, searchAddress);
-      }, 1500);
-    })
-
-    //Init Button Search
-
-    searchAddress.on('click', function(e) {
       e.preventDefault();
-
-      setTimeout(function() {
-        getAddressByPostCode(endpoint, postCode.val()).then(function({
-          dataSelect
-        }) {
-          console.log(dataSelect); // Now this logs the correct data
-
-          // If dataSelect is undefined or empty, return early
-          if (typeof dataSelect === 'undefined' || dataSelect.length === 0) return;
-
-          const message = `Found ${dataSelect.length} address!`;
-          alert(message);
-          initAddressSelect(dataSelect);
-        });
-
-      }, 1000);
-
+      const postCodeValue = postCode.val();
+      debouncedSearch(postCodeValue);
     });
 
-    // Listen SelectChange
+    //Append data for Fields
 
-    selectAddress.on("select2:select", function(e) {
-      var data = e.params.data;
-      if (data === '') return;
-      buldingField.val(data.text);
-      streetField.val(data.id);
-    })
+    const appendData = async (addressData, streetData) => {
+      const address = $('#billing_address_1');
+      const street = $('#billing_address_2');
+      address.val(addressData);
+      street.val(streetData);
 
-    function initSearchButton(el) {
-      if (el === '') searchAddress.removeClass('opened')
-      searchAddress.addClass('opened');
     }
+    //Append data for Fields
 
-    function hanleMappingDataAddress(data) {
-      if (typeof data === 'undefined' || data.length === 0) return;
-      const dataSelect = data.map(item => ({
-        id: item.i,
-        text: item.v,
+    const removeData = async () => {
+      const address = $('#billing_address_1');
+      const street = $('#billing_address_2');
+      address.val('');
+      street.val('');
 
-      }));
-      const addressData = data.map(item => ({
-        id: item.v,
-        text: item.v,
-        apartment: item.v,
-        strees: item.i
+    }
+    // Async function to handle input change
+    const handleOnChange = async (params) => {
+      if (isLoading) return;
 
-      }));
-      return {
-        dataSelect,
-        addressData
+      isLoading = true;
+      const data = await fetchData(params);
+      isLoading = false;
+      return data;
+    };
+
+    // Async function to fetch data from the API
+    const fetchData = async (params) => {
+      const query = {
+        searchVal: params,
+        returnGeom: "Y",
+        getAddrDetails: 'y'
       };
-    }
+      const queryString = new URLSearchParams(query).toString();
+      const url = `https://www.onemap.gov.sg/api/common/elastic/search?${queryString}`;
 
-    function initAddressSelect(address) {
-      if (typeof address == 'undefined') return;
-      $("#billing_select_address").addClass('opened')
-      $("#billing_select_address").select2({
-        data: address
-      })
-    }
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        return null; // Return null or handle the error appropriately
+      }
+    };
 
-    function getAddressByPostCode(endpoint, postcode, method = 'GET') {
-      const params = {
-        mode: 'search',
-        profile: 'sd_auto',
-        country: 'sg',
-        state: 0,
-        q: postcode,
-        output: 'js',
-        limit: 10,
-        callback: 'set_data_search',
-        level: 7,
-        v: '1.0.2.820',
-        not_nearby: 1,
-        x: '103.83050972046',
-        y: '1.304787132947',
-      };
+    // Create the results container element
+    const createResultsContainer = () => {
+      const resultContainer = document.getElementById('billing_postcode_field');
+      const resultWrapper = document.createElement('div');
+      resultWrapper.id = 'results-wrapper';
+      resultContainer.appendChild(resultWrapper);
+    };
+    createResultsContainer();
 
-      return $.ajax({
-        url: endpoint + '?' + $.param(params),
-        type: method,
-        dataType: 'jsonp',
-      }).then(function(response) {
-        console.log(response);
-        const {
-          dataSelect,
-          addressData
-        } = hanleMappingDataAddress(response);
-        console.log(dataSelect);
+    // Display results in the results container
+    const displayResults = (results) => {
+      const resultWrapper = document.getElementById('results-wrapper');
+      clearPreviousResults(resultWrapper);
 
-        return {
-          dataSelect,
-          addressData
-        };
-      }).catch(function(xhr, status, error) {
-        console.error("API call failed:", error);
-        console.error("Status:", status);
-        console.error("Response:", xhr.responseText);
-        return {
-          dataSelect: [],
-          addressData: null
-        }; // Return empty data on error
+      if (!results || results.length === 0) {
+        displayNoResults(resultWrapper);
+        return;
+      }
+
+      results.forEach(result => {
+        const resultItem = createResultItem(result);
+        resultWrapper.appendChild(resultItem);
       });
-    }
+    };
+
+    // Clear previous results
+    const clearPreviousResults = (container) => {
+      container.innerHTML = ''; // Clear previous results
+    };
+
+    // Display no results message
+    const displayNoResults = (wrapper) => {
+      wrapper.innerHTML = '<p>No results found.</p>';
+    };
+
+    // Create a result item
+    const createResultItem = (result) => {
+      const resultItem = document.createElement('div');
+      resultItem.className = 'result-item';
+
+      const removeIcon = createRemoveIcon(resultItem);
+      resultItem.innerHTML = `
+        <h3>${result.BUILDING || 'Address'}</h3>
+        <p>${result.ADDRESS || 'No address available.'}</p>
+      `;
+      resultItem.appendChild(removeIcon);
+
+      resultItem.addEventListener('click', () => handleItemClick(resultItem, result));
+      return resultItem;
+    };
+
+    // Create a remove icon for the result item
+    const createRemoveIcon = (resultItem) => {
+      const removeIcon = document.createElement('span');
+      removeIcon.className = 'remove-icon';
+      removeIcon.innerHTML = '&times;';
+      removeIcon.style.cursor = 'pointer';
+
+      removeIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        resultItem.remove();
+        // remove data Address
+        removeData();
+      });
+
+      return removeIcon;
+    };
+
+    // Handle item click to select it
+    const handleItemClick = (resultItem, result) => {
+      const resultWrapper = document.getElementById('results-wrapper');
+      resultWrapper.innerHTML = ''; // Clear results
+
+      resultWrapper.appendChild(resultItem); // Keep the selected item
+      const allItems = document.querySelectorAll('.result-item');
+
+      allItems.forEach(item => item.classList.remove('selected'));
+      resultItem.classList.add('selected');
+
+      appendData(result.ADDRESS, result.BUILDING)
+    };
+
+    // Debounce function
+    const debounce = (func, delay) => {
+      let timeoutId;
+      return (...args) => {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
+        timeoutId = setTimeout(() => {
+          func.apply(null, args);
+        }, delay);
+      };
+    };
+
+    // Debounced search function
+    const debouncedSearch = debounce(async function(query) {
+      const data = await handleOnChange(query);
+      if (!data || data.length === 0) return;
+
+      displayResults(data.results);
+    }, 1000);
   });
 </script>
 <style>
-  #search_address_button_field {
-    text-align: right;
+  #billing_postcode_field {
+    position: relative;
   }
 
-  #search_address_button_field,
-  #search_address_button_field * {
-    height: 0;
-    overflow: hidden;
-    pointer-events: none;
-    transition: all .2s linear;
+  /* #results-wrapper {
+    position: absolute;
+    top: 75px;
+    left: 0px;
+    width: 100%;
+    padding: 15px;
+    max-height: 330px;
+    background: #fff;
+    z-index: 2;
+    overflow-y: auto;
+    box-shadow: 0px 8px 8px #ddd;
+  } */
+
+  .result-item {
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin: 5px 0;
+    cursor: pointer;
+    position: relative;
   }
 
-  #search_address_button_field.opened,
-  #search_address_button_field.opened * {
-    height: auto;
-    pointer-events: all;
+  .result-item:hover {
+    background-color: rgb(246, 246, 246);
   }
 
-  #billing_select_address {
-    height: 0;
-    border: 0px;
+  .result-item .remove-icon {
+    display: none;
   }
 
-  #billing_select_address.opened {
-    transition: all .2s linear;
-    border: auto;
+  .result-item.selected .remove-icon {
+    display: block;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 25px;
+  }
 
-    height: auto;
-
+  .result-item.selected {
+    background-color: rgb(246, 246, 246);
   }
 </style>

@@ -25,7 +25,7 @@ const AuthTitle = ({ status, loading, ...props }) => {
               <span
                 className={
                   status === "unauthorized"
-                    ? "text-error text-capitalize "
+                    ? "text-danger text-capitalize "
                     : "text-success text-capitalize"
                 }
               >

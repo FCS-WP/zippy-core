@@ -4,8 +4,7 @@ import AuthTitle from "../Title/AuthTitle";
 import { Woocommerce } from "../../Woocommerce/woocommerce";
 import { Api } from "../../api";
 import WooAuthForm from "../Forms/WooAuthForm";
-
-const AuthContent = ({ admin_id }) => {
+const AuthContent = () => {
   const [htmlAuth, setHtmlAuth] = useState();
   const [auth, setAuth] = useState("unauthorized");
   const [loading, setLoading] = useState(true);
@@ -27,7 +26,7 @@ const AuthContent = ({ admin_id }) => {
   const fetchData = useCallback(async (params) => {
     try {
       setLoading(true);
-      const { data } = await Api.checkAuthentication(params);
+      const { data } = await Api.checkKeyExits(params);
       setAuth(data.message);
     } catch (err) {
       setError("Failed to fetch authentication status");
@@ -68,12 +67,21 @@ const AuthContent = ({ admin_id }) => {
         <div className="content-wrapper">
           <Container className="w-80">
             <AuthTitle loading={loading} status={auth} />
-            {auth === "unauthorized" && !loading && (
+            {auth === "unauthorized" && !loading ? (
               <WooAuthForm
                 handleSubmit={handleSubmit}
                 callbackUrl={callback_url}
                 returnUrl={return_url}
               />
+            ) : (
+              <div className="text-center mt-5">
+                <a
+                  className="btn btn-outline-success "
+                  href="/wp-admin/admin.php?page=admin.php?page=wc-zippy-dashboard"
+                >
+                  Go to Dashboad
+                </a>
+              </div>
             )}
           </Container>
         </div>

@@ -43,11 +43,12 @@ class Zippy_Postal_code
 
   protected function set_hooks()
   {
+    $is_active =  get_option('_zippy_postal_code');
     if (!function_exists('is_plugin_active')) {
 
       include_once(ABSPATH . 'wp-admin/includes/plugin.php');
     }
-    if (!is_plugin_active('woocommerce/woocommerce.php')) return;
+    if (!is_plugin_active('woocommerce/woocommerce.php') || !isset($is_active) || $is_active == 0) return;
     add_filter('woocommerce_checkout_fields', array($this, 'ehancement_checkout_fields'), 10, 1);
     add_action('wp_footer', array($this, 'postcode_script'), 10, 1);
     add_filter('woocommerce_default_address_fields', array($this, 'modify_default_fields'));
@@ -80,7 +81,7 @@ class Zippy_Postal_code
 
     $country_priority = $fields[$type . 'country']['priority'];
     $fields[$type . 'postcode']['priority'] = $country_priority + 5;
-    $fields[$type . 'postcode']['required'] = true;
+    // $fields[$type . 'postcode']['required'] = true;
 
     return $fields;
   }
@@ -108,26 +109,6 @@ class Zippy_Postal_code
   public function ehancement_checkout_fields($fields)
   {
     unset($fields['billing']['billing_city']);
-    $fields['billing']['billing_select_address'] = array(
-      'type'        => 'select',
-      'placeholder' => __('Choose your address', ZIPPY_CORE_PREFIX),
-      'required'    => false,
-      'class'       => array('form-row-wide'),
-      'clear'       => true,
-      'priority' => 46,
-      'options'     => array(
-        '0' => __('Choose your address', 'woocommerce'),
-      )
-    );
-
-    $fields['billing']['search_address_button'] = array(
-      'type'         => 'button',
-      'label'        => __('Search your address'),
-      'class'        =>  array('form-row-wide'),
-      'input-class'  => 'button alt',
-      'priority'     => 45,
-      'disabled' => true,
-    );
     return $fields;
   }
 }

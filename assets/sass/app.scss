@@ -1,5 +1,6 @@
 @import "./component/mixins";
 @import "./component/style";
+@import "./component/zippy-settings";
 html {
   margin: 0px !important;
 }
@@ -116,6 +117,4 @@ body.settings_page_zippy-setting {
   }
 }
 
-#zippy-settings {
-  overflow: hidden;
-}
+

@@ -44,16 +44,24 @@ class Zippy_Admin_Setting
 
   public function zippy_setting_init_api()
   {
-    register_rest_route('zippy-core/v1', '/auth_status', array(
+    register_rest_route('zippy-core/v1', '/check_option', array(
       'methods' => 'GET',
-      'callback' => array($this, 'check_auth_status'),
+      'callback' => array($this, 'check_option'),
+      'permission_callback' => function () {
+        return true;
+      }
+    ));
+
+    register_rest_route('zippy-core/v1', '/update_settings', array(
+      'methods' => 'POST',
+      'callback' => array($this, 'update_settings'),
       'permission_callback' => function () {
         return true;
       }
     ));
   }
 
-  public function check_auth_status(WP_REST_Request $request)
+  public function check_option(WP_REST_Request $request)
   {
     // check Authentication;
     $params = $request->get_params();
@@ -75,6 +83,29 @@ class Zippy_Admin_Setting
 
     return new WP_REST_Response($response, 200);
   }
+
+  public function update_settings(WP_REST_Request $request)
+  {
+    // check Authentication;
+    $params = $request->get_params();
+    $response = array(
+      'status' => 'success',
+      'message' => 'unauthorized',
+    );
+    if (!isset($params)) return new WP_REST_Response($response, 400);
+
+    update_option($params['key'], $params['value']);
+
+
+    $response = array(
+      'status' => 'success',
+      'message' => 'autheticated',
+    );
+
+    return new WP_REST_Response($response, 200);
+  }
+
+  public function update_postal_code_option() {}
 
   public function render()
   {

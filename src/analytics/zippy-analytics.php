@@ -46,7 +46,6 @@ class Zippy_Analytics
     add_action('admin_enqueue_scripts', array($this, 'analytics_assets'));
 
     add_action('admin_menu',  array($this, 'zippy_dashboard'));
-
   }
 
   /**
@@ -84,6 +83,10 @@ class Zippy_Analytics
 
   public function zippy_dashboard($reports)
   {
+    $is_authenticated =  get_option('_zippy_woocommerce_key');
+
+    if (!isset($is_authenticated) || empty($is_authenticated['consumer_key'])) return;
+
     add_submenu_page('woocommerce', 'Dashboard', 'Dashboard', 'manage_options', 'admin.php?page=wc-zippy-dashboard', array($this, 'render'), 1);
   }
 
@@ -147,15 +150,14 @@ class Zippy_Analytics
   {
     echo  '<link as="style" rel="stylesheet preload prefetch"  href="/wp-content/plugins/woocommerce/assets/client/admin/app/style.css?ver=7.9.0" as="style" />';
 
-    $is_authenticated =  get_option('_zippy_woocommerce_key');
 
     echo '<div id="zippy-root">';
+    echo '<div id="zippy-main"></div>';
 
-    if (!isset($is_authenticated) || empty($is_authenticated['consumer_key'])) {
-      echo '<div id="zippy-authentication"></div>';
-    } else {
-      echo '<div id="zippy-main"></div>';
-    }
+    // if (!isset($is_authenticated) || empty($is_authenticated['consumer_key'])) {
+    //   echo '<div id="zippy-authentication"></div>';
+    // } else {
+    // }
 
     echo '</div>';
   }
