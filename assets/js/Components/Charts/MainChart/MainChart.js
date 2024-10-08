@@ -6,7 +6,6 @@ import React, {
   useCallback,
 } from "react";
 import { Card, CardBody, Spinner, Alert } from "react-bootstrap";
-import MainChartTitle from "./MainChartTitle";
 import { Chart, registerables } from "chart.js";
 import { Woocommerce } from "../../../Woocommerce/woocommerce";
 import { Line, getElementAtEvent } from "react-chartjs-2";

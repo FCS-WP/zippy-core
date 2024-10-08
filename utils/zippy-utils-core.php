@@ -12,7 +12,27 @@ defined('ABSPATH') or die();
 
 class Zippy_Utils_Core
 {
+  public static function check_exits_woocommerce()
+  {
+    if (!function_exists('is_plugin_active')) {
 
+      include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+    }
+    if (!is_plugin_active('woocommerce/woocommerce.php')) return false;
+
+    return true;
+  }
+
+  public static function check_is_active_feature($key)
+  {
+    $is_active = '';
+
+    $is_active = get_option($key);
+
+    if (empty($is_active) || $is_active == 0) return false;
+
+    return true;
+  }
   public static function encrypt_data_input($input)
   {
     $encryption_key = ZIPPY_CORE_PREFIX;
@@ -27,7 +47,7 @@ class Zippy_Utils_Core
 
     if (!isset($data_encryption) || empty($data_encryption)) return false;
 
-    $encryption_key = ZIPPY_CORE_PREFIX; 
+    $encryption_key = ZIPPY_CORE_PREFIX;
 
     list($iv, $data) = explode('::', base64_decode($data_encryption), 2);
 

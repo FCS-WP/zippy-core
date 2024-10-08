@@ -35,11 +35,7 @@ class Zippy_Analytics
 
   public function __construct()
   {
-    if (!function_exists('is_plugin_active')) {
-
-      include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-    }
-    if (!is_plugin_active('woocommerce/woocommerce.php')) return;
+    if (!Zippy_Utils_Core::check_exits_woocommerce()) return;
 
     add_action('rest_api_init', array($this, 'zippy_init_api'));
 

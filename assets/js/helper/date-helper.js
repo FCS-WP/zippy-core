@@ -9,6 +9,8 @@ import {
   parseISO,
   startOfYear,
   addWeeks,
+  subMonths,
+  isAfter,
 } from "date-fns";
 
 export const DateHelper = {
@@ -128,6 +130,9 @@ export const DateHelper = {
     switch (type) {
       case "custom":
         return { date_start: this.getDayStartMonth(), date_end: this.getNow() };
+      case "last_month":
+        const { date_start, date_end } = this.getLastMonthStartAndEnd();
+        return { date_start: date_start, date_end: date_end };
       case "this_month":
         return {
           date_start: this.getDayStartMonth(),
@@ -150,8 +155,11 @@ export const DateHelper = {
   },
 
   getDayEndMonth() {
-    const result = formatISO(endOfDay(endOfMonth(new Date())));
-    return result;
+    // const result = formatISO(endOfDay(endOfMonth(new Date())));
+    const endDate = isAfter(endOfMonth(new Date()), new Date())
+      ? new Date()
+      : endOfMonth(new Date());
+    return formatISO(endOfDay(endDate));
   },
 
   getNow() {
@@ -163,5 +171,12 @@ export const DateHelper = {
   },
   endOfDateToString(date) {
     return formatISO(endOfDay(new Date(date)));
+  },
+
+  getLastMonthStartAndEnd() {
+    const lastMonth = subMonths(new Date(), 1);
+    const date_start = formatISO(startOfMonth(lastMonth));
+    const date_end = formatISO(endOfMonth(lastMonth));
+    return { date_start, date_end };
   },
 };

@@ -22,7 +22,7 @@ const Settings = () => {
       key: "_zippy_postal_code",
       value: postalCode,
     };
-    const { data } = await Api.updateSetting(params);
+    const { data } = await Api.updateSettings(params);
     setLoading(true);
     window.location.reload();
   };

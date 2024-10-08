@@ -29,6 +29,8 @@ const Content = () => {
     interval: "day",
     after: dateParams.after,
     before: dateParams.before,
+    order: "asc",
+    per_page: 100,
   });
 
   const [categoriesParams, setCategoriesParams] = useState({
@@ -57,6 +59,8 @@ const Content = () => {
       interval: "day",
       after: date.date_start,
       before: date.date_end,
+      order: "asc",
+      per_page: 100,
     });
     setActiveFilter(key);
 
@@ -85,11 +89,14 @@ const Content = () => {
       before: date_end,
       extended_info: true,
       orderby: "net_revenue",
+      
     });
     setOrderParams({
       after: date_start,
       before: date_end,
       interval: "day",
+      order: "asc",
+      per_page: 100,
     });
     const dataSelected = DateHelper.getDateOutputSelect(date, viewTypeSelected);
     setCurrentViewBy({
@@ -105,6 +112,8 @@ const Content = () => {
         interval: "day",
         after: dateParams.date_start,
         before: dateParams.date_end,
+        order: "asc",
+        per_page: 100,
       });
       setCategoriesParams({
         after: dateParams.date_start,
@@ -126,6 +135,8 @@ const Content = () => {
       interval: "day",
       after: dateParams.date_start,
       before: dateParams.date_end,
+      order: "asc",
+      per_page: 100,
     });
     setCurrentViewBy({
       name: "",
@@ -145,6 +156,8 @@ const Content = () => {
         interval: "day",
         after: dateParams.date_start,
         before: dateParams.date_end,
+        order: "asc",
+        per_page: 100,
       });
     } else {
       setOrderParams(orderParams);

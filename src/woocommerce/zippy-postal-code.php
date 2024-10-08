@@ -31,24 +31,14 @@ class Zippy_Postal_code
   }
   public function __construct()
   {
-    if (!function_exists('is_plugin_active')) {
-
-      include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-    }
-    if (!is_plugin_active('woocommerce/woocommerce.php')) return;
-
+    if (!Zippy_Utils_Core::check_exits_woocommerce()) return;
+    if (!Zippy_Utils_Core::check_is_active_feature('_zippy_postal_code')) return;
     //load all class in here
     $this->set_hooks();
   }
 
   protected function set_hooks()
   {
-    $is_active =  get_option('_zippy_postal_code');
-    if (!function_exists('is_plugin_active')) {
-
-      include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-    }
-    if (!is_plugin_active('woocommerce/woocommerce.php') || !isset($is_active) || $is_active == 0) return;
     add_filter('woocommerce_checkout_fields', array($this, 'ehancement_checkout_fields'), 10, 1);
     add_action('wp_footer', array($this, 'postcode_script'), 10, 1);
     add_filter('woocommerce_default_address_fields', array($this, 'modify_default_fields'));
@@ -81,7 +71,7 @@ class Zippy_Postal_code
 
     $country_priority = $fields[$type . 'country']['priority'];
     $fields[$type . 'postcode']['priority'] = $country_priority + 5;
-    // $fields[$type . 'postcode']['required'] = true;
+    $fields[$type . 'postcode']['required'] = true;
 
     return $fields;
   }
