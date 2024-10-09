@@ -29,6 +29,8 @@ const Content = () => {
     interval: "day",
     after: dateParams.after,
     before: dateParams.before,
+    order: "asc",
+    per_page: 100,
   });
 
   const [categoriesParams, setCategoriesParams] = useState({
@@ -56,7 +58,9 @@ const Content = () => {
     setOrderParams({
       interval: "day",
       after: date.date_start,
-      before: date.bedate_endfore,
+      before: date.date_end,
+      order: "asc",
+      per_page: 100,
     });
     setActiveFilter(key);
 
@@ -85,11 +89,14 @@ const Content = () => {
       before: date_end,
       extended_info: true,
       orderby: "net_revenue",
+      
     });
     setOrderParams({
       after: date_start,
       before: date_end,
       interval: "day",
+      order: "asc",
+      per_page: 100,
     });
     const dataSelected = DateHelper.getDateOutputSelect(date, viewTypeSelected);
     setCurrentViewBy({
@@ -104,11 +111,13 @@ const Content = () => {
       setOrderParams({
         interval: "day",
         after: dateParams.date_start,
-        before: dateParams.bedate_endfore,
+        before: dateParams.date_end,
+        order: "asc",
+        per_page: 100,
       });
       setCategoriesParams({
         after: dateParams.date_start,
-        before: dateParams.bedate_endfore,
+        before: dateParams.date_end,
         extended_info: true,
         orderby: "net_revenue",
       });
@@ -116,7 +125,7 @@ const Content = () => {
       setMainChartParams({
         interval: viewTypeSelected,
         after: dateParams.date_start,
-        before: dateParams.bedate_endfore,
+        before: dateParams.date_end,
         fields: ["net_revenue", "items_sold"],
         order: "asc",
         per_page: 100,
@@ -125,7 +134,9 @@ const Content = () => {
     setOrderParams({
       interval: "day",
       after: dateParams.date_start,
-      before: dateParams.bedate_endfore,
+      before: dateParams.date_end,
+      order: "asc",
+      per_page: 100,
     });
     setCurrentViewBy({
       name: "",
@@ -144,7 +155,9 @@ const Content = () => {
       setOrderParams({
         interval: "day",
         after: dateParams.date_start,
-        before: dateParams.bedate_endfore,
+        before: dateParams.date_end,
+        order: "asc",
+        per_page: 100,
       });
     } else {
       setOrderParams(orderParams);
@@ -152,7 +165,7 @@ const Content = () => {
 
     setCategoriesParams({
       after: dateParams.date_start,
-      before: dateParams.bedate_endfore,
+      before: dateParams.date_end,
       extended_info: true,
       orderby: "net_revenue",
     });
@@ -178,8 +191,8 @@ const Content = () => {
   const handleCustomDate = (date) => {
     setDateParams((prev) => ({
       ...prev,
-      date_start: DateHelper.getDateToString(date.date_start, "23:59:00"),
-      date_end: DateHelper.getDateToString(date.date_end, "00:00:00"),
+      date_start: DateHelper.startOfDateToString(date.date_start),
+      date_end: DateHelper.endOfDateToString(date.date_end),
     }));
   };
 

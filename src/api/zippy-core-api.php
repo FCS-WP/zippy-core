@@ -15,6 +15,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Subscriber\Oauth\Oauth1;
+use GuzzleHttp\Exception\RequestException;
+
 
 use Zippy_Core\Utils\Zippy_Utils_Core;
 
@@ -98,6 +100,8 @@ class Zippy_Core_Api
       })->wait();
     } catch (ConnectException $e) {
       $response = false;
+    } catch (RequestException $e) {
+      $response = $e->getResponse()->getStatusCode();
     }
 
     return $response;

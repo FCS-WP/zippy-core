@@ -1,9 +1,11 @@
 @import "./component/mixins";
 @import "./component/style";
+@import "./component/zippy-settings";
 html {
   margin: 0px !important;
 }
-body.woocommerce_page_admin-page-wc-zippy-dashboard {
+body.woocommerce_page_admin-page-wc-zippy-dashboard,
+body.settings_page_zippy-setting {
   margin: 0px !important;
   padding: 0 !important;
   max-width: none !important;
@@ -13,6 +15,7 @@ body.woocommerce_page_admin-page-wc-zippy-dashboard {
   @import "bootstrap/scss/bootstrap";
 }
 #zippy-root {
+
   #zippy-authentication,
   #zippy-main {
     position: relative;
@@ -113,3 +116,5 @@ body.woocommerce_page_admin-page-wc-zippy-dashboard {
     }
   }
 }
+
+

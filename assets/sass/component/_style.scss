@@ -3,8 +3,8 @@
 #zippy-root {
   .spinner-border {
     position: absolute;
-    left: calc(50% - 16px);
-    top: calc(50% + 32px);
+    left: calc(50%);
+    top: calc(50%);
 
     // transform: translateX(-50%, -50%);
   }
@@ -56,7 +56,6 @@
 
     @include tablet {
       padding: 75px 0px;
-
     }
     .authen-thumnail {
       display: flex;
@@ -77,14 +76,32 @@
       }
     }
 
-    .btn-auth{
+    .btn-auth {
       min-width: 150px;
       padding: 10px 10px;
       border-radius: 32px;
     }
-    .content-wrapper{
+    .content-wrapper {
       max-width: 750px;
       margin: 0 auto;
+    }
+  }
+}
+
+#zippy-root {
+  // Nav-tabs
+
+  .nav-tabs {
+    border-bottom: 0px !important;
+
+    .nav-link {
+      background-color: transparent !important;
+      border-color: transparent !important;
+      border: 0px;
+      &.active {
+        font-weight: bold;
+        border-bottom: 2px solid #2271b1 !important;
+      }
     }
   }
 }

@@ -27,7 +27,6 @@ class Zippy_Analytics
 
   public static function get_instance()
   {
-    if (!is_plugin_active('woocommerce/woocommerce.php')) return;
     if (is_null(self::$_instance)) {
       self::$_instance = new self();
     }
@@ -36,26 +35,20 @@ class Zippy_Analytics
 
   public function __construct()
   {
-    // $screen = get_current_screen();
+    if (!Zippy_Utils_Core::check_exits_woocommerce()) return;
 
     add_action('rest_api_init', array($this, 'zippy_init_api'));
 
-    // if ($screen->id || $page_id) return;
-
     add_action('admin_enqueue_scripts', array($this, 'analytics_assets'));
 
-    // add_filter('woocommerce_analytics_report_menu_items', array($this, 'analytics_menu'));
-
     add_action('admin_menu',  array($this, 'zippy_dashboard'));
-
-
-    // add_action('rest_api_init', array($this, 'rest_api_rest_init_fun'));
   }
 
   /**
    *
    * Assests Resource
    */
+
 
   public function analytics_assets()
   {
@@ -86,6 +79,10 @@ class Zippy_Analytics
 
   public function zippy_dashboard($reports)
   {
+    $is_authenticated =  get_option('_zippy_woocommerce_key');
+
+    if (!isset($is_authenticated) || empty($is_authenticated['consumer_key'])) return;
+
     add_submenu_page('woocommerce', 'Dashboard', 'Dashboard', 'manage_options', 'admin.php?page=wc-zippy-dashboard', array($this, 'render'), 1);
   }
 
@@ -149,15 +146,14 @@ class Zippy_Analytics
   {
     echo  '<link as="style" rel="stylesheet preload prefetch"  href="/wp-content/plugins/woocommerce/assets/client/admin/app/style.css?ver=7.9.0" as="style" />';
 
-    $is_authenticated =  get_option('_zippy_woocommerce_key');
 
     echo '<div id="zippy-root">';
+    echo '<div id="zippy-main"></div>';
 
-    if (!isset($is_authenticated) || empty($is_authenticated['consumer_key'])) {
-      echo '<div id="zippy-authentication"></div>';
-    } else {
-      echo '<div id="zippy-main"></div>';
-    }
+    // if (!isset($is_authenticated) || empty($is_authenticated['consumer_key'])) {
+    //   echo '<div id="zippy-authentication"></div>';
+    // } else {
+    // }
 
     echo '</div>';
   }
