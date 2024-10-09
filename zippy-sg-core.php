@@ -62,9 +62,9 @@ define( 'MY_PLUGIN_SLUG', 'my-plugin-slug' );
 
 load_plugin_textdomain('zippy-sg-core', false, basename(dirname(__FILE__)) . '/languages');
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+// ini_set('display_startup_errors', 1);
+// error_reporting(E_ALL);
 
 
 /* ------------------------------------------
