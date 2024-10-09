@@ -32,9 +32,15 @@ class Zippy_Admin_Setting
 
   public function __construct()
   {
-
     add_action('admin_menu',  array($this, 'zippy_setting'));
     add_action('rest_api_init', array($this, 'zippy_setting_init_api'));
+    add_filter('plugin_action_links_' . ZIPPY_CORE_BASENAME, array($this, 'zippy_action_links'));
+  }
+
+  function zippy_action_links($links)
+  {
+    $links[] = '<a href="' . menu_page_url('zippy-setting', false) . '">Settings</a>';
+    return $links;
   }
 
   public function zippy_setting()
@@ -104,8 +110,6 @@ class Zippy_Admin_Setting
 
     return new WP_REST_Response($response, 200);
   }
-
-  public function update_postal_code_option() {}
 
   public function render()
   {

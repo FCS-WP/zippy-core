@@ -48,7 +48,7 @@ const Settings = () => {
     fetchData(params);
   }, [fetchData, loading]);
   return (
-    <Form action="wp-admin/options-general.php?page=zippy-setting">
+    <Form>
       <Tabs
         id="controlled-tab-example"
         activeKey={key}

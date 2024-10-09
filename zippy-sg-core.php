@@ -25,7 +25,7 @@ defined('ABSPATH') or die('°_°’');
 /* Set plugin version constant. */
 
 if (!defined('ZIPPY_CORE_VERSION')) {
-	define('ZIPPY_CORE_VERSION', '1.1.8');
+	define('ZIPPY_CORE_VERSION', '4.0');
 }
 
 /* Set plugin name. */
@@ -36,6 +36,10 @@ if (!defined('ZIPPY_CORE_NAME')) {
 
 if (!defined('ZIPPY_CORE_PREFIX')) {
 	define('ZIPPY_CORE_PREFIX', 'zippysg_core');
+}
+
+if (!defined('ZIPPY_CORE_BASENAME')) {
+	define('ZIPPY_CORE_BASENAME', plugin_basename(__FILE__));
 }
 
 /* Set constant path to the plugin directory. */
@@ -50,20 +54,25 @@ if (!defined('ZIPPY_CORE_URL')) {
 	define('ZIPPY_CORE_URL', plugin_dir_url(__FILE__));
 }
 
+define( 'MY_PLUGIN_SLUG', 'my-plugin-slug' );
+
 /* ------------------------------------------
 // i18n
 ---------------------------- --------------------------------------------- */
 
 load_plugin_textdomain('zippy-sg-core', false, basename(dirname(__FILE__)) . '/languages');
 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+
 /* ------------------------------------------
 // Includes
  --------------------------- --------------------------------------------- */
 require ZIPPY_CORE_DIR_PATH . '/includes/autoload.php';
 require ZIPPY_CORE_DIR_PATH . '/vendor/autoload.php';
+
 
 use	Zippy_Core\Src\Admin\Zippy_Admin_Setting;
 
