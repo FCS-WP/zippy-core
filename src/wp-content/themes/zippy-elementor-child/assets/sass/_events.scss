@@ -1,5 +1,5 @@
 #event-product-tabs{
-    padding: 0;
+    // padding: 0;
     > .e-con-inner{
         padding-top: 50px;
         @media screen and (max-width: 768px){
@@ -16,7 +16,7 @@
             padding: 8px 15px;
             .ntabs--title{
                 @media screen and (max-width: 768px){
-                    font-size: 13px;
+                    font-size: var(--e-global-typography-text-font-size);
                 }
             }
             &.e-active{
@@ -37,7 +37,7 @@
         }
         .product-price{
             padding-top: 15px;
-            font-size: 13px;
+            font-size: var(--e-global-typography-text-font-size);
         }
     }
 }

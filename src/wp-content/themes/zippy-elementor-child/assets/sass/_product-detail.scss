@@ -16,3 +16,29 @@
     overflow: hidden;
     border: 1px;
 }
+#related-product{
+    ul.products{
+        li{
+            text-align: center;
+            .la-custom-badge.onsale{
+                display: none;
+            }
+            .la-addcart{
+                display: none;
+            }
+            figure{
+                img.attachment-woocommerce_thumbnail{
+                    width: 100%;
+                }
+            }
+            h2{
+                padding: 10px;
+                font-size: 16px;
+                text-align: center;
+                
+            }
+        }
+        
+    }
+    
+}

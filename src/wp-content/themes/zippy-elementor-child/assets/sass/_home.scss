@@ -13,10 +13,10 @@
                     font-size: 16px;
                 }
                 .price{
-                    font-size: 13px;
+                    font-size: var(--e-global-typography-text-font-size);
                 }
                 .item--excerpt{
-                    font-size: 13px;
+                    font-size: var(--e-global-typography-text-font-size);
                 }
             }
             .la-custom-badge{
@@ -31,13 +31,13 @@
                 @media screen and (max-width: 1024px) {
                     a.button{
                         padding: 10px 15px;
-                        font-size: 13px;
+                        font-size: var(--e-global-typography-text-font-size);
                         line-height: 20px;       
                     }
                 }
                 .product_item--info-action{
                     a .labtn-text{
-                        font-size: 13px;
+                        font-size: var(--e-global-typography-text-font-size);
                     }
                 }
             }
@@ -77,7 +77,7 @@ box-shadow: 3px 6px 20px -11px rgba(0,0,0,0.75);
     height: 87px;
     text-overflow: ellipsis;
     overflow: hidden;
-    font-size: 13px;
+    font-size: var(--e-global-typography-text-font-size);
     margin-bottom: 5px;
 }
 
@@ -98,6 +98,7 @@ box-shadow: 3px 6px 20px -11px rgba(0,0,0,0.75);
 #section-review .lakit-testimonials__item .lakit-testimonials__content .lakit-testimonials__name{
     order: 3;
     font-size: 16px;
+    color: var(--theme-secondary-color);
 }
 #section-review .lakit-testimonials__item .lakit-testimonials__content .lakit-testimonials__position{
     order: 4;
