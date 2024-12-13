@@ -1,4 +1,4 @@
-#header{
+#header{    
     #header-top{
         .lakit-search{
             position: relative;
@@ -16,18 +16,7 @@
     .lakit-nav__mobile-trigger{
         padding-top: 10px;
     }
-}
-
-.show_more{
-    font-size: 13px;
-    color: var(--enav_n_tcolor);
-    display: flex;
-    align-items: center;
-    text-align: right;
-    i{
-        // font-size: 13px;
-        color: var(--enav_n_tcolor);
-        font-weight: bold;
-        padding-top: 2px;
+    .menu-text{
+        text-transform: uppercase;
     }
 }
