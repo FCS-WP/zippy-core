@@ -108,6 +108,21 @@ box-shadow: 3px 6px 20px -11px rgba(0,0,0,0.75);
     display: none;
 }
 
+
+.show_more{
+    font-size: 13px;
+    color: var(--enav_n_tcolor);
+    display: flex;
+    align-items: center;
+    text-align: right;
+    i{
+        // font-size: 13px;
+        color: var(--enav_n_tcolor);
+        font-weight: bold;
+        padding-top: 2px;
+    }
+}
+
 @media screen and (max-width: 1024px) {
     #section-review .lakit-testimonials__item .lakit-testimonials__content{
         padding-left: 20px;
