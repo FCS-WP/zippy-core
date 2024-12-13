@@ -41,9 +41,6 @@
     form{
         position: relative;
     }
-    .lakit-search__field{
-
-    }
     .lakit-search__submit{
         background: none;
         position: absolute;
@@ -59,32 +56,6 @@
         .category-list-item{
             + .category-list-item{
                 margin-top: 5px;
-            }
-        }
-    }
-    .popular-post{
-        .elementor-posts{
-            gap: 15px;
-            padding-left: 20px;
-            article{
-                display: flex;
-                flex-direction: row;
-                .elementor-post__thumbnail__link{
-                    width: 100px;
-                    margin-bottom: 0;
-                }
-                .elementor-post__text{
-                    width: calc(100% - 150px);
-                    padding-left: 15px;
-                    display: flex;
-                    h4{
-                        order: 2;
-                    }
-                    .elementor-post__meta-data{
-                        order: 1;
-                        margin-bottom: 5px;
-                    }
-                }
             }
         }
     }
