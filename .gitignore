@@ -13,6 +13,8 @@ src/wp-content/*
 
 !src/wp-content/plugins
 
+src/wp-content/plugins/zippy-booking
+
 
 !src/wp-content/.htaccess
 
