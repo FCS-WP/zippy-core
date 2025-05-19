@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Card, CardBody, Col } from "react-bootstrap/esm";
+
 import { Woocommerce } from "../../../Woocommerce/woocommerce";
+import { Card, CardContent, Grid } from "@mui/material";
 const TopTotal = ({ params, ...props }) => {
   const [orderTotal, setOrderTotal] = useState(0);
   const [productSold, setProductSold] = useState(0);
@@ -18,22 +19,22 @@ const TopTotal = ({ params, ...props }) => {
 
   return (
     <>
-      <Col >
+      <Grid size={3} >
         <Card className="mt-0">
-          <CardBody>
+          <CardContent>
             <label>Orders</label>
             <h5>{orderTotal}</h5>
-          </CardBody>
+          </CardContent>
         </Card>
-      </Col>
-      <Col>
+      </Grid>
+      <Grid size={3}>
         <Card className="mt-0">
-          <CardBody>
+          <CardContent>
             <label>Products Sold</label>
             <h5>{productSold}</h5>
-          </CardBody>
+          </CardContent>
         </Card>
-      </Col>
+      </Grid>
     </>
   );
 };

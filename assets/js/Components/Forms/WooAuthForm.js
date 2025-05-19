@@ -1,5 +1,4 @@
 import React from "react";
-import { Col, Row, Form, Button } from "react-bootstrap";
 
 const WooAuthForm = ({
   handleSubmit,
@@ -9,18 +8,19 @@ const WooAuthForm = ({
   ...props
 }) => {
   return (
-    <Row>
-      <Col sm="12" className="text-center">
-        <Button
-          onClick={handleSubmit}
-          className="mt-5 btn-auth"
-          variant="primary"
-          type="submit"
-        >
-          Connect
-        </Button>
-      </Col>
-    </Row>
+    <div>Woo Auth Form</div>
+    // <Row>
+    //   <Col sm="12" className="text-center">
+    //     <Button
+    //       onClick={handleSubmit}
+    //       className="mt-5 btn-auth"
+    //       variant="primary"
+    //       type="submit"
+    //     >
+    //       Connect
+    //     </Button>
+    //   </Col>
+    // </Row>
   );
 };
 export default WooAuthForm;

@@ -5,11 +5,12 @@ import React, {
   useCallback,
   useRef,
 } from "react";
-import { Card, CardBody, Spinner, Alert } from "react-bootstrap";
+
 import { Bar } from "react-chartjs-2";
 import { Woocommerce } from "../../../Woocommerce/woocommerce";
 import { Line, getElementAtEvent } from "react-chartjs-2";
 import { type } from "jquery";
+import { Alert, Card, CardContent, CircularProgress, Typography } from "@mui/material";
 
 const RightChart = ({ categoriesParams, onClickCallback, currentViewBy }) => {
   const options = useMemo(
@@ -113,9 +114,9 @@ const RightChart = ({ categoriesParams, onClickCallback, currentViewBy }) => {
 
   return (
     <Card className="mt-0">
-      <CardBody>
-        {loading && <Spinner animation="border" variant="primary" />}
-        {error && <Alert variant="danger">{error}</Alert>}
+      <CardContent>
+        {loading && <CircularProgress color="primary" />}
+        {error && <Alert severity="error">{error}.</Alert>}
         <Bar
           height={450}
           width={800}
@@ -124,8 +125,8 @@ const RightChart = ({ categoriesParams, onClickCallback, currentViewBy }) => {
           options={options}
           onClick={handleOnClickChart}
         />
-        <h5 className="mt-2 text-center">Top 10 Categories</h5>
-      </CardBody>
+        <h5 style={{ textAlign: 'center' }}>Top 10 Categories</h5>
+      </CardContent>
     </Card>
   );
 };

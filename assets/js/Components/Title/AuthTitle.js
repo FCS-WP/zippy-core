@@ -1,21 +1,21 @@
 import React from "react";
 import Arrows from "../../../icons/back.svg";
-import { Col, Row } from "react-bootstrap";
+import { Grid } from "@mui/material";
 
 const AuthTitle = ({ status, loading, ...props }) => {
   return (
     <>
-      <Row className="mb-4">
-        <Col>
+      <Grid container>
+        <Grid>
           <div className="authen-thumnail">
             <img src="/wp-content/plugins/zippy-core/assets/images/logo-zippy.png"></img>
             <Arrows />
             <img src="/wp-content/plugins/zippy-core/assets/images/woocommerce.png"></img>
           </div>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
+        </Grid>
+      </Grid>
+      <Grid container>
+        <Grid>
           <h4 className="text-center my-2">
             Authentication with Woocommerce to see Order Analytics
           </h4>
@@ -33,8 +33,8 @@ const AuthTitle = ({ status, loading, ...props }) => {
               </span>
             </div>
           )}
-        </Col>
-      </Row>
+        </Grid>
+      </Grid>
     </>
   );
 };

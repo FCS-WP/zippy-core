@@ -34,7 +34,7 @@
   .react-datepicker__input-container {
     input {
       max-width: 120px;
-
+      padding: 3px;
       @include tablet {
         max-width: 150px;
       }

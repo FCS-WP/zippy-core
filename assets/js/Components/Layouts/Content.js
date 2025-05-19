@@ -1,5 +1,4 @@
 import React, { useEffect, useCallback, useState } from "react";
-import { Row, Col, Card, CardBody } from "react-bootstrap";
 import MainChart from "../Charts/MainChart/MainChart";
 import RightChart from "../Charts/RightChart/RightChart";
 import ReportFilter from "../Filter/ReportFilter";
@@ -8,6 +7,7 @@ import { DateHelper } from "../../helper/date-helper";
 import MainChartTitle from "../Charts/MainChart/MainChartTitle";
 import { Woocommerce } from "../../Woocommerce/woocommerce";
 import ViewType from "../Charts/MainChart/ViewType";
+import { Box, Card, CardContent, Grid } from "@mui/material";
 const Content = () => {
   const [periodFilter, setPeriodFilter] = useState("week");
 
@@ -221,45 +221,45 @@ const Content = () => {
   }, [orderParams]);
   return (
     <div id="zippy-content">
-      <Row>
-        <Col sm="12">
-          <ReportFilter
-            activeFilter={activeFilter}
-            onClick={clickFilter}
-            handleCustomDate={handleCustomDate}
-          />
-        </Col>
-      </Row>
-      <Row>
-        <Col sm="6">
-          <Card className="mt-0">
-            <MainChartTitle netSales={netSales} totalSale={totalSale} />
-            <ViewType
-              onClearDate={onClearDate}
-              viewTypeSelected={viewTypeSelected}
-              onClickViewType={onClickViewType}
-              currentViewBy={currentViewBy}
-            />
-            <MainChart
-              onClearDate={onClearDate}
-              mainChartParams={mainChartParams}
-              onClickChart={onClickChart}
-            />
+      <Box>
+        <ReportFilter
+          activeFilter={activeFilter}
+          onClick={clickFilter}
+          handleCustomDate={handleCustomDate}
+        />
+      </Box>
+      <Grid container mt={3} spacing={3}>
+        <Grid size={6}>
+          <Card>
+            <CardContent>
+              <MainChartTitle netSales={netSales} totalSale={totalSale} />
+              <ViewType
+                onClearDate={onClearDate}
+                viewTypeSelected={viewTypeSelected}
+                onClickViewType={onClickViewType}
+                currentViewBy={currentViewBy}
+              />
+              <MainChart
+                onClearDate={onClearDate}
+                mainChartParams={mainChartParams}
+                onClickChart={onClickChart}
+              />
+            </CardContent>
           </Card>
-        </Col>
-        <Col sm="6">
-          <Row className="right-chart">
+        </Grid>
+        <Grid size={6}>
+          <Grid className="right-chart" container spacing={2}>
             <TopTotal params={orderParams} />
-            <Col sm="12">
+            <Grid size={12} mt={1}>
               <RightChart
                 currentViewBy={currentViewBy}
                 onClickCallback={onClickBarCallback}
                 categoriesParams={categoriesParams}
               />
-            </Col>
-          </Row>
-        </Col>
-      </Row>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
     </div>
   );
 };
