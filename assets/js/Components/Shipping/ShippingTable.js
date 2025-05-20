@@ -1,110 +1,86 @@
 import React, { useState } from "react";
 import ShippingConfigModal from "./ShippingConfigModal";
-import StaticExample from "./StaticExample";
-
-const exampleCategories = [
-  {
-    id: 244,
-    name: "Hat",
-  },
-  {
-    id: 432,
-    name: "High Heels",
-  },
-  {
-    id: 23,
-    name: "Shoes",
-  },
-];
-
-const exampleData = [
-  {
-    id: 1,
-    category_includes: [
-      {
-        id: 123,
-        name: "Accessories",
-      },
-      {
-        id: 432,
-        name: "Bags",
-      },
-      {
-        id: 111,
-        name: "Wallets",
-      },
-    ],
-    shipping_fee: 15,
-  },
-  {
-    id: 3,
-    category_includes: [
-      {
-        id: 123,
-        name: "Accessories",
-      },
-      {
-        id: 432,
-        name: "Bags",
-      },
-    ],
-    shipping_fee: 20,
-  },
-];
-
-const showCategories = (categories) => {
-  let showNames = [];
-  categories.map((item, index) => {
-    showNames.push(item.name);
-  });
-  return showNames.join(", ");
-};
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DataTable from "./DataTable";
+import { GridActionsCellItem } from "@mui/x-data-grid";
+import { useShippingProvider } from "../../contexts/ShippingProvider";
 
 const ShippingTable = () => {
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedRow, setSelectedRow] = useState();  
+  const { shippingData } = useShippingProvider();
+  const [diaglogData, setDiaglogData] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
+  const showCategories = (categories) => {
+    let showNames = [];
+    categories.map((item, index) => {
+      showNames.push(item.name);
+    });
+    return showNames.join(", ");
+  };
+
+  // Table Function
+
+  const tableData = shippingData
+    ? shippingData.map((item) => {
+        return {
+          id: item.id,
+          categories: showCategories(item.category_includes),
+          fee: item.shipping_fee,
+          note: item.note ?? "",
+        };
+      })
+    : [];
+
+  const columns = [
+    { field: "id", headerName: "ID", width: 70 },
+    { field: "categories", headerName: "Categories", width: 300 },
+    { field: "fee", headerName: "Fee", width: 100 },
+    { field: "note", headerName: "Note", width: 100 },
+    {
+      field: "actions",
+      type: "actions",
+      headerName: "Actions",
+      width: 100,
+      getActions: (params) => [
+        <GridActionsCellItem
+          icon={<EditIcon />}
+          label="Edit"
+          onClick={() => handleUpdateRow(params.row)}
+        />,
+        <GridActionsCellItem
+          icon={<DeleteIcon />}
+          label="Delete"
+          onClick={() => handleDeleteRows(params.id)}
+        />,
+      ],
+    },
+  ];
+
+  const handleDeleteRows = async (rows = []) => {
+    console.log("deleteRows", rows);
+  };
+
+  const handleUpdateRow = async (row) => {
+    const originData = shippingData.find((item) => item.id === row.id);
+    setDiaglogData(originData);
+    setShowModal(true);
+  };
+
+  // Dialog
+
   const onCloseModal = () => {
-    setOpenModal(false);
-  }
-  const handleOpenModal = (row) => {
-    setSelectedRow(row);
-    setOpenModal(true);
-  }
-  
+    setShowModal(false);
+  };
+
   return (
     <div>
-      shipping table
-      {/* <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>The categories included in the order.</th>
-            <th>Shipping Fee</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {exampleData.length > 0 &&
-            exampleData.map((item, index) => (
-              <tr key={index}>
-                <td>{item.id}</td>
-                <td>{showCategories(item.category_includes)}</td>
-                <td>{item.shipping_fee}</td>
-                <td>
-                  <div className="d-flex gap-3">
-                    <button type="button" className="btn btn-secondary edit-btn" onClick={()=>handleOpenModal(item)}>
-                      Edit
-                    </button>
-                    <button type="button" className="btn btn-danger edit-btn">
-                      Remove
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-
-      </Table> */}
+      <DataTable initRows={tableData} columns={columns} />
+      <ShippingConfigModal
+        data={diaglogData}
+        show={showModal}
+        onClose={onCloseModal}
+      />
     </div>
   );
 };

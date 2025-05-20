@@ -7,4 +7,10 @@ export const Api = {
   async updateSettings(params) {
     return await makeRequest("/update_settings", params, "POST");
   },
+  async getShippingConfigs(params) {
+    return await makeRequest("/shipping", params);
+  },
+  async updateShippingConfig(params) {
+    return await makeRequest("/shipping", params, "PUT");
+  },
 };

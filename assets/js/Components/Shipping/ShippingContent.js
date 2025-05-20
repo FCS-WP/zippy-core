@@ -1,12 +1,39 @@
-import React from 'react'
-import MinCostFreeShip from './MinCostFreeShip'
+import React, { useState } from "react";
+import MinCostFreeShip from "./MinCostFreeShip";
+import { Box, Collapse, Divider, FormControlLabel, Switch } from "@mui/material";
+import ShippingTable from "./ShippingTable";
 
 const ShippingContent = () => {
-  return (
-    <div className="zippy-settings-content"> 
-      <MinCostFreeShip />
-    </div>
-  )
-}
+  const [tableChecked, setTableChecked] = useState(false);
 
-export default ShippingContent
+  const handleChangeTableChecked = () => {
+    setTableChecked((prev) => !prev);
+  };
+
+  return (
+    <Box className="zippy-settings-content">
+      <Box px={5}>
+        <MinCostFreeShip />
+        <Divider sx={{ my: 4 }} />
+        <Box>
+          <FormControlLabel
+            sx={{ mb: 2 }}
+            control={
+              <Switch
+                checked={tableChecked}
+                onChange={handleChangeTableChecked}
+                name="active-table"
+              />
+            }
+            label="Shipping By Categories"
+          />
+            <Collapse in={tableChecked}>
+              <ShippingTable />
+            </Collapse>
+        </Box>
+      </Box>
+    </Box>
+  );
+};
+
+export default ShippingContent;
