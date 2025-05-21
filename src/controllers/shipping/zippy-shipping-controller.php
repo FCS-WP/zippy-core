@@ -75,6 +75,7 @@ class Zippy_Shipping_Controller
         if (is_wp_error($validation)) {
             return $validation;
         }
+
         $config_id     = isset($params['id']) ? intval($params['id']) : 0;
         $name          = sanitize_text_field($params['name']);
         $shipping_fee  = floatval($params['shipping_fee']);
@@ -99,7 +100,7 @@ class Zippy_Shipping_Controller
                 ['%d']
             );
         } else {
-    
+
             $data['created_at'] = current_time('mysql');
             $wpdb->insert(
                 $table_name,
@@ -170,5 +171,31 @@ class Zippy_Shipping_Controller
         }
     }
 
-    public static function save_configs(WP_REST_Request $request) {}
+    public static function save_configs(WP_REST_Request $request)
+    {
+        $params = $request->get_params();
+
+        $rules = [
+            'min_cost'     => 'float',
+            'is_active' => 'boolean',
+        ];
+
+        $validation = Shipping_Helper::validate_request_data($params, $rules);
+
+        if (is_wp_error($validation)) {
+            return $validation;
+        }
+        $is_active = boolval($params['is_active']) ? 1 : 0;
+
+        update_option('shipping_config_min_cost', floatval($params['min_cost']));
+        update_option('shipping_config_is_active', $is_active);
+
+        return rest_ensure_response([
+            'success' => true,
+            'results'    => [
+                'min_cost'  => floatval(get_option('shipping_config_min_cost', 0)),
+                'is_active' => intval(get_option('shipping_config_is_active', -1)),
+            ],
+        ]);
+    }
 }

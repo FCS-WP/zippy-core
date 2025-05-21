@@ -10,7 +10,16 @@ export const Api = {
   async getShippingConfigs(params) {
     return await makeRequest("/shipping", params);
   },
-  async updateShippingConfig(params) {
+  async updateShippingConfigs(params) {
     return await makeRequest("/shipping", params, "PUT");
+  },
+  async deleteShippingConfigs(params) {
+    return await makeRequest("/shipping", params, "DELETE");
+  },
+  async saveShippingConfigs(params) {
+    return await makeRequest("/save-shipping-config", params, "POST");
+  },
+  async searchCategories(params) {
+    return await makeRequest("/categories", params);
   },
 };

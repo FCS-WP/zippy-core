@@ -30,7 +30,6 @@ class Zippy_Shipping_Router
 
     }
 
-
     public function zippy_shipping_init_api()
     {
         register_rest_route(ZIPPY_SHIPPING_API_NAMESPACE, '/products', array(
@@ -60,6 +59,12 @@ class Zippy_Shipping_Router
         register_rest_route(ZIPPY_SHIPPING_API_NAMESPACE, '/shipping', array(
             'methods' => 'DELETE',
             'callback' => [Zippy_Shipping_Controller::class, 'remove_shipping_configs'],
+            'permission_callback' => '__return_true',
+        ));
+
+        register_rest_route(ZIPPY_SHIPPING_API_NAMESPACE, '/save-shipping-config', array(
+            'methods' => 'POST',
+            'callback' => [Zippy_Shipping_Controller::class, 'save_configs'],
             'permission_callback' => '__return_true',
         ));
     }
