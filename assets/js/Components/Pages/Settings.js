@@ -6,6 +6,7 @@ import { Api } from "../../api";
 import CustomizeShipping from "./Shipping/CustomizeShipping";
 import { Box, Button, Tab, Tabs } from "@mui/material";
 import CustomTabPanel from "../Layouts/CustomTabPanel";
+import { ToastContainer } from "react-toastify";
 
 const Settings = () => {
   const [tabValue, setTabValue] = React.useState(0);
@@ -101,6 +102,7 @@ const Settings = () => {
       <Button sx={{ mt: 3 }} onClick={handleSubmit} variant="contained">
         Save Changes
       </Button>
+      <ToastContainer />
     </Box>
   );
 };

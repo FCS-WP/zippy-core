@@ -7,9 +7,18 @@ import {
   Table,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 
 const MinCostFreeShip = () => {
+
+  const [costValue, setCostValue] = useState(null);
+  const handleChangeCost = (e) => {
+   if (e.target.value < 0) {
+    return;
+   }
+   setCostValue(e.target.value);
+  }
+
   return (
     <div>
       <Grid container>
@@ -24,6 +33,8 @@ const MinCostFreeShip = () => {
             <OutlinedInput
               size="small"
               type="number"
+              value={costValue ?? ""}
+              onChange={handleChangeCost}
               id="outlined-adornment-amount"
               startAdornment={
                 <InputAdornment position="start">$</InputAdornment>

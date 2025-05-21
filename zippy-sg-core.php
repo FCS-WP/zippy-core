@@ -56,6 +56,11 @@ if (!defined('ZIPPY_CORE_URL')) {
 
 define( 'MY_PLUGIN_SLUG', 'my-plugin-slug' );
 
+if (!defined('ZIPPY_SHIPPING_API_NAMESPACE')) {
+  define('ZIPPY_SHIPPING_API_NAMESPACE', 'zippy-core/v1');
+}
+
+
 /* ------------------------------------------
 // i18n
 ---------------------------- --------------------------------------------- */
@@ -93,6 +98,7 @@ use Zippy_Core\Src\Woocommerce\Zippy_Postal_code;
 
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
+use Zippy_Core\Src\Routers\Shipping\Zippy_Shipping_Router;
 
 /**
  * Zippy Plugin update
@@ -142,3 +148,5 @@ Zippy_Analytics::get_instance();
 Zippy_Woocommerce::get_instance();
 
 Zippy_Postal_code::get_instance();
+
+Zippy_Shipping_Router::get_instance();
