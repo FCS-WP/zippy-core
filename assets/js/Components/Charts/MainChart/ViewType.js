@@ -1,12 +1,6 @@
-import React from "react";
-import {
-  Badge,
-  CardBody,
-  Col,
-  DropdownButton,
-  DropdownItem,
-  Row,
-} from "react-bootstrap";
+import { Badge, Box, Grid, Menu, MenuItem, Select } from "@mui/material";
+import React, { useEffect } from "react";
+
 const ViewType = ({
   viewTypeSelected,
   onClickViewType,
@@ -27,12 +21,12 @@ const ViewType = ({
       key: "month",
     },
   ];
-  return (
-    <CardBody className="reportFilter">
-      <Row>
-        <Col md="6" xs="6" className="d-flex view-type">
-          <span> Currently viewing By:</span>
 
+  return (
+    <Box mb={3}>
+      <Grid container>
+        <Grid size={6} className="d-flex view-type">
+          <span> Currently viewing By:</span>
           {currentViewBy?.name && (
             <div className="font-weight-bold small">
               <Badge
@@ -47,26 +41,23 @@ const ViewType = ({
               </Badge>
             </div>
           )}
-        </Col>
-        <Col md="6" xs="6">
-          <DropdownButton
-            title={`By ${viewTypeSelected}`}
-            variant="tranparent"
-            className="float-right  "
-          >
+        </Grid>
+        <Grid size={6}>
+          <Select fullWidth size="small" value={viewTypeSelected}>
             {viewTypes.map((viewType) => (
-              <DropdownItem
+              <MenuItem
                 className="btn-viewby"
                 onClick={() => onClickViewType(viewType.key)}
+                value={viewType.key}
                 key={viewType.key}
               >
                 {viewType.title}
-              </DropdownItem>
+              </MenuItem>
             ))}
-          </DropdownButton>
-        </Col>
-      </Row>
-    </CardBody>
+          </Select>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 export default ViewType;

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Container, Spinner, Alert } from "react-bootstrap";
 import AuthTitle from "../Title/AuthTitle";
 import { Woocommerce } from "../../Woocommerce/woocommerce";
 import { Api } from "../../api";
 import WooAuthForm from "../Forms/WooAuthForm";
+import { Box } from "@mui/material";
 const AuthContent = () => {
   const [htmlAuth, setHtmlAuth] = useState();
   const [auth, setAuth] = useState("unauthorized");
@@ -57,15 +57,15 @@ const AuthContent = () => {
     fetchCredentials(params);
   };
 
-  if (loading) return <Spinner animation="border" variant="primary" />;
+  // if (loading) return <Spinner animation="border" variant="primary" />;
 
   return (
-    <div id="zippy-content">
-      {error && <Alert variant="danger">{error}</Alert>}
+    <div id="zippy-settings-content">
+      {/* {error && <Alert variant="danger">{error}</Alert>} */}
 
       {!htmlAuth ? (
         <div className="content-wrapper">
-          <Container className="w-80">
+          <Box display={'flex'} flexDirection={'column'} justifyContent={'center'} alignItems={'center'} gap={3}>
             <AuthTitle loading={loading} status={auth} />
             {auth === "unauthorized" && !loading ? (
               <WooAuthForm
@@ -76,14 +76,14 @@ const AuthContent = () => {
             ) : (
               <div className="text-center mt-5">
                 <a
-                  className="btn btn-outline-success "
+                  className="btn btn-primary"
                   href="/wp-admin/admin.php?page=admin.php?page=wc-zippy-dashboard"
                 >
                   Go to Dashboad
                 </a>
               </div>
             )}
-          </Container>
+          </Box>
         </div>
       ) : (
         <div className="content-wrapper">
