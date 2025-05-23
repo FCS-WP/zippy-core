@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Chip,
   Grid,
   IconButton,
   InputAdornment,
@@ -19,108 +20,72 @@ import {
 } from "../custom-mui/CustomLayouts";
 import { debounce } from "../../helper/debounce";
 import SearchIcon from "@mui/icons-material/Search";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import AddIcon from "@mui/icons-material/Add";
 import { toast } from "react-toastify";
+import { Api } from "../../api";
 
-const SearchBox = () => {
-  const [productSearch, setProductSearch] = useState("");
-  const [selectedProducts, setSelectedProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+const SearchBox = ({ includeCategories, update }) => {
+
+  const [categorySearch, setCategorySearch] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const debounceFetchProducts = useCallback(
-    debounce(async (keyword, type) => {
-      // if (keyword.trim()) {
-      //   const dataProducts = await handleSearch(keyword);
-      //   if (dataProducts) {
-      //     setFilteredProducts(dataProducts);
-      //   } else {
-      //     toast.error("Search error");
-      //     setFilteredProducts([]);
-      //   }
-      // } else {
-      //   setFilteredProducts([]);
-      // }
-      console.log("Search", keyword);
+  const handleSearch = async (keyword) => {
+    const params = {
+      keyword: keyword,
+    };
+
+    const response = await Api.searchCategories(params);
+    return response?.data.results;
+  };
+
+  const debounceFetchCategories = useCallback(
+    debounce(async (keyword) => {
+      if (keyword.trim()) {
+        const dataProducts = await handleSearch(keyword);
+        if (dataProducts) {
+          setFilteredCategories(dataProducts);
+        } else {
+          toast.error("Search error");
+          setFilteredCategories([]);
+        }
+      } else {
+        setFilteredCategories([]);
+      }
     }, 500),
     []
   );
 
   useEffect(() => {
-    debounceFetchProducts(productSearch, "product");
-  }, [productSearch]);
+    debounceFetchCategories(categorySearch);
+  }, [categorySearch]);
 
-  const handleProductClick = (product) => {
-    const isInSelectedArr = selectedProducts.find(
-      (item) => item.id === product.id
+  const handleCategoryClick = (categories) => {
+    const isInSelectedArr = selectedCategories.find(
+      (item) => item.id === categories.id
     );
     if (!isInSelectedArr) {
-      setSelectedProducts([...selectedProducts, product]);
+      setSelectedCategories([...selectedCategories, categories]);
     }
-    setProductSearch("");
+    setCategorySearch("");
   };
 
   const handleProductKeyDown = (event) => {
-    if (event.key === "Enter" && filteredProducts.length > 0) {
-      handleProductClick(filteredProducts[0]);
+    if (event.key === "Enter" && filteredCategories.length > 0) {
+      handleCategoryClick(filteredCategories[0]);
       event.preventDefault();
     }
   };
 
-  const handleDeleteProduct = (productToDelete) => {
-    setSelectedProducts(
-      selectedProducts.filter((product) => product !== productToDelete)
+  const handleDeleteCategory = (productToDelete) => {
+    setSelectedCategories(
+      selectedCategories.filter((product) => product !== productToDelete)
     );
   };
 
-  const handleAddProducts = async () => {
-    setIsLoading(true);
-
-    if (selectedProducts.length <= 0) {
-      toast.error("Select product first!");
-      setIsLoading(false);
-      return false;
-    }
-
-    try {
-      const addedIds = [];
-      const prepareRequestData = selectedProducts.map((item) => {
-        const productInfo = {
-          items_id: item.id,
-          mapping_type: "product",
-        };
-        addedIds.push(productInfo);
-      });
-      const params = {
-        products: addedIds,
-      };
-      const { data } = await Api.addSupportProducts(params);
-
-      if (!data) {
-        setIsLoading(false);
-        toast.error("Can not add categories!");
-        return false;
-      }
-
-      if (data.status != "success") {
-        setIsLoading(false);
-        toast.error(data.message);
-        return false;
-      }
-
-      toast.success("Add products successfully!");
-      setSelectedProducts([]);
-      updateListMapping();
-    } catch (error) {
-      toast.error("Can not add products!");
-    }
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-  };
-
-  const tooltipAddProducts = `The products you add will be supported for booking.`;
+  useEffect(()=>{
+    setSelectedCategories(includeCategories);
+  }, [includeCategories])
 
   return (
     <Box>
@@ -128,11 +93,12 @@ const SearchBox = () => {
         <SearchContainer>
           <TextField
             fullWidth
-            label="Search Products"
+            size="small"
+            label="Search category"
             variant="outlined"
             placeholder="Type to search..."
-            value={productSearch}
-            onChange={(e) => setProductSearch(e.target.value)}
+            value={categorySearch}
+            onChange={(e) => setCategorySearch(e.target.value)}
             onKeyDown={handleProductKeyDown}
             slotProps={{
               input: {
@@ -144,15 +110,15 @@ const SearchBox = () => {
               },
             }}
           />
-          {productSearch && (
+          {categorySearch && (
             <SuggestionsContainer>
               <List>
-                {filteredProducts.length > 0 ? (
-                  filteredProducts.map((product, index) => (
+                {filteredCategories.length > 0 ? (
+                  filteredCategories.map((product, index) => (
                     <ListItemButton
                       key={index}
-                      divider={index !== filteredProducts.length - 1}
-                      onClick={() => handleProductClick(product)}
+                      divider={index !== filteredCategories.length - 1}
+                      onClick={() => handleCategoryClick(product)}
                     >
                       <ListItemText primary={product.name} />
                     </ListItemButton>
@@ -169,43 +135,18 @@ const SearchBox = () => {
             </SuggestionsContainer>
           )}
         </SearchContainer>
-        <Grid container spacing={3} alignItems={"end"}>
-          <Grid
-            display={"flex"}
-            justifyContent={"end"}
-            textAlign={"end"}
-            alignItems={"center"}
-            gap={1}
-          >
-            <Button
-              className="btn-hover-float"
-              disabled={isLoading}
-              sx={{ fontSize: "12px" }}
-              onClick={handleAddProducts}
-              variant="contained"
-              startIcon={<AddIcon />}
-            >
-              Add Products
-            </Button>
-            <Tooltip title={tooltipAddProducts}>
-              <IconButton size="small" sx={{ p: 0, mb: 0.5 }}>
-                <HelpOutlineIcon role="button" />
-              </IconButton>
-            </Tooltip>
-          </Grid>
+        <Grid>
+          <ChipContainer>
+            {selectedCategories.map((category, index) => (
+              <Chip
+                key={index}
+                label={category.name}
+                onDelete={() => handleDeleteCategory(category)}
+              />
+            ))}
+          </ChipContainer>
         </Grid>
       </StyledPaper>
-      <Grid>
-        <ChipContainer>
-          {selectedProducts.map((product, index) => (
-            <Chip
-              key={index}
-              label={product.name}
-              onDelete={() => handleDeleteProduct(product)}
-            />
-          ))}
-        </ChipContainer>
-      </Grid>
     </Box>
   );
 };

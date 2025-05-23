@@ -15,12 +15,15 @@ class Zippy_Shipping_Controller
 
         $table_name = $wpdb->prefix . 'shipping_by_categories';
 
-        $results = $wpdb->get_results("SELECT id, category_ids, name, shipping_fee FROM {$table_name}", ARRAY_A);
+        $results = $wpdb->get_results("SELECT id, category_ids, name, note, shipping_fee FROM {$table_name}", ARRAY_A);
+
 
         if (empty($results)) {
             return rest_ensure_response([
                 'success' => true,
-                'data'    => [],
+                'results'    => [],
+                'min_cost'  => floatval(get_option('shipping_config_min_cost', 0)),
+                'is_active' => intval(get_option('shipping_config_is_active', -1)),
             ]);
         }
 
@@ -47,6 +50,7 @@ class Zippy_Shipping_Controller
             $response[] = [
                 'id'                => intval($row['id']),
                 'name'                => $row['name'],
+                'note'                => $row['note'],
                 'category_includes' => $categories,
                 'shipping_fee'      => floatval($row['shipping_fee']),
             ];
@@ -54,7 +58,9 @@ class Zippy_Shipping_Controller
 
         return rest_ensure_response([
             'success' => true,
-            'data'    => $response,
+            'results'    => $response,
+            'min_cost'  => floatval(get_option('shipping_config_min_cost', 0)),
+            'is_active' => intval(get_option('shipping_config_is_active', -1)),
         ]);
     }
 
@@ -78,6 +84,7 @@ class Zippy_Shipping_Controller
 
         $config_id     = isset($params['id']) ? intval($params['id']) : 0;
         $name          = sanitize_text_field($params['name']);
+        $note          = sanitize_text_field($params['note']);
         $shipping_fee  = floatval($params['shipping_fee']);
         $category_ids  = array_map('intval', $params['category_ids']);
         $category_ids_json = wp_json_encode($category_ids);
@@ -86,6 +93,7 @@ class Zippy_Shipping_Controller
 
         $data = [
             'name'          => $name,
+            'note'          => $note,
             'category_ids'  => $category_ids_json,
             'shipping_fee'  => $shipping_fee,
             'updated_at'    => current_time('mysql'),
@@ -96,7 +104,7 @@ class Zippy_Shipping_Controller
                 $table_name,
                 $data,
                 ['id' => $config_id],
-                ['%s', '%s', '%f', '%s'],
+                ['%s', '%s', '%s', '%f', '%s'],
                 ['%d']
             );
         } else {
@@ -105,7 +113,7 @@ class Zippy_Shipping_Controller
             $wpdb->insert(
                 $table_name,
                 $data,
-                ['%s', '%s', '%f', '%s', '%s']
+                ['%s', '%s', '%s', '%f', '%s', '%s']
             );
             $config_id = $wpdb->insert_id;
         }
@@ -160,6 +168,7 @@ class Zippy_Shipping_Controller
             $sql = "CREATE TABLE {$table_name} (
                 id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
                 category_ids TEXT NOT NULL,
+                note TEXT NOT NULL,
                 name VARCHAR(255) NOT NULL,
                 shipping_fee DECIMAL(10,2) NOT NULL DEFAULT 0,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -185,10 +194,12 @@ class Zippy_Shipping_Controller
         if (is_wp_error($validation)) {
             return $validation;
         }
-        $is_active = boolval($params['is_active']) ? 1 : 0;
+        
+        $is_active = filter_var($params['is_active'], FILTER_VALIDATE_BOOLEAN);
+        $save_active_value = $is_active ? 1 : 0;
 
         update_option('shipping_config_min_cost', floatval($params['min_cost']));
-        update_option('shipping_config_is_active', $is_active);
+        update_option('shipping_config_is_active', $save_active_value);
 
         return rest_ensure_response([
             'success' => true,

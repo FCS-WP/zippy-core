@@ -6,17 +6,21 @@ import { Api } from "../../api";
 import CustomizeShipping from "./Shipping/CustomizeShipping";
 import { Box, Button, Tab, Tabs } from "@mui/material";
 import CustomTabPanel from "../Layouts/CustomTabPanel";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 const Settings = () => {
   const [tabValue, setTabValue] = React.useState(0);
   const [postalCode, setPostalCode] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [shipData, setShipData] = useState();
+
+  const updateTempShippingData = (newData) => {
+    setShipData(newData);
+  }
 
   const handlePostcodeChange = (e) => {
     setPostalCode(e.target.value);
-    console.log(e.target.value);
   };
 
   const handleChangeTabValue = (event, newValue) => {
@@ -30,13 +34,23 @@ const Settings = () => {
           key: "_zippy_postal_code",
           value: postalCode,
         };
-        const { data } = await Api.updateSettings(params);
         setLoading(true);
+        const { data } = await Api.updateSettings(params);
         window.location.reload();
         break;
       case 2:
-        // Handle save shipping & Reload
-        console.log("Handle Shipping Reload");
+        setLoading(true);
+        const saveResponse = await Api.saveShippingConfigs({
+          min_cost: shipData.cost,
+          is_active: shipData.active
+        });
+
+        if (!saveResponse || saveResponse.data.success !== true) {
+          toast.error("Error when update shipping config!");
+          return;
+        } else {
+          window.location.reload();
+        }
       default:
         break;
     }
@@ -96,7 +110,7 @@ const Settings = () => {
           />
         </CustomTabPanel>
         <CustomTabPanel value={tabValue} index={2}>
-          <CustomizeShipping />
+          <CustomizeShipping onUpdateData={updateTempShippingData} />
         </CustomTabPanel>
       </Box>
       <Button sx={{ mt: 3 }} onClick={handleSubmit} variant="contained">

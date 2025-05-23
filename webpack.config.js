@@ -80,7 +80,12 @@ module.exports = [
           issuer: {
               and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
           },
-        }
+        },
+        // Load @mui/x-data
+        {
+          test: /\.css$/i,
+          use: ['style-loader', 'css-loader'],
+        },
       ],
     },
     // externals: {

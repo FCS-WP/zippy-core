@@ -16,21 +16,34 @@ import {
 import React, { useEffect, useState } from "react";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import SearchBox from "../Search/SearchBox";
+import BorderColorIcon from '@mui/icons-material/BorderColor';
 
 const ShippingConfigModal = ({ data, show, onClose }) => {
-  const [costValue, setCostValue] = useState(null);
-  const handleChangeCost = (e) => {
+  const [shippingFee, setShippingFee] = useState(null);
+  const [name, setName] = useState('');
+  const [note, setNote] = useState('');
+  const [includeCategories, setIncludeCategories] = useState([]);
+
+  const handleChangeShippingFee = (e) => {
     if (e.target.value < 0) {
       return;
     }
-    setCostValue(e.target.value);
+    setShippingFee(e.target.value);
   };
 
   const handleSaveData = (e) => {
     e.preventDefault();
-    console.log("Submit form, data:", data);
     onClose();
   };
+
+  useEffect(() => {
+    if (data) {
+      setShippingFee(data.shipping_fee);
+      setName(data.name);
+      setNote(data.note);
+      setIncludeCategories(data.category_includes);
+    }
+  }, [data]);
 
   useEffect(() => {
     return () => {};
@@ -57,9 +70,42 @@ const ShippingConfigModal = ({ data, show, onClose }) => {
                 </Typography>
               </Grid>
               <Grid size={6}>
-                <SearchBox />
+                <SearchBox includeCategories={includeCategories}/>
               </Grid>
             </Grid>
+            {/* Name */}
+            <Grid
+              size={12}
+              display={"flex"}
+              justifyContent={"center"}
+              alignItems={"center"}
+              gap={3}
+            >
+              <Grid size={3}>
+                <Typography variant="body2" fontSize={16} fontWeight={600}>
+                  Note:
+                </Typography>
+              </Grid>
+              <Grid size={6}>
+                <FormControl fullWidth>
+                  <InputLabel htmlFor="input-name">Name</InputLabel>
+                  <OutlinedInput
+                    size="small"
+                    type="text"
+                    id="input-name"
+                    value={name ?? ""}
+                    onChange={(e)=>setName(e.target.value)}
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <BorderColorIcon />
+                      </InputAdornment>
+                    }
+                    label="Name"
+                  />
+                </FormControl>
+              </Grid>
+            </Grid>
+            {/* Shipping Fee */}
             <Grid
               size={12}
               display={"flex"}
@@ -80,8 +126,8 @@ const ShippingConfigModal = ({ data, show, onClose }) => {
                   <OutlinedInput
                     size="small"
                     type="number"
-                    value={costValue ?? ""}
-                    onChange={handleChangeCost}
+                    value={shippingFee ?? ""}
+                    onChange={handleChangeShippingFee}
                     id="outlined-adornment-amount"
                     startAdornment={
                       <InputAdornment position="start">$</InputAdornment>
@@ -91,6 +137,7 @@ const ShippingConfigModal = ({ data, show, onClose }) => {
                 </FormControl>
               </Grid>
             </Grid>
+            {/* Note */}
             <Grid
               size={12}
               display={"flex"}
@@ -110,6 +157,8 @@ const ShippingConfigModal = ({ data, show, onClose }) => {
                     size="small"
                     type="text"
                     id="input-note"
+                    value={note ?? ""}
+                    onChange={(e)=>setNote(e.target.value)}
                     startAdornment={
                       <InputAdornment position="start">
                         <EditNoteIcon />
@@ -122,7 +171,7 @@ const ShippingConfigModal = ({ data, show, onClose }) => {
             </Grid>
           </Grid>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ p: 3 }}>
           <Button onClick={onClose}>Cancel</Button>
           <Button variant="contained" onClick={handleSaveData} autoFocus>
             Update

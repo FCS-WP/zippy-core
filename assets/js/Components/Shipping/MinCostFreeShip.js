@@ -7,17 +7,27 @@ import {
   Table,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useShippingProvider } from "../../contexts/ShippingProvider";
 
-const MinCostFreeShip = () => {
+const MinCostFreeShip = ({ onChangeCost }) => {
+  const { minCost } = useShippingProvider();
+  const [costValue, setCostValue] = useState(minCost);
 
-  const [costValue, setCostValue] = useState(null);
   const handleChangeCost = (e) => {
    if (e.target.value < 0) {
     return;
    }
    setCostValue(e.target.value);
   }
+
+  useEffect(()=>{
+    setCostValue(minCost);
+  }, [minCost])
+  
+  useEffect(()=>{
+   onChangeCost(costValue);
+  }, [costValue])
 
   return (
     <div>

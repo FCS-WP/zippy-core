@@ -20,7 +20,6 @@ const ShippingTable = () => {
   };
 
   // Table Function
-
   const tableData = shippingData
     ? shippingData.map((item) => {
         return {

@@ -1,32 +1,46 @@
 import React, { useContext, useEffect, useState } from "react";
 import ShippingContext from "./ShippingContext";
 import { exampleData } from "../Components/Shipping/exampleData";
+import { Api } from "../api";
 
 export const ShippingProvider = ({ children }) => {
   const [shippingData, setShippingData] = useState(null);
   const [minCost, setMinCost] = useState(0);
+  const [isShipByCategoryActive, setIsShipByCategoryActive] = useState(false);
 
-  const getShippingConfigs = async () => {
-    // Call Api here;
-    const initShippingData = {
-      min_cost: 50,
-      ship_by_categories: exampleData,
+  const fetchShippingConfigs = async () => {
+    const response = await Api.getShippingConfigs();
+
+    if (!response || response.data.success !== true) {
+      console.log("Failed to get shipping configs");
+      return;
     }
-    setMinCost(initShippingData.min_cost)
-    setShippingData(initShippingData.ship_by_categories);
-  }
+    const data = response.data;
+
+    setMinCost(data.min_cost ?? 0);
+    setIsShipByCategoryActive(data.is_active == 1 ? true : false);
+    setShippingData(data.results ?? []);
+
+    return;
+  };
 
   useEffect(() => {
-    getShippingConfigs();
+    fetchShippingConfigs();
     return () => {};
   }, []);
 
   const value = {
     shippingData,
     minCost,
+    isShipByCategoryActive,
+    fetchShippingConfigs,
   };
 
-  return <ShippingContext.Provider value={value}>{children}</ShippingContext.Provider>;
+  return (
+    <ShippingContext.Provider value={value}>
+      {children}
+    </ShippingContext.Provider>
+  );
 };
 
 export const useShippingProvider = () => useContext(ShippingContext);
