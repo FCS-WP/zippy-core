@@ -25,36 +25,36 @@ defined('ABSPATH') or die('°_°’');
 /* Set plugin version constant. */
 
 if (!defined('ZIPPY_CORE_VERSION')) {
-	define('ZIPPY_CORE_VERSION', '4.0');
+  define('ZIPPY_CORE_VERSION', '4.0');
 }
 
 /* Set plugin name. */
 
 if (!defined('ZIPPY_CORE_NAME')) {
-	define('ZIPPY_CORE_NAME', 'ZippySG Core');
+  define('ZIPPY_CORE_NAME', 'ZippySG Core');
 }
 
 if (!defined('ZIPPY_CORE_PREFIX')) {
-	define('ZIPPY_CORE_PREFIX', 'zippysg_core');
+  define('ZIPPY_CORE_PREFIX', 'zippysg_core');
 }
 
 if (!defined('ZIPPY_CORE_BASENAME')) {
-	define('ZIPPY_CORE_BASENAME', plugin_basename(__FILE__));
+  define('ZIPPY_CORE_BASENAME', plugin_basename(__FILE__));
 }
 
 /* Set constant path to the plugin directory. */
 
 if (!defined('ZIPPY_CORE_DIR_PATH')) {
-	define('ZIPPY_CORE_DIR_PATH', plugin_dir_path(__FILE__));
+  define('ZIPPY_CORE_DIR_PATH', plugin_dir_path(__FILE__));
 }
 
 /* Set constant url to the plugin directory. */
 
 if (!defined('ZIPPY_CORE_URL')) {
-	define('ZIPPY_CORE_URL', plugin_dir_url(__FILE__));
+  define('ZIPPY_CORE_URL', plugin_dir_url(__FILE__));
 }
 
-define( 'MY_PLUGIN_SLUG', 'my-plugin-slug' );
+define('MY_PLUGIN_SLUG', 'my-plugin-slug');
 
 /* ------------------------------------------
 // i18n
@@ -70,14 +70,17 @@ load_plugin_textdomain('zippy-sg-core', false, basename(dirname(__FILE__)) . '/l
 /* ------------------------------------------
 // Includes
  --------------------------- --------------------------------------------- */
+if (!class_exists(\Composer\Autoload\ClassLoader::class)) {
+  require_once ZIPPY_PAY_DIR_PATH . 'vendor/autoload.php';
+}
 require ZIPPY_CORE_DIR_PATH . '/includes/autoload.php';
-require ZIPPY_CORE_DIR_PATH . '/vendor/autoload.php';
+
 require ZIPPY_CORE_DIR_PATH . 'vendor/plugin-update-checker/plugin-update-checker.php';
 
 
-use	Zippy_Core\Src\Admin\Zippy_Admin_Setting;
+use  Zippy_Core\Src\Admin\Zippy_Admin_Setting;
 
-use	Zippy_Core\Src\Admin\Zippy_Admin_Url;
+use  Zippy_Core\Src\Admin\Zippy_Admin_Url;
 
 use Zippy_Core\Src\Core\Zippy_Core;
 
