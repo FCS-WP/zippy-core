@@ -1,36 +1,35 @@
+import { Box, FormControl, FormGroup, Grid, MenuItem, Select, Typography } from "@mui/material";
 import React from "react";
-import {
-  Col,
-  Container,
-  Form,
-  FormControl,
-  FormGroup,
-  Row,
-} from "react-bootstrap";
+
 const PostalCode = ({ postalCodeChange, postalCode, ...props }) => {
   return (
     <div className="zippy-settings-content">
-      <Container>
-        <FormGroup controlId="enable_postalcode">
-          <Row>
-            <Col sm="2" className="d-flex align-items-center">
-              <Form.Label className="m-0">
-                <strong>Enable</strong>
-              </Form.Label>
-            </Col>
-            <Col sm="4">
-              <FormControl
-                as="select"
-                value={postalCode}
-                onChange={(e) => postalCodeChange(e)}
-              >
-                <option value={1}>Yes</option>
-                <option value={0}>No</option>
+      <Box>
+        <>
+          <Grid container justifyContent={'center'} alignItems={'center'}>
+            <Grid size={2} className="d-flex align-items-center">
+              <Typography fontWeight={'bold'}>
+                Enable
+              </Typography>
+            </Grid>
+            <Grid size={4}>
+              <FormControl sx={{ width: 300 }}>
+                <Select
+                  size="small"
+                  value={postalCode}
+                  id="enable_postalcode"
+                  onChange={(e) => postalCodeChange(e)}
+                  displayEmpty
+                  inputProps={{ "aria-label": "Without label" }}
+                >
+                  <MenuItem value={1}>Yes</MenuItem>
+                  <MenuItem value={0}>No</MenuItem>
+                </Select>
               </FormControl>
-            </Col>
-          </Row>
-        </FormGroup>
-      </Container>
+            </Grid>
+          </Grid>
+        </>
+      </Box>
     </div>
   );
 };

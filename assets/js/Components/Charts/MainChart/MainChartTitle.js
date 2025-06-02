@@ -1,5 +1,5 @@
+import { Box, Grid } from "@mui/material";
 import React, { useEffect } from "react";
-import { CardBody, Col, Row } from "react-bootstrap";
 const MainChartTitle = ({
   netSales,
   totalSale,
@@ -8,23 +8,21 @@ const MainChartTitle = ({
   ...props
 }) => {
   return (
-    <CardBody className="border-bottom">
-      <Row>
-        <Col sm="6">
+    <Box>
+      <Grid container>
+        <Grid size={6}>
           <h4>Total Sales</h4>
-        </Col>
-        <Col sm="3" xs="6">
+        </Grid>
+        <Grid size={{ xs: 6, sm: 3 }}>
           <label>Total Sales</label>
-
           <h5>${totalSale}</h5>
-        </Col>
-        <Col sm="3" xs="6">
+        </Grid>
+        <Grid size={{ xs: 6, sm: 3 }}>
           <label>Net Sales</label>
-
           <h5>${netSales}</h5>
-        </Col>
-      </Row>
-    </CardBody>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 export default MainChartTitle;

@@ -5,11 +5,11 @@ import React, {
   useRef,
   useCallback,
 } from "react";
-import { Card, CardBody, Spinner, Alert } from "react-bootstrap";
 import { Chart, registerables } from "chart.js";
 import { Woocommerce } from "../../../Woocommerce/woocommerce";
 import { Line, getElementAtEvent } from "react-chartjs-2";
 import { DateHelper } from "../../../helper/date-helper";
+import { Box, CircularProgress } from "@mui/material";
 Chart.register(...registerables);
 
 const MainChart = ({
@@ -59,6 +59,7 @@ const MainChart = ({
       },
     ],
   });
+  
   const fetchData = useCallback(async (params) => {
     setLoading(true);
     setError(null);
@@ -76,7 +77,7 @@ const MainChart = ({
       }));
       const dataIntervals = dataTotal.map((interval) => interval.labels);
       const dataNetRevenue = data.intervals.map(
-        (interval) => interval.subtotals.net_revenue 
+        (interval) => interval.subtotals.net_revenue
       );
       setdataTotal(dataTotal);
       setChartData({
@@ -117,9 +118,9 @@ const MainChart = ({
   };
 
   return (
-    <CardBody className="">
-      {loading && <Spinner animation="border" variant="primary" />}
-      {error && <Alert variant="danger">{error}</Alert>}
+    <Box>
+      {loading && <CircularProgress color="primary" />}
+      {error && <Alert severity="error">{error}.</Alert>}
       <Line
         height={430}
         width={780}
@@ -128,7 +129,7 @@ const MainChart = ({
         onClick={handleOnClickChart}
         options={options}
       />
-    </CardBody>
+    </Box>
   );
 };
 

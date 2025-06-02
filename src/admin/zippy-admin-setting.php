@@ -34,6 +34,7 @@ class Zippy_Admin_Setting
   {
     add_action('admin_menu',  array($this, 'zippy_setting'));
     add_action('rest_api_init', array($this, 'zippy_setting_init_api'));
+    add_action('admin_enqueue_scripts', array($this, 'remove_default_stylesheets'));
     add_filter('plugin_action_links_' . ZIPPY_CORE_BASENAME, array($this, 'zippy_action_links'));
   }
 
@@ -113,5 +114,50 @@ class Zippy_Admin_Setting
   public function render()
   {
     echo Zippy_Utils_Core::get_template('admin-settings.php', [], dirname(__FILE__), '/templates');
+  }
+
+  public function remove_default_stylesheets($handle)
+  {
+    $apply_urls = [
+      'settings_page_zippy-setting',
+      'woocommerce_page_admin-page-wc-zippy-dashboard'
+    ];
+
+    if (in_array($handle, $apply_urls)) {
+      // Deregister the 'forms' stylesheet
+      wp_deregister_style('forms');
+
+      add_action('admin_head', function () {
+        $admin_url = get_admin_url();
+        $styles_to_load = [
+          'dashicons',
+          'admin-bar',
+          'common',
+          'admin-menu',
+          'dashboard',
+          'list-tables',
+          'edit',
+          'revisions',
+          'media',
+          'themes',
+          'about',
+          'nav-menus',
+          'wp-pointer',
+          'widgets',
+          'site-icon',
+          'l10n',
+          'buttons',
+          'wp-auth-check'
+        ];
+
+        $wp_version = get_bloginfo('version');
+
+        // Generate the styles URL
+        $styles_url = $admin_url . '/load-styles.php?c=0&dir=ltr&load=' . implode(',', $styles_to_load) . '&ver=' . $wp_version;
+
+        // Enqueue the stylesheet
+        echo '<link rel="stylesheet" href="' . esc_url($styles_url) . '" media="all">';
+      });
+    }
   }
 }
