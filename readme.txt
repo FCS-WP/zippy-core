@@ -63,6 +63,9 @@ This version fixes a security related bug.  Upgrade immediately.
 = 1.5 =
 This version enhancements for update plugin
 
+= 2.0 =
+This version enhancements for update plugin
+
 == A brief Markdown Example ==
 
 Markdown is what the parser uses to process much of the readme file.
