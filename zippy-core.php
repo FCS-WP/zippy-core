@@ -94,35 +94,36 @@ use Zippy_Core\Src\Woocommerce\Zippy_Woocommerce;
 
 use Zippy_Core\Src\Woocommerce\Zippy_Postal_code;
 
-use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
-
+use YahnisElsts\PluginUpdateChecker\v5p6\PucFactory;
 
 /**
  * Zippy Plugin update
- *
  */
 if (is_admin()) {
-
-
   $zippyUpdateChecker = PucFactory::buildUpdateChecker(
     'https://github.com/FCS-WP/zippy-core',
     __FILE__,
     'zippy-core'
   );
 
-  $zippyUpdateChecker->setBranch('production');
+  $zippyUpdateChecker->setBranch('master'); // Set the GitHub branch
 
-   $zippyUpdateChecker->getVcsApi()->enableReleaseAssets();
+  // Show upgrade notice if present in readme.txt
+  add_action(
+    'in_plugin_update_message-zippy-core/zippy-core.php',
+    'zippy_show_upgrade_notification',
+    10,
+    2
+  );
 
-  // $zippyUpdateChecker->setAuthentication('your-token-here');
-
-  add_action('in_plugin_update_message-' . ZIPPY_CORE_NAME . '/' . ZIPPY_CORE_NAME . '.php', 'plugin_name_show_upgrade_notification', 10, 2);
-  function plugin_name_show_upgrade_notification($current_plugin_metadata, $new_plugin_metadata)
+  function zippy_show_upgrade_notification($current_plugin_metadata, $new_plugin_metadata)
   {
-
-    if (isset($new_plugin_metadata->upgrade_notice) && strlen(trim($new_plugin_metadata->upgrade_notice)) > 0) {
-
-      echo sprintf('<span style="background-color:#d54e21;padding:10px;color:#f9f9f9;margin-top:10px;display:block;"><strong>%1$s: </strong>%2$s</span>', esc_attr('Important Upgrade Notice', 'exopite-multifilter'), esc_html(rtrim($new_plugin_metadata->upgrade_notice)));
+    if (!empty($new_plugin_metadata->upgrade_notice)) {
+      printf(
+        '<div style="background-color:#d54e21;padding:10px;color:#f9f9f9;margin-top:10px;"><strong>%s: </strong>%s</div>',
+        esc_html__('Important Upgrade Notice', 'zippy-core'),
+        esc_html(trim($new_plugin_metadata->upgrade_notice))
+      );
     }
   }
 }
