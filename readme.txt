@@ -54,11 +54,14 @@ Answer to foo bar dilemma.
 
 == Upgrade Notice ==
 
-= 1.0 =
+= 0.5 =
 Upgrade notices describe the reason a user should upgrade.  No more than 300 characters.
 
-= 0.5 =
+= 1.0 =
 This version fixes a security related bug.  Upgrade immediately.
+
+= 1.5 =
+This version enhancements for update plugin
 
 == A brief Markdown Example ==
 
