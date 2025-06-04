@@ -112,6 +112,8 @@ if (is_admin()) {
 
   $zippyUpdateChecker->setBranch('production');
 
+   $zippyUpdateChecker->getVcsApi()->enableReleaseAssets();
+
   // $zippyUpdateChecker->setAuthentication('your-token-here');
 
   add_action('in_plugin_update_message-' . ZIPPY_CORE_NAME . '/' . ZIPPY_CORE_NAME . '.php', 'plugin_name_show_upgrade_notification', 10, 2);
