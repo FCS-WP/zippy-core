@@ -109,7 +109,7 @@ if (is_admin()) {
 
   $zippyUpdateChecker->setBranch('master'); // Set the GitHub branch
 
-  $zippyUpdateChecker->getVcsApi()->setAuthentication('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');
+  $zippyUpdateChecker->getVcsApi()->setAuthentication('');
 
   // Show upgrade notice if present in readme.txt
   add_action(
