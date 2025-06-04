@@ -71,7 +71,7 @@ load_plugin_textdomain('zippy-sg-core', false, basename(dirname(__FILE__)) . '/l
 // Includes
  --------------------------- --------------------------------------------- */
 if (!class_exists(\Composer\Autoload\ClassLoader::class)) {
-  require_once ZIPPY_PAY_DIR_PATH . 'vendor/autoload.php';
+  require_once ZIPPY_CORE_DIR_PATH . 'vendor/autoload.php';
 }
 require ZIPPY_CORE_DIR_PATH . '/includes/autoload.php';
 
@@ -111,6 +111,8 @@ if (is_admin()) {
   );
 
   $zippyUpdateChecker->setBranch('production');
+
+   $zippyUpdateChecker->getVcsApi()->enableReleaseAssets();
 
   // $zippyUpdateChecker->setAuthentication('your-token-here');
 
