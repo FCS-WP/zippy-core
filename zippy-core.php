@@ -63,9 +63,9 @@ define('MY_PLUGIN_SLUG', 'my-plugin-slug');
 
 load_plugin_textdomain('zippy-sg-core', false, basename(dirname(__FILE__)) . '/languages');
 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 
 /* ------------------------------------------
@@ -102,16 +102,13 @@ use YahnisElsts\PluginUpdateChecker\v5p6\PucFactory;
  */
 if (is_admin()) {
   $zippyUpdateChecker = PucFactory::buildUpdateChecker(
-    'https://github.com/FCS-WP/zippy-core',
+    'https://epos.theshin.info/wp-content/uploads/plugin.json',
     __FILE__,
     'zippy-core'
   );
 
-  $zippyUpdateChecker->setBranch('master'); // Set the GitHub branch
-
-  // Show upgrade notice if present in readme.txt
   add_action(
-    'in_plugin_update_message-zippy-core/zippy-core.php',
+    'in_plugin_update_message-' . ZIPPY_CORE_DIR_PATH . '/zippy-core.php',
     'zippy_show_upgrade_notification',
     10,
     2
