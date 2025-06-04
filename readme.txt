@@ -17,6 +17,3 @@ Support change default URL Admin, provide Advanced Analytics Woocommrece, Remove
 
 = 1.0 =
 * List versions from most recent at top to oldest at bottom.
-
-= 1.5 =
-* List versions from most recent at top to oldest at bottom 2.
