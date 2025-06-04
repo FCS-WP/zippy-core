@@ -3,7 +3,7 @@
 Plugin Name: ZippySG Core
 Plugin URI: https://zippy.sg/
 Description: Support change default URL Admin, provide Advanced Analytics Woocommrece, Remove thirt party default of Wordpress, Setting SMTP Mail Server, Optime Wordpress Core...
-Version: 2.0
+Version: 2.1
 Author: Zippy SG
 Author URI: https://zippy.sg/
 License: GNU General Public
