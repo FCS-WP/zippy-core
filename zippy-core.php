@@ -32,11 +32,11 @@ if (!defined('ZIPPY_CORE_VERSION')) {
 /* Set plugin name. */
 
 if (!defined('ZIPPY_CORE_NAME')) {
-  define('ZIPPY_CORE_NAME', 'ZippySG Core');
+  define('ZIPPY_CORE_NAME', 'Zippy Core');
 }
 
 if (!defined('ZIPPY_CORE_PREFIX')) {
-  define('ZIPPY_CORE_PREFIX', 'zippysg_core');
+  define('ZIPPY_CORE_PREFIX', 'zippy_core');
 }
 
 if (!defined('ZIPPY_CORE_BASENAME')) {
@@ -55,13 +55,11 @@ if (!defined('ZIPPY_CORE_URL')) {
   define('ZIPPY_CORE_URL', plugin_dir_url(__FILE__));
 }
 
-define('MY_PLUGIN_SLUG', 'my-plugin-slug');
-
 /* ------------------------------------------
 // i18n
 ---------------------------- --------------------------------------------- */
 
-load_plugin_textdomain('zippy-sg-core', false, basename(dirname(__FILE__)) . '/languages');
+load_plugin_textdomain('zippy-core', false, basename(dirname(__FILE__)) . '/languages');
 
 // ini_set('display_errors', 1);
 // ini_set('display_startup_errors', 1);
@@ -108,7 +106,7 @@ if (is_admin()) {
   );
 
   add_action(
-    'in_plugin_update_message-' . ZIPPY_CORE_DIR_PATH . '/zippy-core.php',
+    'in_plugin_update_message-' . ZIPPY_CORE_NAME . '/' . ZIPPY_CORE_NAME . '.php',
     'zippy_show_upgrade_notification',
     10,
     2
