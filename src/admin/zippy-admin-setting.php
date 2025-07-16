@@ -137,4 +137,21 @@ class Zippy_Admin_Setting
     global $wpdb;
     $wpdb->query("UPDATE $wpdb->posts SET comment_status = 'closed', ping_status = 'closed' WHERE post_type = 'post'");
   }
+
+  public function update_search_engine_indexing() {
+    $current_domain = parse_url(home_url(), PHP_URL_HOST);
+
+    // localhost
+    if (preg_match('/^localhost(:\d+)?$/', $current_domain)) {
+        return; 
+    }
+
+    // theshin.info
+    if (preg_match('/^(.*\.)?theshin\.info$/', $current_domain)) {
+        return;
+    }
+
+    // Turn off if another domain
+    update_option('blog_public', 1);
+  }
 }
