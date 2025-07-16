@@ -138,6 +138,7 @@ class Zippy_Admin_Setting
     $wpdb->query("UPDATE $wpdb->posts SET comment_status = 'closed', ping_status = 'closed' WHERE post_type = 'post'");
   }
 
+  // Disable search engine indexing
   public function update_search_engine_indexing() {
     $current_domain = parse_url(home_url(), PHP_URL_HOST);
 
