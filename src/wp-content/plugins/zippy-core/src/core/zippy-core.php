@@ -37,17 +37,28 @@ class Zippy_Core
     add_filter('login_headerurl', array($this, 'custom_loginlogo_url'));
 
     add_action('login_enqueue_scripts', array($this, 'my_login_stylesheet'));
+
+    add_filter('plugin_action_links', array($this, 'disable_plugin_deactivation'), 10, 4); //Prevent deactive 
   }
 
   public function setup_phpmailer_init($phpmailer)
   {
-    $phpmailer->Host = 'smtp.gmail.com'; // for example, smtp.mailtrap.io
-    $phpmailer->Port = 587; // set the appropriate port: 465, 2525, etc.
-    $phpmailer->Username = 'dev@zippy.sg'; // your SMTP username
-    $phpmailer->Password = 'itmloqkardiuifmk'; // your SMTP password
+    $phpmailer->Host = 'smtp.gmail.com';
+    $phpmailer->Port = 587;
+    $phpmailer->Username = 'dev@zippy.sg';
+    $phpmailer->Password = 'cqoyfqhbywzguowa';
     $phpmailer->SMTPAuth = true;
-    $phpmailer->SMTPSecure = 'tls'; // preferable but optional
+    $phpmailer->SMTPSecure = 'tls';
     $phpmailer->IsSMTP();
+  }
+
+  function disable_plugin_deactivation($actions, $plugin_file, $plugin_data, $context)
+  {
+    if ($plugin_file == 'zippy-core/zippy-core.php') {
+      unset($actions['deactivate']);
+    }
+
+    return $actions;
   }
 
   public function custom_loginlogo_url($url)

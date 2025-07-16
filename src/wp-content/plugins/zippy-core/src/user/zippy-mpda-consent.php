@@ -36,17 +36,20 @@ class Zippy_MPDA_Consent
 
     protected function set_hooks()
     {
-        add_action('admin_init', [$this, 'mpda_consent_settings_init']);
-        add_shortcode('privacy_policy_link', [$this, 'privacy_policy_link_shortcode']);
-        add_shortcode('mpda_consent_checkbox', [$this, 'mpda_consent_checkbox_shortcode']);
-        add_action('woocommerce_register_form', [$this, 'add_consent_checkbox_to_registration_form']);
-        add_action('wp_footer', [$this, 'disable_submit_if_consent_not_checked']);
-        add_filter('woocommerce_registration_errors', [$this, 'validate_consent_checkbox'], 10, 3);
-        add_action('woocommerce_created_customer', [$this, 'save_consent_checkbox_data']);
-        add_action('show_user_profile', [$this, 'show_consent_in_user_profile']);
-        add_action('edit_user_profile', [$this, 'show_consent_in_user_profile'], 19, 2);
-        add_action('personal_options_update', [$this, 'save_consent_in_user_profile']);
-        add_action('edit_user_profile_update', [$this, 'save_consent_in_user_profile']);
+        if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
+            add_action('admin_init', [$this, 'mpda_consent_settings_init']);
+            add_shortcode('privacy_policy_link', [$this, 'privacy_policy_link_shortcode']);
+            add_shortcode('mpda_consent_checkbox', [$this, 'mpda_consent_checkbox_shortcode']);
+            add_action('woocommerce_register_form', [$this, 'add_consent_checkbox_to_registration_form']);
+            add_action('wp_footer', [$this, 'disable_submit_if_consent_not_checked']);
+            add_filter('woocommerce_registration_errors', [$this, 'validate_consent_checkbox'], 10, 3);
+            add_action('woocommerce_created_customer', [$this, 'save_consent_checkbox_data']);
+            add_action('show_user_profile', [$this, 'show_consent_in_user_profile'],19,2);
+            add_action('edit_user_profile', [$this, 'show_consent_in_user_profile'],19,2);
+            add_action('personal_options_update', [$this, 'save_consent_in_user_profile'],19,2);
+            add_action('edit_user_profile_update', [$this, 'save_consent_in_user_profile'],19,2);
+            register_activation_hook(__FILE__, [$this, 'set_default_consent_time']);
+        }
     }
 
     public function mpda_consent_settings_init()
@@ -86,7 +89,7 @@ class Zippy_MPDA_Consent
         register_setting('general', 'mpda_consent_time', array(
             'type' => 'string',
             'sanitize_callback' => 'sanitize_textarea_field',
-            'default' => '5_year'
+            'default' => '5'
         ));
 
         register_setting('general', 'mpda_consent_description', array(
@@ -118,13 +121,16 @@ class Zippy_MPDA_Consent
             esc_url($privacy_policy_url)
         );
     }
-
+    public function mpda_set_default_consent_time() {
+        if (get_option('mpda_consent_time') === false) {  
+            update_option('mpda_consent_time', '5');
+        }
+    }
 
     public function mpda_consent_time_callback($user)
     {
 
         $retention_period = get_option('mpda_consent_time');
-
         echo Zippy_Utils_Core::get_template('consent-time.php', [
             'retention_period' =>   $retention_period,
         ], dirname(__FILE__), '/templates');

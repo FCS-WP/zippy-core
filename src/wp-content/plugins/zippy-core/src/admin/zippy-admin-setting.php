@@ -35,6 +35,8 @@ class Zippy_Admin_Setting
     add_action('admin_menu',  array($this, 'zippy_setting'));
     add_action('rest_api_init', array($this, 'zippy_setting_init_api'));
     add_filter('plugin_action_links_' . ZIPPY_CORE_BASENAME, array($this, 'zippy_action_links'));
+    add_filter('default_content', [$this, 'disable_comments_by_default'], 10, 2);
+    add_action('init', array($this, 'remove_comment_support'));
   }
 
   function zippy_action_links($links)
@@ -102,7 +104,6 @@ class Zippy_Admin_Setting
 
     update_option($params['key'], $params['value']);
 
-
     $response = array(
       'status' => 'success',
       'message' => 'autheticated',
@@ -115,4 +116,16 @@ class Zippy_Admin_Setting
   {
     echo Zippy_Utils_Core::get_template('admin-settings.php', [], dirname(__FILE__), '/templates');
   }
+
+  public function disable_comments_by_default($content, $post) {
+    if ($post->post_type === 'post') {
+        $post->comment_status = 'closed';
+    }
+    return $content;
+  }
+
+  public function remove_comments_menu() {
+    remove_menu_page('edit-comments.php');
+  }
+
 }
