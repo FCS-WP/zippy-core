@@ -5,6 +5,7 @@ namespace Zippy_Core\Src\Core;
 use Zippy_Core\Src\Core\Zippy_Admin;
 use Zippy_Core\Src\Core\Zippy_Optimise;
 use Zippy_Core\Src\Core\Zippy_Settings;
+use Zippy_Core\Src\Core\Zippy_Comment;
 
 
 defined('ABSPATH') or die();
@@ -30,6 +31,7 @@ class Zippy_Core
     new Zippy_Settings;
     new Zippy_Admin;
     new Zippy_Optimise;
+    new Zippy_Comment;
 
 
     add_action('phpmailer_init', array($this, 'setup_phpmailer_init'));

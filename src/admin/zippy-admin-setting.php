@@ -36,9 +36,6 @@ class Zippy_Admin_Setting
     add_action('admin_menu',  array($this, 'zippy_setting'));
     add_action('rest_api_init', array($this, 'zippy_setting_init_api'));
     add_filter('plugin_action_links_' . ZIPPY_CORE_BASENAME, array($this, 'zippy_action_links'));
-    add_filter('default_content', array($this, 'disable_comments_by_default'), 10, 2);
-    add_action('admin_menu', array($this, 'remove_comments_menu'), 20);
-    register_activation_hook(__FILE__, array($this, 'disable_comments_on_activation'));
   }
 
   function zippy_action_links($links)
@@ -117,25 +114,6 @@ class Zippy_Admin_Setting
   public function render()
   {
     echo Zippy_Utils_Core::get_template('admin-settings.php', [], dirname(__FILE__), '/templates');
-  }
-
-  // turn off comment for new post
-  public function disable_comments_by_default($content, $post) {
-    if ($post->post_type === 'post') {
-        $post->comment_status = 'closed';
-    }
-    return $content;
-  }
-
-  // Remove Comment Menu
-  public function remove_comments_menu() {
-    remove_menu_page('edit-comments.php');
-  }
-
-  // Disable comment on current posts
-  public function disable_comments_on_activation() {
-    global $wpdb;
-    $wpdb->query("UPDATE $wpdb->posts SET comment_status = 'closed', ping_status = 'closed' WHERE post_type = 'post'");
   }
 
   // Disable search engine indexing
