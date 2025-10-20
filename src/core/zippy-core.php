@@ -27,13 +27,6 @@ class Zippy_Core
 
   public function __construct()
   {
-    if (!$this->check_active_required_plugins()) {
-      add_action('admin_notices', function () {
-        echo '<div class="notice notice-error"><p><strong>Zippy Core</strong> requires the <strong>Activity Log</strong> plugin to be activated first.</p></div>';
-      });
-      return;
-    }
-
     new Zippy_Settings;
     new Zippy_Admin;
     new Zippy_Optimise;
@@ -46,22 +39,6 @@ class Zippy_Core
     add_action('login_enqueue_scripts', array($this, 'my_login_stylesheet'));
 
     add_filter('plugin_action_links', array($this, 'disable_plugin_deactivation'), 10, 4); //Prevent deactive 
-  }
-
-  public function check_active_required_plugins()
-  {
-    return $this->check_active_plugin_activity_log();
-  }
-
-  public function check_active_plugin_activity_log()
-  {
-    include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-
-    if (!is_plugin_active('aryo-activity-log/aryo-activity-log.php')) {
-      return false;
-    }
-
-    return true;
   }
 
   public function setup_phpmailer_init($phpmailer)
