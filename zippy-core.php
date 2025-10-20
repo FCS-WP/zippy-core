@@ -17,6 +17,7 @@ Copyright 2024
 
 namespace Zippy_Core;
 
+use Zippy_Core\Src\Core\Zippy_Activate;
 
 defined('ABSPATH') or die('°_°’');
 
@@ -78,7 +79,7 @@ require ZIPPY_CORE_DIR_PATH . 'vendor/plugin-update-checker/plugin-update-checke
 
 require_once __DIR__ . '/src/core/zippy-activate.php';
 
-register_activation_hook(__FILE__, ['Zippy_Core\Src\Core\Zippy_Activate', 'activate']);
+register_activation_hook(__FILE__, [Zippy_Activate::class, 'activate']);
 
 
 use  Zippy_Core\Src\Admin\Zippy_Admin_Setting;
