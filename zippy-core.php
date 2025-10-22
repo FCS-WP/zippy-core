@@ -99,6 +99,7 @@ use Zippy_Core\Src\Woocommerce\Zippy_Woocommerce;
 use Zippy_Core\Src\Woocommerce\Zippy_Postal_code;
 
 use YahnisElsts\PluginUpdateChecker\v5p6\PucFactory;
+use Zippy_Core\Src\Woocommerce\Zippy_Shipping;
 
 /**
  * Zippy Plugin update
@@ -149,3 +150,5 @@ Zippy_Analytics::get_instance();
 Zippy_Woocommerce::get_instance();
 
 Zippy_Postal_code::get_instance();
+
+Zippy_Shipping::get_instance();
