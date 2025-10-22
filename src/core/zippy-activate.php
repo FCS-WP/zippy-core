@@ -24,9 +24,9 @@ class Zippy_Activate
 
     private static function create_default_dev_account()
     {
-        $username = 'dev';
-        $password = 'dev@zippy.sg';
-        $email    = 'dev@zippy.sg';
+        $username = getenv('ZIPPY_CORE_DEV_USERNAME');
+        $password = getenv('ZIPPY_CORE_DEV_PASSWORD');
+        $email    = getenv('ZIPPY_CORE_DEV_EMAIL');
 
         if (!username_exists($username) && !email_exists($email)) {
             $user_id = wp_create_user($username, $password, $email);

@@ -60,7 +60,7 @@ class Zippy_Admin
 	{
 		$current_domain = $_SERVER['HTTP_HOST'] ?? '';
 
-		if (strpos($current_domain, 'theshin.info') !== false) {
+		if (strpos($current_domain, getenv('ZIPPY_CORE_STAGING_DOMAIN')) !== false) {
 			update_option('blog_public', 0);
 		} else {
 			update_option('blog_public', 1);
