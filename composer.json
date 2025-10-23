@@ -1,4 +1,7 @@
 {
+    "name": "zippy/core",
+    "author": "zippy",
+    "vesion": "7.0",
     "require": {
         "guzzlehttp/guzzle": "^7.0",
         "guzzlehttp/oauth-subscriber": "^0.6"
