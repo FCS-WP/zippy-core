@@ -17,6 +17,7 @@ Copyright 2024
 
 namespace Zippy_Core;
 
+use Zippy_Core\Src\Core\Zippy_Activate;
 
 defined('ABSPATH') or die('°_°’');
 
@@ -75,6 +76,10 @@ if (!class_exists(\Composer\Autoload\ClassLoader::class)) {
 require ZIPPY_CORE_DIR_PATH . '/includes/autoload.php';
 
 require ZIPPY_CORE_DIR_PATH . 'vendor/plugin-update-checker/plugin-update-checker.php';
+
+require_once __DIR__ . '/src/core/zippy-activate.php';
+
+register_activation_hook(__FILE__, [Zippy_Activate::class, 'activate']);
 
 
 use  Zippy_Core\Src\Admin\Zippy_Admin_Setting;
