@@ -36,7 +36,7 @@ class Zippy_Admin_Orders
          * Handle setting tabs
          */
         add_filter('woocommerce_settings_tabs_array', [$this, 'add_zippy_woo_tab'], 50);
-        add_action('woocommerce_settings_tabs_zippy_woo', [$this, 'zippy_woo_settings_tab.']);
+        add_action('woocommerce_settings_tabs_zippy_woo', [$this, 'zippy_woo_settings_tab']);
         add_action('woocommerce_update_options_zippy_woo', [$this, 'update_zippy_woo_settings']);
 
         /**
