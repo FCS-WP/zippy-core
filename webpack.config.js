@@ -12,15 +12,16 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const destChildTheme = "./";
 
 // Define Work path
-const destFileCss = destChildTheme + "/assets/sass/app.scss";
-const destFileJs = destChildTheme + "/assets/js/index.js";
 const destOutput = destChildTheme + "/assets/dist";
+const destAdminFileCss = destChildTheme + "/assets/admin/sass/app.scss";
+const destAdminFileJs = destChildTheme + "/assets/admin/js/index.js";
 
 module.exports = [
   {
+    mode: "development",
     stats: "minimal",
     entry: {
-      main: [destFileCss, destFileJs],
+      admin: [destAdminFileCss, destAdminFileJs],
     },
     output: {
       filename: destOutput + "/js/[name].min.js",
@@ -76,11 +77,11 @@ module.exports = [
         //load svg
         {
           test: /\.svg$/,
-          use:  ['@svgr/webpack'],
+          use: ["@svgr/webpack"],
           issuer: {
-              and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
+            and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
           },
-        }
+        },
       ],
     },
     // externals: {

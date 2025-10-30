@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import Dashboard from "./Components/Pages/Dashboad";
 import Settings from "./Components/Pages/Settings";
+import { ThemeProvider } from "react-bootstrap";
+import Orders from "./pages/orders/Orders";
 
 // Zippy Dashboard
 
@@ -22,5 +24,14 @@ document.addEventListener("DOMContentLoaded", function () {
   if (typeof zippySetting != "undefined" && zippySetting != null) {
     const root = ReactDOM.createRoot(zippySetting);
     root.render(<Settings />);
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const zippyOrdersPage = document.getElementById("orders-page");
+
+  if (zippyOrdersPage) {
+    const root = ReactDOM.createRoot(zippyOrdersPage);
+    root.render(<Orders />);
   }
 });
