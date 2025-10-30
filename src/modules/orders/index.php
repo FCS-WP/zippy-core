@@ -1,37 +1,21 @@
 <?php
 
-/**
- * This class handle new layout for order page of Woocommerce
- *
- * @package MPDA_Consent
- */
+namespace Zippy_Core;
 
-namespace Zippy_Core\Src\Admin\Orders;
+use Zippy_Core\Orders\Routes\Order_Detail_Route;
+use Zippy_Core\Orders\Routes\Order_Route;
 
-class Zippy_Admin_Orders
+
+
+defined('ABSPATH') || exit;
+
+class Core_Orders
 {
-    protected static $_instance = null;
-
-    /**
-     * 
-     * @return Zippy_Admin_Orders
-     */
-
-    public static function get_instance()
-    {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
-    }
-
-    /**
-     * Auto run & init function
-     * @return void;
-     */
-
     public function __construct()
     {
+        //  Load module
+        self::load_required_files();
+        add_action('plugins_loaded', [$this, 'init']);
         /**
          * Handle setting tabs
          */
@@ -49,9 +33,34 @@ class Zippy_Admin_Orders
         // if ($enable_custom_orders_page === 'yes') {
         //     add_action('admin_menu', [$this, 'add_custom_orders_page']);
         // }
-        
+
         // remove this code after done
         add_action('admin_menu', [$this, 'add_custom_orders_page']);
+    }
+
+    public function load_required_files()
+    {
+        $paths = [
+            __DIR__ . '/controllers',
+            __DIR__ . '/routes',
+            __DIR__ . '/services',
+        ];
+
+        foreach ($paths as $path) {
+            if (! is_dir($path)) {
+                continue;
+            }
+
+            foreach (glob($path . '/*.php') as $file) {
+                require_once $file;
+            }
+        }
+    }
+
+    public function init()
+    {
+        Order_Route::get_instance();
+        Order_Detail_Route::get_instance();
     }
 
     // Start handle setting tabs
@@ -109,6 +118,6 @@ class Zippy_Admin_Orders
         <div>
             <h2>This is custom order pages</h2>
         </div>
-    <?php
+<?php
     }
 }

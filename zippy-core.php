@@ -97,12 +97,10 @@ use Zippy_Core\Src\User\Zippy_MPDA_Consent;
 use Zippy_Core\Src\User\Zippy_User_Account_Expiry;
 
 use Zippy_Core\Src\Analytics\Zippy_Analytics;
-use Zippy_Core\Src\Routes\Admin\Orders\Zippy_Admin_Order_Routes;
 use Zippy_Core\Src\Woocommerce\Zippy_Woocommerce;
 
 use Zippy_Core\Src\Woocommerce\Zippy_Postal_code;
 use Zippy_Core\Src\Woocommerce\Zippy_Shipping;
-use Zippy_Core\Utils\Zippy_Request_Helper;
 
 /**
  *
@@ -130,8 +128,14 @@ Zippy_Shipping::get_instance();
 
 
 /**
- * Zippy Core V2 Class
+ * Zippy Core V2: Import modules
  */
-Zippy_Admin_Orders::get_instance();
-Zippy_Admin_Order_Routes::get_instance();
+
+require_once ZIPPY_CORE_DIR_PATH . 'src/modules/route.php';
+
+require_once ZIPPY_CORE_DIR_PATH . 'src/modules/orders/index.php';
+
+if ( class_exists( 'Zippy_Core\Core_Orders' ) ) {
+  new \Zippy_Core\Core_Orders();
+}
 

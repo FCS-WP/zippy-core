@@ -1,28 +1,13 @@
 <?php
 
-namespace Zippy_Core\Src\Controllers;
 
-use Exception;
+namespace Zippy_Core\Orders\Controllers;
+
 use WP_REST_Request;
 use WP_Error;
 use Zippy_Core\Utils\Zippy_Request_Helper;
 
-class Zippy_Orders_Controllers
-{
-    // public static function example_function($request)
-    // {
-    //     $params = $request->get_params();
-    //     $rules = [
-    //         'id' =>  ['type' => 'int', 'required' => false],
-    //     ];
-
-    //     $validation = Zippy_Request_Helper::validate_request($params, $rules);
-
-    //     if (is_wp_error($validation)) {
-    //     return $validation;
-    //     }
-    // }
-
+class Order_Controllers {
     public static function get_all_orders_with_pagination(WP_REST_Request $request)
     {
         try {
@@ -131,6 +116,19 @@ class Zippy_Orders_Controllers
                     'total_orders' => $total_orders,
                     'orders'       => $data,
                 ],
+                'message' => "Get orders successfully!",
+            ]);
+        } catch (\Exception $e) {
+            $error_message = $e->getMessage();
+            return new WP_Error($error_message, 500);
+        }
+    }
+
+    public static function get_order_detail_by_id (WP_REST_Request $request)
+    {
+        try {
+            return rest_ensure_response([
+                'success' => true,
                 'message' => "Get orders successfully!",
             ]);
         } catch (\Exception $e) {
