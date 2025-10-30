@@ -1,42 +1,26 @@
 <?php
 
-/**
- * This class handle new layout for order page of Woocommerce
- *
- * @package MPDA_Consent
- */
+namespace Zippy_Core;
 
-namespace Zippy_Core\Src\Admin\Orders;
+use Zippy_Core\Orders\Routes\Order_Detail_Route;
+use Zippy_Core\Orders\Routes\Order_Route;
 
-class Zippy_Admin_Orders
+
+
+defined('ABSPATH') || exit;
+
+class Core_Orders
 {
-    protected static $_instance = null;
-
-    /**
-     * 
-     * @return Zippy_Admin_Orders
-     */
-
-    public static function get_instance()
-    {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
-    }
-
-    /**
-     * Auto run & init function
-     * @return void;
-     */
-
     public function __construct()
     {
+        //  Load module
+        self::load_required_files();
+        add_action('plugins_loaded', [$this, 'init']);
         /**
          * Handle setting tabs
          */
         add_filter('woocommerce_settings_tabs_array', [$this, 'add_zippy_woo_tab'], 50);
-        add_action('woocommerce_settings_tabs_zippy_woo', [$this, 'zippy_woo_settings_tab.']);
+        add_action('woocommerce_settings_tabs_zippy_woo', [$this, 'zippy_woo_settings_tab']);
         add_action('woocommerce_update_options_zippy_woo', [$this, 'update_zippy_woo_settings']);
 
         /**
@@ -52,6 +36,31 @@ class Zippy_Admin_Orders
 
         // remove this code after done
         add_action('admin_menu', [$this, 'add_custom_orders_page']);
+    }
+
+    public function load_required_files()
+    {
+        $paths = [
+            __DIR__ . '/controllers',
+            __DIR__ . '/routes',
+            __DIR__ . '/services',
+        ];
+
+        foreach ($paths as $path) {
+            if (! is_dir($path)) {
+                continue;
+            }
+
+            foreach (glob($path . '/*.php') as $file) {
+                require_once $file;
+            }
+        }
+    }
+
+    public function init()
+    {
+        Order_Route::get_instance();
+        Order_Detail_Route::get_instance();
     }
 
     // Start handle setting tabs
@@ -107,6 +116,6 @@ class Zippy_Admin_Orders
     {
     ?>
         <div id="orders-page"></div>
-<?php
+    <?php
     }
 }
