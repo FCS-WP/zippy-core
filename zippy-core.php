@@ -17,6 +17,7 @@ Copyright 2024
 
 namespace Zippy_Core;
 
+use Zippy_Core\Src\Admin\Orders\Zippy_Admin_Orders;
 use Zippy_Core\Src\Core\Zippy_Activate;
 
 defined('ABSPATH') or die('°_°’');
@@ -56,6 +57,13 @@ if (!defined('ZIPPY_CORE_URL')) {
   define('ZIPPY_CORE_URL', plugin_dir_url(__FILE__));
 }
 
+/* Set API prefix url */
+
+if (!defined('ZIPPY_CORE_API_PREFIX')) {
+  define('ZIPPY_CORE_API_PREFIX', 'zippy-core/v2');
+}
+
+
 /* ------------------------------------------
 // i18n
 ---------------------------- --------------------------------------------- */
@@ -89,11 +97,11 @@ use Zippy_Core\Src\User\Zippy_MPDA_Consent;
 use Zippy_Core\Src\User\Zippy_User_Account_Expiry;
 
 use Zippy_Core\Src\Analytics\Zippy_Analytics;
-
+use Zippy_Core\Src\Routes\Admin\Orders\Zippy_Admin_Order_Routes;
 use Zippy_Core\Src\Woocommerce\Zippy_Woocommerce;
 
 use Zippy_Core\Src\Woocommerce\Zippy_Postal_code;
-
+use Zippy_Core\Utils\Zippy_Request_Helper;
 
 /**
  *
@@ -116,4 +124,13 @@ Zippy_Woocommerce::get_instance();
 
 Zippy_Postal_code::get_instance();
 
-Zippy_Shipping::get_instance();
+// Zippy_Shipping::get_instance();
+
+
+
+/**
+ * Zippy Core V2 Class
+ */
+Zippy_Admin_Orders::get_instance();
+Zippy_Admin_Order_Routes::get_instance();
+
