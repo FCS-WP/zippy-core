@@ -49,7 +49,7 @@ class Zippy_Admin_Orders
         // if ($enable_custom_orders_page === 'yes') {
         //     add_action('admin_menu', [$this, 'add_custom_orders_page']);
         // }
-        
+
         // remove this code after done
         add_action('admin_menu', [$this, 'add_custom_orders_page']);
     }
@@ -106,9 +106,7 @@ class Zippy_Admin_Orders
     function render_custom_orders_page()
     {
     ?>
-        <div>
-            <h2>This is custom order pages</h2>
-        </div>
-    <?php
+        <div id="orders-page"></div>
+<?php
     }
 }

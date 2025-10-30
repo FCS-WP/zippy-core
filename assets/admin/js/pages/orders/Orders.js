@@ -11,7 +11,12 @@ import {
   Paper,
   CircularProgress,
   Typography,
+  Link,
 } from "@mui/material";
+import { Api } from "../../api/admin";
+import OrderStatusLabel from "../../Components/Pages/Orders/OrderStatusLabel";
+import BillingCell from "../../Components/Pages/Orders/BillingCell";
+import ShippingCell from "../../Components/Pages/Orders/ShippingCell";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -25,11 +30,8 @@ const Orders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await fetch(
-          "http://localhost:12381/wp-json/zippy-core/v2/orders"
-        );
-        const data = await res.json();
-        if (data.success) setOrders(data.result.orders);
+        const res = await Api.getOrders();
+        if (res.data.success) setOrders(res.data.result.orders);
       } catch (err) {
         console.error("Error fetching orders:", err);
       } finally {
@@ -39,7 +41,6 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
-  // Handle sorting
   const handleSort = (property) => {
     const isAsc = orderBy === property && orderDirection === "asc";
     setOrderDirection(isAsc ? "desc" : "asc");
@@ -84,7 +85,7 @@ const Orders = () => {
   return (
     <Paper sx={{ p: 2 }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
-        Orders List
+        Orders
       </Typography>
       <TableContainer>
         <Table>
@@ -92,14 +93,20 @@ const Orders = () => {
             <TableRow>
               {[
                 { id: "order_number", label: "Order #" },
-                { id: "date_created", label: "Date Created" },
+                { id: "phone_number", label: "Phone Number" },
                 { id: "status", label: "Status" },
                 { id: "total", label: "Total (VND)" },
                 { id: "payment_method", label: "Payment Method" },
+                { id: "date_created", label: "Date Created" },
               ].map((col) => (
                 <TableCell
                   key={col.id}
                   sortDirection={orderBy === col.id ? orderDirection : false}
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#333",
+                    backgroundColor: "#f5f5f5",
+                  }}
                 >
                   <TableSortLabel
                     active={orderBy === col.id}
@@ -116,13 +123,29 @@ const Orders = () => {
           <TableBody>
             {paginatedOrders.map((order) => (
               <TableRow key={order.id}>
-                <TableCell>{order.order_number}</TableCell>
-                <TableCell>{order.date_created}</TableCell>
-                <TableCell>{order.status}</TableCell>
+                <TableCell>
+                  <Link
+                    href={`/wp-admin/admin.php?page=wc-orders&action=edit&id=${order.id}`}
+                    underline="hover"
+                    color="primary"
+                    sx={{ fontWeight: "bold", cursor: "pointer" }}
+                  >
+                    #{order.order_number} - {order.billing?.first_name}{" "}
+                    {order.billing?.last_name}
+                  </Link>
+                </TableCell>
+                <BillingCell billing={order.billing} />
+                <TableCell>
+                  <OrderStatusLabel status={order.status} />
+                </TableCell>
                 <TableCell>
                   {parseInt(order.total).toLocaleString()} {order.currency}
                 </TableCell>
-                <TableCell>{order.payment_method?.title || "-"}</TableCell>
+                <ShippingCell
+                  shipping={order.shipping}
+                  paymentMethod={order.payment_method}
+                />
+                <TableCell>{order.date_created}</TableCell>
               </TableRow>
             ))}
           </TableBody>

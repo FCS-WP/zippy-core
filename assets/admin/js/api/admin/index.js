@@ -1,6 +1,6 @@
-import { makeRequest } from "./axios";
+import { OrderApi } from "./orders/index";
 export const Api = {
   async getOrders(params) {
-    return await makeRequest("/check_option", params);
+    return OrderApi.getOrders(params);
   },
 };
