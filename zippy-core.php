@@ -101,6 +101,7 @@ use Zippy_Core\Src\Routes\Admin\Orders\Zippy_Admin_Order_Routes;
 use Zippy_Core\Src\Woocommerce\Zippy_Woocommerce;
 
 use Zippy_Core\Src\Woocommerce\Zippy_Postal_code;
+use Zippy_Core\Src\Woocommerce\Zippy_Shipping;
 use Zippy_Core\Utils\Zippy_Request_Helper;
 
 /**
@@ -124,7 +125,7 @@ Zippy_Woocommerce::get_instance();
 
 Zippy_Postal_code::get_instance();
 
-// Zippy_Shipping::get_instance();
+Zippy_Shipping::get_instance();
 
 
 
