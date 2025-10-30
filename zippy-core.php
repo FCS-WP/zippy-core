@@ -93,7 +93,7 @@ use Zippy_Core\Src\Analytics\Zippy_Analytics;
 use Zippy_Core\Src\Woocommerce\Zippy_Woocommerce;
 
 use Zippy_Core\Src\Woocommerce\Zippy_Postal_code;
-
+use Zippy_Core\Src\Woocommerce\Zippy_Shipping;
 
 /**
  *
