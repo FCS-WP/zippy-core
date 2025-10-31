@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import OrderStatusLabel from "./OrderStatusLabel";
 import BillingCell from "./BillingCell";
-import ShippingCell from "./ShippingCell";
 import BulkAction from "./BulkAction";
 
 const OrdersTable = ({
