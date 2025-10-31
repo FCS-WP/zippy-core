@@ -134,6 +134,7 @@ require_once ZIPPY_CORE_DIR_PATH . 'src/modules/route.php';
 require_once ZIPPY_CORE_DIR_PATH . 'src/modules/module.php';
 
 require_once ZIPPY_CORE_DIR_PATH . 'src/modules/orders/index.php';
+require_once ZIPPY_CORE_DIR_PATH . 'src/modules/shipping/index.php';
 
 if (class_exists('Zippy_Core\Core_Orders')) {
   new \Zippy_Core\Core_Orders();

@@ -6,7 +6,7 @@ use Zippy_Core\Orders\Controllers\Order_Controllers;
 
 class Order_Route extends Core_Route {
 
-    public function orders_init_api() {
+    public function init_module_api() {
         register_rest_route( ZIPPY_CORE_API_PREFIX, '/orders', [
             'methods'  => 'GET',
             'callback' => [ Order_Controllers::class, 'get_all_orders_with_pagination' ],

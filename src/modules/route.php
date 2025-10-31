@@ -25,7 +25,7 @@ abstract class Core_Route {
      */
 
     public function __construct() {
-        add_action( 'rest_api_init', [ $this, 'orders_init_api' ] );
+        add_action( 'rest_api_init', [ $this, 'init_module_api' ] );
     }
 
      /**
@@ -33,5 +33,5 @@ abstract class Core_Route {
      *
      * @return void
      */
-    abstract public function orders_init_api();
+    abstract public function init_module_api();
 }
