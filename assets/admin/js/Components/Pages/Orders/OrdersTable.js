@@ -12,10 +12,13 @@ import {
   Typography,
   Link,
   Checkbox,
+  Box,
 } from "@mui/material";
 import OrderStatusLabel from "./OrderStatusLabel";
 import BillingCell from "./BillingCell";
 import BulkAction from "./BulkAction";
+import FilterOrder from "./FilterOrder";
+import { useOrderProvider } from "../../../context/OrderContext";
 
 const OrdersTable = ({
   orders,
@@ -29,6 +32,9 @@ const OrdersTable = ({
 }) => {
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [paginatedOrders, setPaginatedOrders] = useState([]);
+
+  const { fromDate, toDate, setFromDate, setToDate, handleFilterDateRange } =
+    useOrderProvider();
 
   useEffect(() => {
     const sorted = [...orders].sort((a, b) => {
@@ -77,10 +83,30 @@ const OrdersTable = ({
       <Typography variant="h6" sx={{ mb: 2 }}>
         Orders
       </Typography>
-      <BulkAction
-        selectedOrders={selectedOrders}
-        setOrders={setPaginatedOrders}
-      />
+
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: 2,
+          flexWrap: "wrap",
+          mb: 2,
+        }}
+      >
+        <BulkAction
+          selectedOrders={selectedOrders}
+          setOrders={setPaginatedOrders}
+        />
+        <FilterOrder
+          fromDate={fromDate}
+          setFromDate={setFromDate}
+          toDate={toDate}
+          setToDate={setToDate}
+          handleFilterDateRange={handleFilterDateRange}
+        />
+      </Box>
+
       <TableContainer sx={{ my: "20px" }}>
         <Table>
           <TableHead>
@@ -130,7 +156,7 @@ const OrdersTable = ({
 
           <TableBody>
             {paginatedOrders.map((order) => (
-              <TableRow key={order.id} id={`order-${order.id}`}>
+              <TableRow key={order.id}>
                 <TableCell padding="checkbox">
                   <Checkbox
                     name="id[]"
@@ -144,7 +170,7 @@ const OrdersTable = ({
                     href={`/wp-admin/admin.php?page=wc-orders&action=edit&id=${order.id}`}
                     underline="hover"
                     color="primary"
-                    sx={{ fontWeight: "bold", cursor: "pointer" }}
+                    sx={{ fontWeight: "bold" }}
                   >
                     #{order.order_number} - {order.billing?.first_name}{" "}
                     {order.billing?.last_name}
@@ -158,30 +184,7 @@ const OrdersTable = ({
                   {parseInt(order.total).toLocaleString()} {order.currency}
                 </TableCell>
                 <TableCell>{order.payment_method?.title || "N/A"}</TableCell>
-                <TableCell sx={{ fontSize: "0.85rem", color: "#555" }}>
-                  {order.billing?.first_name} {order.billing?.last_name}
-                  {order.shipping?.company && `, ${order.shipping.company}`}
-                  <br />
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                      `${order.shipping?.address_1 || ""} ${
-                        order.shipping?.address_2 || ""
-                      }, ${order.shipping?.city || ""}`
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      textDecoration: "none",
-                      color: "#1976d2",
-                      fontSize: "0.8rem",
-                      display: "inline-block",
-                      marginTop: "2px",
-                    }}
-                  >
-                    {order.shipping?.address_1} {order.shipping?.address_2},{" "}
-                    {order.shipping?.city}
-                  </a>
-                </TableCell>
+                <TableCell>{order.shipping?.city}</TableCell>
                 <TableCell>{order.date_created}</TableCell>
               </TableRow>
             ))}

@@ -99,7 +99,8 @@ class Zippy_Admin
 	}
 
 
-	public function build_admin_scripts_and_styles () {
+	public function build_admin_scripts_and_styles()
+	{
 		$version = time();
 		$current_user_id = get_current_user_id();
 
@@ -112,8 +113,8 @@ class Zippy_Admin
 		));
 
 		wp_localize_script('core-admin-scripts', 'core_admin_api', array(
-			'url' => esc_url_raw( rest_url( ZIPPY_CORE_API_PREFIX ) ),
-        	'nonce'  => wp_create_nonce( 'wp_rest' ),
+			'url' => esc_url_raw(rest_url(ZIPPY_CORE_API_PREFIX)),
+			'nonce'  => wp_create_nonce('wp_rest'),
 		));
 	}
 }

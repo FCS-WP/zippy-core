@@ -1,6 +1,8 @@
 @import "./component/mixins";
 @import "./component/style";
 @import "./component/zippy-settings";
+@import "react-datepicker/dist/react-datepicker.css";
+
 html {
   margin: 0px !important;
 }

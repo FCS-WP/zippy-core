@@ -108,13 +108,17 @@ const BulkAction = ({ selectedOrders, setOrders }) => {
         variant="outlined"
         sx={{
           height: "32px",
-          fontSize: "14px",
+          fontSize: "12px",
           borderRadius: "2px",
           background: "#f6f7f7",
           color: "#2271b1",
           border: "1px solid #2271b1",
           boxShadow: "none",
           "&:hover": { background: "#e1e4e6", boxShadow: "none" },
+          "@media (max-width: 600px)": {
+            height: "40px",
+            fontSize: "10px",
+          },
         }}
         onClick={handleSubmit}
         disabled={loading}
