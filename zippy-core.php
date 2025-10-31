@@ -126,7 +126,6 @@ Zippy_Postal_code::get_instance();
 Zippy_Shipping::get_instance();
 
 
-
 /**
  * Zippy Core V2: Import modules
  */
@@ -135,7 +134,6 @@ require_once ZIPPY_CORE_DIR_PATH . 'src/modules/route.php';
 
 require_once ZIPPY_CORE_DIR_PATH . 'src/modules/orders/index.php';
 
-if ( class_exists( 'Zippy_Core\Core_Orders' ) ) {
+if (class_exists('Zippy_Core\Core_Orders')) {
   new \Zippy_Core\Core_Orders();
 }
-

@@ -115,9 +115,7 @@ class Core_Orders
     function render_custom_orders_page()
     {
     ?>
-        <div>
-            <h2>This is custom order pages</h2>
-        </div>
-<?php
+        <div id="orders-page"></div>
+    <?php
     }
 }
