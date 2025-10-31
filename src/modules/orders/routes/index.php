@@ -11,7 +11,7 @@ class Order_Route extends Core_Route {
             'methods'  => 'GET',
             'callback' => [ Order_Controllers::class, 'get_all_orders_with_pagination' ],
             'permission_callback' => '__return_true',
-             'args' => [
+            'args' => [
                 'page' => [
                     'default' => 1,
                     'sanitize_callback' => 'absint',

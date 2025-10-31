@@ -20,7 +20,7 @@ class Core_Orders extends Core_Module {
             if (! is_dir($path)) {
                 continue;
             }
-
+            
             foreach (glob($path . '/*.php') as $file) {
                 require_once $file;
             }
@@ -29,8 +29,8 @@ class Core_Orders extends Core_Module {
 
     public function init_module()
     {
-        Order_Route::get_instance();
         Order_Detail_Route::get_instance();
+        Order_Route::get_instance();
 
         /**
          * Handle setting tabs
@@ -107,7 +107,7 @@ class Core_Orders extends Core_Module {
     function render_custom_orders_page()
     {
         ?>
-            <div id="orders-page"></div>
+            <div id="orders-page"><h2>Hello world</h2></div>
         <?php
     }
 }

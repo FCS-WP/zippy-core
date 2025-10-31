@@ -138,3 +138,4 @@ require_once ZIPPY_CORE_DIR_PATH . 'src/modules/orders/index.php';
 if (class_exists('Zippy_Core\Core_Orders')) {
   new \Zippy_Core\Core_Orders();
 }
+

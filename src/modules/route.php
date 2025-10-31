@@ -3,19 +3,21 @@
 namespace Zippy_Core;
 
 abstract class Core_Route {
-    protected static $_instance = null;
-    
-    /**
-     * 
-     * @return Core_Route
-     */
+    protected static $_instances = [];
 
+    /**
+     * Get (or create) the singleton instance for each subclass.
+     */
     public static function get_instance() {
-        if ( is_null( static::$_instance ) ) {
-            static::$_instance = new static();
+        $called_class = static::class;
+
+        if ( ! isset( self::$_instances[ $called_class ] ) ) {
+            self::$_instances[ $called_class ] = new static();
         }
-        return static::$_instance;
+
+        return self::$_instances[ $called_class ];
     }
+
 
     /**
      * Auto run & init function
@@ -25,7 +27,6 @@ abstract class Core_Route {
     public function __construct() {
         add_action( 'rest_api_init', [ $this, 'orders_init_api' ] );
     }
-
 
      /**
      * Each child class should define its own API routes here.
