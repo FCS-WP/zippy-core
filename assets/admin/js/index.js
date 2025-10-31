@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import Dashboard from "./pages/dashboard/Dashboad";
 import Settings from "./pages/setting/Settings";
 import { ThemeProvider } from "react-bootstrap";
-import Orders from "./pages/orders/Orders";
+import OrdersPage from "./pages/orders/OrdersPage";
 
 // Zippy Dashboard
 
@@ -32,6 +32,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (zippyOrdersPage) {
     const root = ReactDOM.createRoot(zippyOrdersPage);
-    root.render(<Orders />);
+    root.render(<OrdersPage />);
   }
 });
