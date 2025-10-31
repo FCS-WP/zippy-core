@@ -1,8 +1,8 @@
 import React, { useEffect, useCallback } from "react";
 import { Button, Tab, Tabs, Form } from "react-bootstrap";
 import { useState } from "react";
-import Authentication from "./Auth/Authentication";
-import PostalCode from "./PostalCode";
+import Authentication from "../../Components/Pages/Settings/Authentication";
+import PostalCode from "../../Components/Pages/Settings/PostalCode";
 import { Api } from "../../api";
 
 const Settings = () => {
