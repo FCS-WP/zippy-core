@@ -1,17 +1,20 @@
 <?php
+
 namespace Zippy_Core\Orders\Routes;
 
 use Zippy_Core\Core_Middleware;
 use Zippy_Core\Core_Route;
 use Zippy_Core\Orders\Controllers\Order_Controllers;
 
-class Order_Route extends Core_Route {
+class Order_Route extends Core_Route
+{
 
-    public function init_module_api() {
-        register_rest_route( ZIPPY_CORE_API_PREFIX, '/orders', [
+    public function init_module_api()
+    {
+        register_rest_route(ZIPPY_CORE_API_PREFIX, '/orders', [
             'methods'  => 'GET',
-            'callback' => [ Order_Controllers::class, 'get_all_orders_with_pagination' ],
-            'permission_callback' => [ Core_Middleware::class, 'admin_only' ],
+            'callback' => [Order_Controllers::class, 'get_all_orders_with_pagination'],
+            'permission_callback' => [Core_Middleware::class, 'admin_only'],
             'args' => [
                 'page' => [
                     'default' => 1,
@@ -22,6 +25,6 @@ class Order_Route extends Core_Route {
                     'sanitize_callback' => 'absint',
                 ],
             ],
-        ] );
+        ]);
     }
 }
