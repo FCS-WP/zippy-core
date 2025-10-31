@@ -7,6 +7,7 @@ use WP_REST_Request;
 use WP_Error;
 use Zippy_Core\Orders\Services\Order_Services;
 use Zippy_Core\Utils\Zippy_Request_Helper;
+use Zippy_Core\Utils\Zippy_Response_Handler;
 
 class Order_Controllers
 {
@@ -75,5 +76,43 @@ class Order_Controllers
         } catch (\Exception $e) {
             return new WP_Error('server_error', $e->getMessage(), ['status' => 500]);
         }
+    }
+
+    public static function update_order_status(WP_REST_Request $request)
+    {
+        $order_ids = $request->get_param('order_ids');
+        $status = $request->get_param('status');
+
+        if (empty($order_ids) || empty($status)) {
+            return Zippy_Response_Handler::error('Missing parameters.');
+        }
+
+        if (!is_array($order_ids)) {
+            return Zippy_Response_Handler::error('Order IDs must be an array.');
+        }
+
+        $valid_statuses = wc_get_order_statuses();
+        if (!array_key_exists($status, $valid_statuses)) {
+            return Zippy_Response_Handler::error('Invalid order status.');
+        }
+
+        $updated_orders = [];
+        $failed_orders = [];
+
+        foreach ($order_ids as $order_id) {
+            $order = wc_get_order($order_id);
+            if ($order) {
+                $order->update_status($status, 'Order status updated via API', true);
+                $updated_orders[] = $order_id;
+            } else {
+                $failed_orders[] = $order_id;
+            }
+        }
+
+        return Zippy_Response_Handler::success([
+            'updated_orders' => $updated_orders,
+            'failed_orders' => $failed_orders,
+            'new_status' => $status,
+        ], 'Order statuses updated successfully.');
     }
 }

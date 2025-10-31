@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import Dashboard from "./Components/Pages/Dashboad";
-import Settings from "./Components/Pages/Settings";
+import Dashboard from "./pages/dashboard/Dashboad";
+import Settings from "./pages/setting/Settings";
 import { ThemeProvider } from "react-bootstrap";
 import Orders from "./pages/orders/Orders";
 

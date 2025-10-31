@@ -8,9 +8,11 @@ export const makeRequest = async (
 ) => {
   const baseURL = "/wp-json/zippy-core/v2";
   const api = axios.create({ baseURL });
-
+  const nonce = window.core_admin_api?.nonce;
   // Build headers
-  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const headers = token
+    ? { Authorization: `Bearer ${token}`, "X-WP-Nonce": nonce }
+    : {};
 
   // Validate HTTP method
   const validMethods = ["GET", "POST", "PUT", "DELETE", "PATCH"];

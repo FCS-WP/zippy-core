@@ -2,11 +2,12 @@ import React from "react";
 import { Chip } from "@mui/material";
 
 const statusColors = {
-  processing: { label: "Processing", color: "warning" },
-  completed: { label: "Completed", color: "success" },
-  pending: { label: "Pending", color: "info" },
-  cancelled: { label: "Cancelled", color: "error" },
-  refunded: { label: "Refunded", color: "secondary" },
+  "processing": { label: "Processing", color: "warning" },
+  "completed": { label: "Completed", color: "success" },
+  "pending": { label: "Pending", color: "info" },
+  "cancelled": { label: "Cancelled", color: "error" },
+  "refunded": { label: "Refunded", color: "secondary" },
+  "on-hold": { label: "On Hold", color: "default" },
 };
 
 export default function OrderStatusLabel({ status }) {

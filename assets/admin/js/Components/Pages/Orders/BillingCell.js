@@ -1,7 +1,7 @@
 import { IconButton, TableCell } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import React, { useState } from "react";
-import BillingModal from "./BillingModal";
+import BillingModal from "./modals/BillingModal";
 
 const BillingCell = ({ billing }) => {
   const [open, setOpen] = useState(false);

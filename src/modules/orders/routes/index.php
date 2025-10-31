@@ -26,5 +26,37 @@ class Order_Route extends Core_Route
                 ],
             ],
         ]);
+        register_rest_route(ZIPPY_CORE_API_PREFIX, '/update-order-status', [
+            'methods'  => 'POST',
+            'callback' => [Order_Controllers::class, 'update_order_status'],
+            'permission_callback' => [Core_Middleware::class, 'admin_only'],
+            'args' => [
+                'order_ids' => [
+                    'required' => true,
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'integer',
+                    ],
+                ],
+                'status' => [
+                    'required' => true,
+                    'type' => 'string',
+                ],
+            ],
+        ]);
+        register_rest_route(ZIPPY_CORE_API_PREFIX, '/move-to-trash', [
+            'methods'  => 'POST',
+            'callback' => [Order_Controllers::class, 'move_to_trash'],
+            'permission_callback' => [Core_Middleware::class, 'admin_only'],
+            'args' => [
+                'order_ids' => [
+                    'required' => true,
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'integer',
+                    ],
+                ],
+            ],
+        ]);
     }
 }

@@ -1,6 +1,6 @@
 import React from "react";
-import Header from "../Header/Header";
-import Content from "../Layouts/Content";
+import Header from "../../Components/Header/Header";
+import Content from "../../Components/Layouts/Content";
 function Dashboard() {
   return (
     <>
