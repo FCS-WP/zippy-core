@@ -2,20 +2,36 @@
 
 namespace Zippy_Core;
 
+use Zippy_Core\Core_Module;
 use Zippy_Core\Orders\Routes\Order_Detail_Route;
 use Zippy_Core\Orders\Routes\Order_Route;
 
+class Core_Orders extends Core_Module {
 
-
-defined('ABSPATH') || exit;
-
-class Core_Orders
-{
-    public function __construct()
+    public function load_required_files()
     {
-        //  Load module
-        self::load_required_files();
-        add_action('plugins_loaded', [$this, 'init']);
+        $paths = [
+            __DIR__ . '/controllers',
+            __DIR__ . '/routes',
+            __DIR__ . '/services',
+        ];
+
+        foreach ($paths as $path) {
+            if (! is_dir($path)) {
+                continue;
+            }
+
+            foreach (glob($path . '/*.php') as $file) {
+                require_once $file;
+            }
+        }
+    }
+
+    public function init_module()
+    {
+        Order_Route::get_instance();
+        Order_Detail_Route::get_instance();
+
         /**
          * Handle setting tabs
          */
@@ -38,50 +54,26 @@ class Core_Orders
         add_action('admin_menu', [$this, 'add_custom_orders_page']);
     }
 
-    public function load_required_files()
-    {
-        $paths = [
-            __DIR__ . '/controllers',
-            __DIR__ . '/routes',
-            __DIR__ . '/services',
-        ];
-
-        foreach ($paths as $path) {
-            if (! is_dir($path)) {
-                continue;
-            }
-
-            foreach (glob($path . '/*.php') as $file) {
-                require_once $file;
-            }
-        }
-    }
-
-    public function init()
-    {
-        Order_Route::get_instance();
-        Order_Detail_Route::get_instance();
-    }
-
+    
     // Start handle setting tabs
     public function add_zippy_woo_tab($tabs)
     {
         $tabs['zippy_woo'] = __('Zippy - Woo', 'woocommerce');
         return $tabs;
     }
-
+    
     function zippy_woo_settings_tab()
     {
         // Get saved promotions
         $enable_custom_orders_page = get_option('zippy_woo_custom_orders_enabled', 'no');
-?>
-        <div class="zippy-woo-configs">
-            <label>
-                <input type="checkbox" name="zippy_woo_custom_orders_enabled" value="yes" <?php checked($enable_custom_orders_page, 'yes'); ?> />
-                <?php _e('Enable customize orders page', 'Zippy'); ?>
-            </label>
-        </div>
-    <?php
+        ?>
+            <div class="zippy-woo-configs">
+                <label>
+                    <input type="checkbox" name="zippy_woo_custom_orders_enabled" value="yes" <?php checked($enable_custom_orders_page, 'yes'); ?> />
+                    <?php _e('Enable customize orders page', 'Zippy'); ?>
+                </label>
+            </div>
+        <?php
     }
 
     function update_zippy_woo_settings()
@@ -114,8 +106,8 @@ class Core_Orders
 
     function render_custom_orders_page()
     {
-    ?>
-        <div id="orders-page"></div>
-    <?php
+        ?>
+            <div id="orders-page"></div>
+        <?php
     }
 }
