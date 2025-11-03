@@ -106,7 +106,7 @@ class Zippy_Admin
 
 		// Pass the user ID to the script
 		wp_enqueue_script('core-admin-scripts', ZIPPY_CORE_URL . '/assets/dist/js/admin.min.js', [], $version, true);
-		wp_enqueue_style('core-admin-styles', ZIPPY_CORE_URL . '/assets/dist/css/main.min.css', [], $version);
+		wp_enqueue_style('core-admin-styles', ZIPPY_CORE_URL . '/assets/dist/css/admin.min.css', [], $version);
 
 		wp_localize_script('core-admin-scripts', 'admin_id', array(
 			'userID' => $current_user_id,

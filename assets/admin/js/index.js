@@ -5,6 +5,7 @@ import Settings from "./pages/setting/Settings";
 import { ThemeProvider } from "react-bootstrap";
 import OrdersPage from "./pages/orders/OrdersPage";
 import ModuleSettings from "./pages/setting/ModuleSettings";
+import TableOrder from "./Components/Pages/Orders/order-info/TableOrder";
 
 // Zippy Dashboard
 
@@ -35,6 +36,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const root = ReactDOM.createRoot(zippyOrdersPage);
     root.render(<OrdersPage />);
   }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const adminOrderTable = document.getElementById("admin-table-order");
+  const root = ReactDOM.createRoot(adminOrderTable);
+  const orderId = adminOrderTable.getAttribute("data-order-id");
+  const enableEdit = adminOrderTable.getAttribute("data-enable-edit");
+
+  root.render(<TableOrder orderId={orderId} enableEdit={enableEdit} />);
 });
 
 // Modules Control

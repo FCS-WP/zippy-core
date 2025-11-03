@@ -13,12 +13,14 @@ import {
   Link,
   Checkbox,
   Box,
+  Button,
 } from "@mui/material";
 import OrderStatusLabel from "./OrderStatusLabel";
 import BillingCell from "./BillingCell";
 import BulkAction from "./BulkAction";
 import FilterOrder from "./FilterOrder";
 import { useOrderProvider } from "../../../context/OrderContext";
+import DateCreatedCell from "./DateCreatedCell";
 
 const OrdersTable = ({
   orders,
@@ -33,8 +35,7 @@ const OrdersTable = ({
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [paginatedOrders, setPaginatedOrders] = useState([]);
 
-  const { fromDate, toDate, setFromDate, setToDate, handleFilterDateRange } =
-    useOrderProvider();
+  const { fromDate, toDate, setFromDate, setToDate } = useOrderProvider();
 
   useEffect(() => {
     const sorted = [...orders].sort((a, b) => {
@@ -80,10 +81,50 @@ const OrdersTable = ({
 
   return (
     <Paper sx={{ p: 2 }}>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        Orders
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: 2,
+          flexWrap: "wrap",
+          mb: 2,
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h5">Orders</Typography>
+        </Box>
 
+        {/* Add new order button */}
+        <Button
+          variant="contained"
+          onClick={() => {
+            window.location.href =
+              "/wp-admin/admin.php?page=wc-orders&action=new";
+          }}
+          sx={{
+            height: "32px",
+            fontSize: "12px",
+            borderRadius: "2px",
+            background: "#f6f7f7",
+            color: "#2271b1",
+            border: "1px solid #2271b1",
+            boxShadow: "none",
+            "&:hover": { background: "#e1e4e6", boxShadow: "none" },
+            "@media (max-width: 600px)": {
+              height: "40px",
+              fontSize: "10px",
+            },
+          }}
+        >
+          Add Order
+        </Button>
+      </Box>
       <Box
         sx={{
           display: "flex",
@@ -103,7 +144,6 @@ const OrdersTable = ({
           setFromDate={setFromDate}
           toDate={toDate}
           setToDate={setToDate}
-          handleFilterDateRange={handleFilterDateRange}
         />
       </Box>
 
@@ -165,6 +205,7 @@ const OrdersTable = ({
                     onClick={() => handleChange(order.id)}
                   />
                 </TableCell>
+
                 <TableCell>
                   <Link
                     href={`/wp-admin/admin.php?page=wc-orders&action=edit&id=${order.id}`}
@@ -176,16 +217,24 @@ const OrdersTable = ({
                     {order.billing?.last_name}
                   </Link>
                 </TableCell>
+
                 <BillingCell billing={order.billing} />
+
                 <TableCell>
                   <OrderStatusLabel status={order.status} />
                 </TableCell>
+
                 <TableCell>
                   {parseInt(order.total).toLocaleString()} {order.currency}
                 </TableCell>
+
                 <TableCell>{order.payment_method?.title || "N/A"}</TableCell>
+
                 <TableCell>{order.shipping?.city}</TableCell>
-                <TableCell>{order.date_created}</TableCell>
+
+                <TableCell>
+                  <DateCreatedCell dateString={order.date_created} />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -5,6 +5,7 @@ namespace Zippy_Core;
 use Zippy_Core\Core_Module;
 use Zippy_Core\Shipping\Services\Shipping_Services;
 use Zippy_Core\Utils\Zippy_Wc_Calculate_Helper;
+use WC_Tax;
 
 class Core_Shipping extends Core_Module
 {
@@ -42,18 +43,19 @@ class Core_Shipping extends Core_Module
 
     public function init_module()
     {
-        add_filter('woocommerce_package_rates', array($this, 'recalculate_shipping_rates'), 9999, 2);
+        if ($this->is_shipping_tax_enabled()) {
+            add_filter('woocommerce_package_rates', [$this, 'recalculate_shipping_rates'], 9999, 2);
+        }
     }
 
-    public function recalculate_shipping_rates($rates, $package)
+    private function is_shipping_tax_enabled()
     {
-        foreach ($rates as $rate_id => $rate) {
-            $cost   = $rate->get_cost();
-            $costExclTax = Zippy_Wc_Calculate_Helper::get_total_price_exclude_tax($cost);
-            $taxes  = Zippy_Wc_Calculate_Helper::get_tax($cost);
-            $rate->set_cost($costExclTax);
-            $rate->set_taxes([1 => $taxes]);
+        $standard_rates = WC_Tax::get_rates_for_tax_class('');
+        foreach ($standard_rates as $rate) {
+            if (!empty($rate->tax_rate_shipping)) {
+                return true;
+            }
         }
-        return $rates;
+        return false;
     }
 }
