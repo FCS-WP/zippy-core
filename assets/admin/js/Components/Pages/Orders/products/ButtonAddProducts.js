@@ -1,6 +1,7 @@
 // EditAddonButton.js
 import React, { useState } from "react";
 import { Button } from "@mui/material";
+import AddProductsDialog from "./AddProductsDialog";
 
 const ButtonAddProducts = ({ orderID }) => {
   const [open, setOpen] = useState(false);
@@ -19,6 +20,14 @@ const ButtonAddProducts = ({ orderID }) => {
       >
         Add Products
       </Button>
+
+      {open && (
+        <AddProductsDialog
+          open={open}
+          orderID={orderID}
+          onClose={handleClose}
+        />
+      )}
     </>
   );
 };

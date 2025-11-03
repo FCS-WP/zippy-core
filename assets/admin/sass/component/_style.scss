@@ -106,15 +106,35 @@
   }
 }
 
-
-#results-wrapper{
-  h3{
+#results-wrapper {
+  h3 {
     font-size: 18px;
     margin-bottom: 0px;
   }
 
-  p{
+  p {
     font-size: 16px;
     margin-bottom: 0px;
+  }
+}
+
+.add_products_model {
+  .custom-modal_table {
+    border: none !important;
+    .widefat tbody td {
+      text-align: center;
+    }
+    .widefat thead th {
+      text-align: center;
+      padding: 1rem;
+    }
+  }
+  .search-products {
+    label {
+      background: #fff;
+    }
+    input {
+      min-height: 54px;
+    }
   }
 }
