@@ -51,7 +51,7 @@ class Zippy_Wc_Calculate_Helper
      */
     public static function get_total_price_including_tax($priceExcludeTax): string
     {
-        $tax       = get_tax_percent();
+        $tax       = self::get_tax_percent();
         $tax_rate  = floatval($tax->tax_rate);
         return self::round_price_wc($priceExcludeTax * (1 + $tax_rate / 100));
     }

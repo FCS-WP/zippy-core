@@ -127,10 +127,10 @@ require_once ZIPPY_CORE_DIR_PATH . 'src/modules/route.php';
 require_once ZIPPY_CORE_DIR_PATH . 'src/modules/module.php';
 require_once ZIPPY_CORE_DIR_PATH . 'src/modules/middleware.php';
 
-require_once ZIPPY_CORE_DIR_PATH . 'src/modules/orders/index.php';
-require_once ZIPPY_CORE_DIR_PATH . 'src/modules/shipping/index.php';
-require_once ZIPPY_CORE_DIR_PATH . 'src/modules/postal_code/index.php';
-require_once ZIPPY_CORE_DIR_PATH . 'src/modules/settings/index.php';
+require_once ZIPPY_CORE_DIR_PATH . 'src/modules/orders/orders.php';
+require_once ZIPPY_CORE_DIR_PATH . 'src/modules/shipping/shipping.php';
+require_once ZIPPY_CORE_DIR_PATH . 'src/modules/postal_code/postal-code.php';
+require_once ZIPPY_CORE_DIR_PATH . 'src/modules/settings/settings.php';
 
 if (class_exists(Core_Orders::class)) {
   new Core_Orders();
@@ -143,10 +143,7 @@ if (class_exists(Core_Shipping::class)) {
 if (class_exists(Core_Postal_Code::class)) {
   new Core_Postal_Code();
 }
-  
+
 if (class_exists(Core_Settings::class)) {
   new Core_Settings();
 }
-
-
-
