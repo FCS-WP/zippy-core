@@ -457,4 +457,23 @@ class Order_Controllers
             'item_id'    => $item_id,
         ];
     }
+
+    public static function export_orders(WP_REST_Request $request)
+    {
+        try {
+            $date_from = sanitize_text_field($request->get_param('date_from') ?? '');
+            $date_to   = sanitize_text_field($request->get_param('date_to') ?? '');
+            $format    = sanitize_text_field($request->get_param('format') ?? 'csv');
+
+            $result = Order_Services::export_orders($date_from, $date_to, $format);
+
+            if (is_wp_error($result)) {
+                return Zippy_Response_Handler::error($result->get_error_message());
+            }
+
+            return Zippy_Response_Handler::success($result, 'Orders exported successfully.');
+        } catch (\Exception $e) {
+            return Zippy_Response_Handler::error('An error occurred while exporting orders.');
+        }
+    }
 }

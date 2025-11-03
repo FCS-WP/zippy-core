@@ -21,6 +21,7 @@ import BulkAction from "./BulkAction";
 import FilterOrder from "./FilterOrder";
 import { useOrderProvider } from "../../../context/OrderContext";
 import DateCreatedCell from "./DateCreatedCell";
+import ExportButton from "./ExportButton";
 
 const OrdersTable = ({
   orders,
@@ -145,6 +146,7 @@ const OrdersTable = ({
           toDate={toDate}
           setToDate={setToDate}
         />
+        <ExportButton />
       </Box>
 
       <TableContainer sx={{ my: "20px" }}>
