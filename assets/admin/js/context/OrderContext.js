@@ -5,23 +5,21 @@ const OrderContext = createContext();
 
 export const OrderProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingOrders, setLoadingOrders] = useState(true);
 
+  //Filter
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  const fetchOrders = async (from = "", to = "") => {
+  const fetchOrders = async (filters) => {
     try {
-      setLoading(true);
-      const res = await Api.getOrders({
-        date_from: from,
-        date_to: to,
-      });
+      setLoadingOrders(true);
+      const res = await Api.getOrders(filters);
       if (res.data.success) setOrders(res.data.result.orders);
     } catch (err) {
       console.error("Error fetching orders:", err);
     } finally {
-      setLoading(false);
+      setLoadingOrders(false);
     }
   };
 
@@ -29,20 +27,19 @@ export const OrderProvider = ({ children }) => {
     fetchOrders();
   }, []);
 
-  const handleFilterDateRange = ({ date_from, date_to }) => {
-    setFromDate(date_from);
-    setToDate(date_to);
-    fetchOrders(date_from, date_to);
+  const handleFilterOrder = (filters) => {
+    fetchOrders(filters);
   };
 
   const value = {
     orders,
-    loading,
+    loadingOrders,
     fromDate,
     toDate,
+    setOrders,
     setFromDate,
     setToDate,
-    handleFilterDateRange,
+    handleFilterOrder,
     fetchOrders,
   };
 

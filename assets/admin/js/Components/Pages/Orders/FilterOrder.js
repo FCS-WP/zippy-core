@@ -3,6 +3,7 @@ import { Button, TextField, Stack, FormControl } from "@mui/material";
 import { DateRangePicker } from "react-date-range";
 import DatePicker from "react-datepicker";
 import FilterDateRange from "./FilterDateRange";
+import { useOrderProvider } from "../../../context/OrderContext";
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
@@ -10,15 +11,11 @@ const formatDate = (dateStr) => {
   return `${y}-${m}-${d}`;
 };
 
-const FilterOrder = ({
-  fromDate,
-  setFromDate,
-  toDate,
-  setToDate,
-  handleFilterDateRange,
-}) => {
+const FilterOrder = ({ fromDate, setFromDate, toDate, setToDate }) => {
+  const { handleFilterOrder } = useOrderProvider();
+
   const onFilter = () => {
-    handleFilterDateRange({
+    handleFilterOrder({
       date_from: formatDate(fromDate),
       date_to: formatDate(toDate),
     });
