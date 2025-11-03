@@ -5,6 +5,7 @@ namespace Zippy_Core;
 use Zippy_Core\Core_Module;
 use Zippy_Core\Orders\Routes\Order_Detail_Route;
 use Zippy_Core\Orders\Routes\Order_Route;
+use Zippy_Core\Products\Routes\Product_Route;
 
 class Core_Products extends Core_Module
 {
@@ -28,5 +29,8 @@ class Core_Products extends Core_Module
         }
     }
 
-    public function init_module() {}
+    public function init_module()
+    {
+        Product_Route::get_instance();
+    }
 }

@@ -121,6 +121,12 @@ class Order_Services
 
     public static function  set_order_item_totals_with_wc_tax($item, $price_incl_tax, $quantity = 1)
     {
+        if (get_option('woocommerce_prices_include_tax') !== 'yes') {
+            $item->set_total($price_incl_tax * $quantity);
+            $item->calculate_taxes();
+            $item->save();
+        }
+
         if (! $item instanceof WC_Order_Item_Product) {
             return false;
         }

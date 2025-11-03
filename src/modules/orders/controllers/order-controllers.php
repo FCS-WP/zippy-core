@@ -264,6 +264,7 @@ class Order_Controllers
             return Zippy_Response_Handler::error('Failed to delete order item.');
         }
 
+        $order->calculate_totals();
         return Zippy_Response_Handler::success([
             'order_id' => $order_id,
             'item_id'  => $item_id,
@@ -304,13 +305,7 @@ class Order_Controllers
             return Zippy_Response_Handler::error('Failed to get product pricing by user.');
         }
 
-        if (get_option('woocommerce_prices_include_tax') === 'yes') {
-            Order_Services::set_order_item_totals_with_wc_tax($item, $product_price, $quantity);
-        } else {
-            $item->set_total($product_price * $quantity);
-            $item->calculate_taxes();
-            $item->save();
-        }
+        Order_Services::set_order_item_totals_with_wc_tax($item, $product_price, $quantity);
 
         return Zippy_Response_Handler::success([
             'status' => 'success',
@@ -393,5 +388,73 @@ class Order_Controllers
         return Zippy_Response_Handler::success([
             'trashed_orders' => $trashed,
         ], 'Orders moved to trash.');
+    }
+
+    public static function add_product_to_order(WP_REST_Request $request)
+    {
+        $order_id = intval($request->get_param('order_id'));
+        $order    = wc_get_order($order_id);
+        if (!$order) {
+            return Zippy_Response_Handler::error('Order not found.');
+        }
+
+        $user_id = $order->get_user_id() ?? 0;
+        $products = $request->get_param('products');
+        if (empty($products) || !is_array($products)) {
+            return Zippy_Response_Handler::error('No products provided.');
+        }
+
+        $added_items = [];
+        foreach ($products as $product) {
+            $added_item = self::add_single_product_to_order($order, $product, $user_id);
+            if (!empty($added_item)) {
+                $added_items[] = $added_item;
+            }
+        }
+
+        return Zippy_Response_Handler::success([
+            'order_id' => $order_id,
+            'items'    => $added_items,
+            'message'  => 'Products added to order successfully',
+        ]);
+    }
+
+    private static function add_single_product_to_order($order, $productData, $user_id)
+    {
+        $product_id = intval($productData['parent_product_id'] ?? 0);
+        $product    = wc_get_product($product_id);
+
+        if (!$product) {
+            return Zippy_Response_Handler::error('Product not found.');
+        }
+
+        return self::add_simple_product_to_order($order, $productData, $user_id);
+    }
+
+    private static function add_simple_product_to_order($order, $productData, $user_id)
+    {
+        $product_id = intval($productData['parent_product_id'] ?? 0);
+        $quantity   = max(1, intval($productData['quantity'] ?? 1));
+
+        $product = wc_get_product($product_id);
+        $product_price = $product->get_price();
+        if (is_null($product_price)) {
+            return Zippy_Response_Handler::error('Failed to get product pricing.');
+        }
+
+        $item_id = $order->add_product($product, $quantity);
+        if (is_wp_error($item_id)) {
+            return Zippy_Response_Handler::error('Failed to add product to order.');
+        }
+
+        $item = $order->get_item($item_id);
+
+        Order_Services::set_order_item_totals_with_wc_tax($item, $product_price, $quantity);
+        $order->calculate_totals();
+        return [
+            'product_id' => $product_id,
+            'quantity'   => $quantity,
+            'item_id'    => $item_id,
+        ];
     }
 }

@@ -118,5 +118,9 @@ class Order_Route extends Core_Route
                 ],
             ],
         ));
+        register_rest_route(ZIPPY_CORE_API_PREFIX, '/add-items-order', array(
+            'methods' => 'POST',
+            'callback' => [Order_Controllers::class, 'add_product_to_order'],
+        ));
     }
 }

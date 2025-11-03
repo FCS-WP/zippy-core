@@ -41,4 +41,20 @@ export const Api = {
   async getAdminNameFromOrder(params) {
     return await makeRequest("/admin-name-from-order", params);
   },
+  async products(params) {
+    return await makeRequest("/products", params, "GET");
+  },
+  async addProductsToOrder(order_id, action, params) {
+    return await makeRequest(
+      `/add-items-order?order_id=${order_id}&action=${action}`,
+      params,
+      "POST"
+    );
+  },
+  async categories(params) {
+    return await makeRequest("/categories", params, "GET");
+  },
+  async product(params) {
+    return await makeRequest("/product", params, "GET");
+  },
 };
