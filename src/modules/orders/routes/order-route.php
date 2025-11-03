@@ -122,5 +122,9 @@ class Order_Route extends Core_Route
             'methods' => 'POST',
             'callback' => [Order_Controllers::class, 'add_product_to_order'],
         ));
+        register_rest_route(ZIPPY_CORE_API_PREFIX, '/export-orders', array(
+            'methods' => 'POST',
+            'callback' => [Order_Controllers::class, 'export_orders'],
+        ));
     }
 }

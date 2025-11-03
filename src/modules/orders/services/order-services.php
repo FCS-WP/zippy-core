@@ -4,6 +4,8 @@ namespace Zippy_Core\Orders\Services;
 
 use WC_Order_Item_Product;
 use WC_Tax;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class Order_Services
 {
@@ -175,5 +177,160 @@ class Order_Services
             'total_tax'         => $total_tax,
             'total_incl_tax'    => $line_price,
         ];
+    }
+
+    public static function export_orders($date_from, $date_to, $format)
+    {
+        $args = [
+            'limit'   => -1,
+            'return'  => 'objects',
+        ];
+
+        if ($date_from && $date_to) {
+            $args['date_created'] = $date_from . '...' . $date_to;
+        } elseif ($date_from) {
+            $args['date_created'] = '>' . $date_from . ' 00:00:00';
+        } elseif ($date_to) {
+            $args['date_created'] = '<' . $date_to . ' 23:59:59';
+        }
+
+        $orders = wc_get_orders($args);
+
+        if (empty($orders)) {
+            return new \WP_Error('no_orders', 'No orders found for the selected date range.');
+        }
+
+        // Chuẩn bị dữ liệu
+        $order_rows = [];
+        foreach ($orders as $order) {
+            $order_rows[] = [
+                'order_id'       => $order->get_id(),
+                'phone'          => $order->get_billing_phone(),
+                'firstname'      => $order->get_billing_first_name(),
+                'lastname'       => $order->get_billing_last_name(),
+                'user'           => $order->get_user_id() ? get_userdata($order->get_user_id())->user_login : 'Guest',
+                'status'         => wc_get_order_status_name($order->get_status()),
+                'total'          => strip_tags(wc_price($order->get_total())),
+                'payment_method' => $order->get_payment_method_title(),
+                'date_created'   => $order->get_date_created()->date_i18n('Y-m-d H:i:s'),
+            ];
+        }
+
+        // Sinh nội dung file (không lưu server)
+        $content = '';
+        if ($format === 'csv') {
+            $content = self::generate_csv($order_rows);
+        } elseif ($format === 'pdf') {
+            $content = self::generate_pdf($order_rows);
+        } else {
+            return new \WP_Error('invalid_format', 'Invalid export format.');
+        }
+
+        // Encode base64 để gửi client tải
+        $file_base64 = base64_encode($content);
+        $file_name = 'orders_export_' . date('Y-m-d_H-i-s') . '.' . $format;
+
+        return [
+            'file_base64' => $file_base64,
+            'file_name'   => $file_name,
+            'file_type'   => $format,
+        ];
+    }
+
+    /**
+     * Tạo CSV – trả về nội dung string
+     */
+    private static function generate_csv($rows)
+    {
+        $handle = fopen('php://memory', 'r+');
+        fwrite($handle, "\xEF\xBB\xBF"); // UTF-8 BOM
+
+        fputcsv($handle, [
+            'Order ID',
+            'Phone',
+            'First Name',
+            'Last Name',
+            'User',
+            'Status',
+            'Total',
+            'Payment Method',
+            'Date Created',
+        ]);
+
+        foreach ($rows as $r) {
+            fputcsv($handle, [
+                $r['order_id'],
+                $r['phone'],
+                $r['firstname'],
+                $r['lastname'],
+                $r['user'],
+                $r['status'],
+                $r['total'],
+                $r['payment_method'],
+                $r['date_created'],
+            ]);
+        }
+
+        rewind($handle);
+        $content = stream_get_contents($handle);
+        fclose($handle);
+        return $content;
+    }
+
+    /**
+     * Tạo PDF – trả về nội dung binary
+     */
+    private static function generate_pdf($rows)
+    {
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($options);
+        $html = '
+        <style>
+            body { font-family: DejaVu Sans, sans-serif; font-size: 12px; }
+            h2 { text-align:center; margin-bottom: 10px; }
+            table { width:100%; border-collapse: collapse; }
+            th, td { border:1px solid #ccc; padding:8px; text-align:left; }
+            th { background-color:#f2f2f2; }
+        </style>
+        <h2>Orders Export</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Phone</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Payment Method</th>
+                    <th>Date Created</th>
+                </tr>
+            </thead>
+            <tbody>';
+
+        foreach ($rows as $r) {
+            $html .= '<tr>
+                <td>' . esc_html($r['order_id']) . '</td>
+                <td>' . esc_html($r['phone']) . '</td>
+                <td>' . esc_html($r['firstname']) . '</td>
+                <td>' . esc_html($r['lastname']) . '</td>
+                <td>' . esc_html($r['user']) . '</td>
+                <td>' . esc_html($r['status']) . '</td>
+                <td>' . esc_html($r['total']) . '</td>
+                <td>' . esc_html($r['payment_method']) . '</td>
+                <td>' . esc_html($r['date_created']) . '</td>
+            </tr>';
+        }
+
+        $html .= '</tbody></table>';
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+
+        return $dompdf->output();
     }
 }

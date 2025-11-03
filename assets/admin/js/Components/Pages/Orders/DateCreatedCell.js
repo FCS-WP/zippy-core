@@ -7,7 +7,6 @@ const DateCreatedCell = ({ dateString }) => {
   if (!dateString) return <Typography>N/A</Typography>;
 
   const parsed = parse(dateString, "yyyy-MM-dd HH:mm:ss", new Date());
-  console.log(parsed);
 
   const isToday = DateTimeHelper.isToday(parsed);
   if (isToday) {
