@@ -17,6 +17,7 @@ Copyright 2024
 
 namespace Zippy_Core;
 
+use Zippy_Core\Src\Admin\Orders\Zippy_Admin_Orders;
 use Zippy_Core\Src\Core\Zippy_Activate;
 
 defined('ABSPATH') or die('°_°’');
@@ -56,15 +57,22 @@ if (!defined('ZIPPY_CORE_URL')) {
   define('ZIPPY_CORE_URL', plugin_dir_url(__FILE__));
 }
 
+/* Set API prefix url */
+
+if (!defined('ZIPPY_CORE_API_PREFIX')) {
+  define('ZIPPY_CORE_API_PREFIX', 'zippy-core/v2');
+}
+
+
 /* ------------------------------------------
 // i18n
 ---------------------------- --------------------------------------------- */
 
 load_plugin_textdomain('zippy-core', false, basename(dirname(__FILE__)) . '/languages');
 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 
 /* ------------------------------------------
@@ -89,11 +97,7 @@ use Zippy_Core\Src\User\Zippy_MPDA_Consent;
 use Zippy_Core\Src\User\Zippy_User_Account_Expiry;
 
 use Zippy_Core\Src\Analytics\Zippy_Analytics;
-
 use Zippy_Core\Src\Woocommerce\Zippy_Woocommerce;
-
-use Zippy_Core\Src\Woocommerce\Zippy_Postal_code;
-use Zippy_Core\Src\Woocommerce\Zippy_Shipping;
 
 /**
  *
@@ -114,6 +118,17 @@ Zippy_Analytics::get_instance();
 
 Zippy_Woocommerce::get_instance();
 
-Zippy_Postal_code::get_instance();
 
-Zippy_Shipping::get_instance();
+/**
+ * Zippy Core V2: Import modules
+ */
+
+require_once ZIPPY_CORE_DIR_PATH . 'src/modules/route.php';
+require_once ZIPPY_CORE_DIR_PATH . 'src/modules/module.php';
+require_once ZIPPY_CORE_DIR_PATH . 'src/modules/middleware.php';
+require_once ZIPPY_CORE_DIR_PATH . 'src/modules/autoload-modules.php';
+
+//Autoload modules
+if (class_exists(Core_Autoload_Module::class)) {
+  Core_Autoload_Module::init();
+}
