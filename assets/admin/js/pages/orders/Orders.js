@@ -4,7 +4,7 @@ import OrdersTable from "../../Components/Pages/Orders/OrdersTable";
 import { useOrderProvider } from "../../context/OrderContext";
 
 const Orders = () => {
-  const { orders, loading } = useOrderProvider();
+  const { orders, loadingOrders } = useOrderProvider();
 
   const [orderBy, setOrderBy] = useState("date_created");
   const [orderDirection, setOrderDirection] = useState("desc");
@@ -17,7 +17,7 @@ const Orders = () => {
     setOrderBy(property);
   };
 
-  if (loading) {
+  if (loadingOrders) {
     return (
       <div style={{ textAlign: "center", padding: "2rem" }}>
         <CircularProgress />
