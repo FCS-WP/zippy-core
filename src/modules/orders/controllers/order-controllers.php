@@ -22,34 +22,23 @@ class Order_Controllers
 
             return Zippy_Response_Handler::success($data, 'Get orders successfully!');
         } catch (\Exception $e) {
-            return new \WP_Error('zippy_orders_error', $e->getMessage(), ['status' => 500]);
+            return Zippy_Response_Handler::error($e->getMessage());
         }
     }
 
     public static function get_order_detail_by_id(WP_REST_Request $request)
     {
         try {
-            $order_id = absint($request->get_param('id'));
+            $order_id = $request->get_param('id');
+            $data = Order_Detail_Services::get_order_detail_by_id($order_id);
 
-            if (empty($order_id)) {
-                return new WP_Error('missing_id', 'Order ID is required.', ['status' => 400]);
+            if (empty($data)) {
+                return Zippy_Response_Handler::error('Order not found or no details available.');
             }
 
-            $order = wc_get_order($order_id);
-
-            if (!$order) {
-                return new WP_Error('not_found', 'Order not found.', ['status' => 404]);
-            }
-
-            $data = Order_Services::parse_order_data($order);
-
-            return rest_ensure_response([
-                'success' => true,
-                'result'  => $data,
-                'message' => "Get order detail successfully!",
-            ]);
+            return Zippy_Response_Handler::success($data, 'Get order detail successfully!');
         } catch (\Exception $e) {
-            return new WP_Error('server_error', $e->getMessage(), ['status' => 500]);
+            return Zippy_Response_Handler::error($e->getMessage());
         }
     }
 

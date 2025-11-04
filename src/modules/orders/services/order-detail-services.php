@@ -6,6 +6,7 @@ use WC_Order_Item_Product;
 use WC_Tax;
 use Zippy_Core\Utils\Zippy_Wc_Calculate_Helper;
 use WC_Coupon;
+use WC_Order;
 
 class Order_Detail_Services
 {
@@ -372,5 +373,17 @@ class Order_Detail_Services
             'quantity'   => $quantity,
             'item_id'    => $item_id,
         ];
+    }
+
+    public static function get_order_detail_by_id($order_id): array
+    {
+        $order = wc_get_order($order_id);
+
+        if (!$order) {
+            return [];
+        }
+
+        $data = Order_Services::parse_order_data($order);
+        return $data;
     }
 }
