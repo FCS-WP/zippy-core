@@ -3,9 +3,11 @@ import ReactDOM from "react-dom/client";
 import Dashboard from "./pages/dashboard/Dashboad";
 import Settings from "./pages/setting/Settings";
 import { ThemeProvider } from "react-bootstrap";
-import OrdersPage from "./pages/orders/OrdersPage";
 import ModuleSettings from "./pages/setting/ModuleSettings";
 import TableOrderInfo from "./Components/Pages/Orders/order-info/TableOrderInfo";
+import { ToastContainer } from "react-toastify";
+import { OrderProvider } from "./context/OrderContext";
+import Orders from "./pages/orders/Orders";
 
 // Zippy Dashboard
 
@@ -34,7 +36,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (zippyOrdersPage) {
     const root = ReactDOM.createRoot(zippyOrdersPage);
-    root.render(<OrdersPage />);
+    root.render(
+      <>
+        <OrderProvider>
+          <Orders />
+          <ToastContainer />
+        </OrderProvider>
+      </>
+    );
   }
 });
 
@@ -45,7 +54,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const root = ReactDOM.createRoot(adminOrderTable);
     const orderId = adminOrderTable.getAttribute("data-order-id");
     const enableEdit = adminOrderTable.getAttribute("data-enable-edit");
-    root.render(<TableOrderInfo orderId={orderId} enableEdit={enableEdit} />);
+    root.render(
+      <>
+        <TableOrderInfo orderId={orderId} enableEdit={enableEdit} />
+        <ToastContainer />
+      </>
+    );
   }
 });
 

@@ -3,7 +3,6 @@
 namespace Zippy_Core;
 
 use Zippy_Core\Core_Module;
-use Zippy_Core\Orders\Routes\Order_Detail_Route;
 use Zippy_Core\Orders\Routes\Order_Route;
 
 class Core_Orders extends Core_Module
@@ -15,6 +14,7 @@ class Core_Orders extends Core_Module
             __DIR__ . '/controllers',
             __DIR__ . '/routes',
             __DIR__ . '/services',
+            __DIR__ . '/models',
         ];
 
         foreach ($paths as $path) {
@@ -30,7 +30,6 @@ class Core_Orders extends Core_Module
 
     public function init_module()
     {
-        Order_Detail_Route::get_instance();
         Order_Route::get_instance();
 
         /**

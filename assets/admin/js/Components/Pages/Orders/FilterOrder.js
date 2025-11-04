@@ -1,9 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { Button, TextField, Stack, FormControl } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Stack,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import { DateRangePicker } from "react-date-range";
 import DatePicker from "react-datepicker";
 import FilterDateRange from "./FilterDateRange";
 import { useOrderProvider } from "../../../context/OrderContext";
+
+const getStatusOptions = () => [
+  { value: "", label: "All statuses" },
+  { value: "pending", label: "Pending" },
+  { value: "processing", label: "Processing" },
+  { value: "completed", label: "Completed" },
+  { value: "on-hold", label: "On Hold" },
+  { value: "cancelled", label: "Cancelled" },
+  { value: "refunded", label: "Refunded" },
+  { value: "failed", label: "Failed" },
+];
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
@@ -12,12 +31,14 @@ const formatDate = (dateStr) => {
 };
 
 const FilterOrder = ({ fromDate, setFromDate, toDate, setToDate }) => {
+  const [status, setStatus] = useState("");
   const { handleFilterOrder } = useOrderProvider();
 
   const onFilter = () => {
     handleFilterOrder({
       date_from: formatDate(fromDate),
       date_to: formatDate(toDate),
+      status_order: status,
     });
   };
 
@@ -29,6 +50,30 @@ const FilterOrder = ({ fromDate, setFromDate, toDate, setToDate }) => {
         toDate={toDate}
         setToDate={setToDate}
       />
+      <Stack direction="row" spacing={1} alignItems="center">
+        <FormControl size="small">
+          <Select
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            displayEmpty
+            sx={{ height: "32px", fontSize: "14px", minWidth: "180px" }}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  mt: 1,
+                  ml: 8,
+                },
+              },
+            }}
+          >
+            {getStatusOptions().map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Stack>
       <Button
         variant="outlined"
         sx={{

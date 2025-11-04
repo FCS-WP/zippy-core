@@ -9,6 +9,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import { Api } from "../../../../api/admin";
+import { toast } from "react-toastify";
 
 const OrderProductRow = ({
   item_id,
@@ -25,7 +26,7 @@ const OrderProductRow = ({
   const roundUp2dp = (num) => {
     return (Math.round(num * 10) / 10).toFixed(2);
   };
-  
+
   const unitPriceInclTax = roundUp2dp(
     parseFloat(item.price_per_item) + parseFloat(item.tax_per_item)
   );
@@ -47,8 +48,11 @@ const OrderProductRow = ({
           addons,
         }
       );
-      if (res.status === "success") refreshOrderInfo();
-      else console.error(res.message);
+
+      if (res.status === "success") {
+        refreshOrderInfo();
+        toast.success("Quantity updated successfully.");
+      } else toast.error(res.message || "Failed to update quantity.");
     } catch (err) {
       console.error(err);
     } finally {
