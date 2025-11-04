@@ -29,6 +29,10 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.4",
+    "@mui/material": "^7.3.4",
     "axios": "^1.7.7",
     "bootstrap": "^4.6.0",
     "date-fns": "^4.1.0",
@@ -36,6 +40,7 @@
     "react-bootstrap": "^2.10.4",
     "react-chartjs-2": "^5.2.0",
     "react-datepicker": "^7.3.0",
-    "react-dom": "18.3.1"
+    "react-dom": "18.3.1",
+    "react-toastify": "^11.0.5"
   }
 }
