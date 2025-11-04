@@ -12,10 +12,16 @@ import {
   Typography,
   Link,
   Checkbox,
+  Box,
+  Button,
 } from "@mui/material";
 import OrderStatusLabel from "./OrderStatusLabel";
 import BillingCell from "./BillingCell";
 import BulkAction from "./BulkAction";
+import FilterOrder from "./FilterOrder";
+import { useOrderProvider } from "../../../context/OrderContext";
+import DateCreatedCell from "./DateCreatedCell";
+import ExportButton from "./ExportButton";
 
 const OrdersTable = ({
   orders,
@@ -29,6 +35,8 @@ const OrdersTable = ({
 }) => {
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [paginatedOrders, setPaginatedOrders] = useState([]);
+
+  const { fromDate, toDate, setFromDate, setToDate } = useOrderProvider();
 
   useEffect(() => {
     const sorted = [...orders].sort((a, b) => {
@@ -74,13 +82,73 @@ const OrdersTable = ({
 
   return (
     <Paper sx={{ p: 2 }}>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        Orders
-      </Typography>
-      <BulkAction
-        selectedOrders={selectedOrders}
-        setOrders={setPaginatedOrders}
-      />
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: 2,
+          flexWrap: "wrap",
+          mb: 2,
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h5">Orders</Typography>
+        </Box>
+
+        {/* Add new order button */}
+        <Button
+          variant="contained"
+          onClick={() => {
+            window.location.href =
+              "/wp-admin/admin.php?page=wc-orders&action=new";
+          }}
+          sx={{
+            height: "32px",
+            fontSize: "12px",
+            borderRadius: "2px",
+            background: "#f6f7f7",
+            color: "#2271b1",
+            border: "1px solid #2271b1",
+            boxShadow: "none",
+            "&:hover": { background: "#e1e4e6", boxShadow: "none" },
+            "@media (max-width: 600px)": {
+              height: "40px",
+              fontSize: "10px",
+            },
+          }}
+        >
+          Add Order
+        </Button>
+      </Box>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          gap: 2,
+          flexWrap: "wrap",
+          mb: 2,
+        }}
+      >
+        <BulkAction
+          selectedOrders={selectedOrders}
+          setOrders={setPaginatedOrders}
+        />
+        <FilterOrder
+          fromDate={fromDate}
+          setFromDate={setFromDate}
+          toDate={toDate}
+          setToDate={setToDate}
+        />
+        <ExportButton />
+      </Box>
+
       <TableContainer sx={{ my: "20px" }}>
         <Table>
           <TableHead>
@@ -130,7 +198,7 @@ const OrdersTable = ({
 
           <TableBody>
             {paginatedOrders.map((order) => (
-              <TableRow key={order.id} id={`order-${order.id}`}>
+              <TableRow key={order.id}>
                 <TableCell padding="checkbox">
                   <Checkbox
                     name="id[]"
@@ -139,50 +207,36 @@ const OrdersTable = ({
                     onClick={() => handleChange(order.id)}
                   />
                 </TableCell>
+
                 <TableCell>
                   <Link
                     href={`/wp-admin/admin.php?page=wc-orders&action=edit&id=${order.id}`}
                     underline="hover"
                     color="primary"
-                    sx={{ fontWeight: "bold", cursor: "pointer" }}
+                    sx={{ fontWeight: "bold" }}
                   >
                     #{order.order_number} - {order.billing?.first_name}{" "}
                     {order.billing?.last_name}
                   </Link>
                 </TableCell>
+
                 <BillingCell billing={order.billing} />
+
                 <TableCell>
                   <OrderStatusLabel status={order.status} />
                 </TableCell>
+
                 <TableCell>
                   {parseInt(order.total).toLocaleString()} {order.currency}
                 </TableCell>
+
                 <TableCell>{order.payment_method?.title || "N/A"}</TableCell>
-                <TableCell sx={{ fontSize: "0.85rem", color: "#555" }}>
-                  {order.billing?.first_name} {order.billing?.last_name}
-                  {order.shipping?.company && `, ${order.shipping.company}`}
-                  <br />
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                      `${order.shipping?.address_1 || ""} ${
-                        order.shipping?.address_2 || ""
-                      }, ${order.shipping?.city || ""}`
-                    )}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      textDecoration: "none",
-                      color: "#1976d2",
-                      fontSize: "0.8rem",
-                      display: "inline-block",
-                      marginTop: "2px",
-                    }}
-                  >
-                    {order.shipping?.address_1} {order.shipping?.address_2},{" "}
-                    {order.shipping?.city}
-                  </a>
+
+                <TableCell>{order.shipping?.city}</TableCell>
+
+                <TableCell>
+                  <DateCreatedCell dateString={order.date_created} />
                 </TableCell>
-                <TableCell>{order.date_created}</TableCell>
               </TableRow>
             ))}
           </TableBody>

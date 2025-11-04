@@ -70,9 +70,9 @@ if (!defined('ZIPPY_CORE_API_PREFIX')) {
 
 load_plugin_textdomain('zippy-core', false, basename(dirname(__FILE__)) . '/languages');
 
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 
 /* ------------------------------------------
@@ -126,27 +126,9 @@ Zippy_Woocommerce::get_instance();
 require_once ZIPPY_CORE_DIR_PATH . 'src/modules/route.php';
 require_once ZIPPY_CORE_DIR_PATH . 'src/modules/module.php';
 require_once ZIPPY_CORE_DIR_PATH . 'src/modules/middleware.php';
+require_once ZIPPY_CORE_DIR_PATH . 'src/modules/autoload-modules.php';
 
-require_once ZIPPY_CORE_DIR_PATH . 'src/modules/orders/index.php';
-require_once ZIPPY_CORE_DIR_PATH . 'src/modules/shipping/index.php';
-require_once ZIPPY_CORE_DIR_PATH . 'src/modules/postal_code/index.php';
-require_once ZIPPY_CORE_DIR_PATH . 'src/modules/settings/index.php';
-
-if (class_exists(Core_Orders::class)) {
-  new Core_Orders();
+//Autoload modules
+if (class_exists(Core_Autoload_Module::class)) {
+  Core_Autoload_Module::init();
 }
-
-if (class_exists(Core_Shipping::class)) {
-  new Core_Shipping();
-}
-
-if (class_exists(Core_Postal_Code::class)) {
-  new Core_Postal_Code();
-}
-  
-if (class_exists(Core_Settings::class)) {
-  new Core_Settings();
-}
-
-
-
