@@ -16,6 +16,7 @@ class Core_Products extends Core_Module
             __DIR__ . '/controllers',
             __DIR__ . '/routes',
             __DIR__ . '/services',
+            __DIR__ . '/models',
         ];
 
         foreach ($paths as $path) {

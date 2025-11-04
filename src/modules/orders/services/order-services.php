@@ -6,12 +6,19 @@ use WC_Order_Item_Product;
 use WC_Tax;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Zippy_Core\Utils\Zippy_Wc_Calculate_Helper;
 
 class Order_Services
 {
     public static function handle_orders($infos)
     {
-        list($page, $per_page, $order_by, $order_val, $order_status, $date_from, $date_to) = $infos;
+        $page         = $infos['page'] ?? null;
+        $per_page     = $infos['per_page'] ?? null;
+        $order_by     = $infos['order_by'] ?? null;
+        $order_val    = $infos['order_val'] ?? null;
+        $order_status = $infos['order_status'] ?? null;
+        $date_from    = $infos['date_from'] ?? null;
+        $date_to      = $infos['date_to'] ?? null;
 
         $args = [
             'limit'   => $per_page,
@@ -121,66 +128,42 @@ class Order_Services
         return $data;
     }
 
-    public static function  set_order_item_totals_with_wc_tax($item, $price_incl_tax, $quantity = 1)
+    public static function bulk_action_update_order_status(array $data)
     {
-        if (get_option('woocommerce_prices_include_tax') !== 'yes') {
-            $item->set_total($price_incl_tax * $quantity);
-            $item->calculate_taxes();
-            $item->save();
+        $order_ids = $data['order_ids'] ?? [];
+        $status    = $data['status'] ?? '';
+
+        $valid_statuses = wc_get_order_statuses();
+        if (!array_key_exists($status, $valid_statuses)) {
+            return [];
         }
 
-        if (! $item instanceof WC_Order_Item_Product) {
-            return false;
+        $updated_orders = [];
+        foreach ($order_ids as $order_id) {
+            $order = wc_get_order($order_id);
+            if ($order) {
+                $order->update_status($status, 'Order status updated via API', true);
+                $updated_orders[] = $order_id;
+            }
         }
-
-        $product = $item->get_product();
-        if (! $product) {
-            return false;
-        }
-
-        // Get tax rates for this product
-        $tax_rates = WC_Tax::get_rates($product->get_tax_class());
-
-        if (empty($tax_rates)) {
-            // No tax: treat as tax-free
-            $subtotal = $price_incl_tax * $quantity;
-            $item->set_subtotal($subtotal);
-            $item->set_total($subtotal);
-            $item->set_taxes(['total' => [], 'subtotal' => []]);
-            $item->save();
-            return [
-                'subtotal_excl_tax' => $subtotal,
-                'total_tax'         => 0,
-                'total_incl_tax'    => $subtotal,
-            ];
-        }
-
-        // Calculate inclusive tax breakdown
-        $line_price = $price_incl_tax * $quantity;
-        $taxes      = WC_Tax::calc_inclusive_tax($line_price, $tax_rates);
-
-        $total_tax        = array_sum($taxes);
-        $subtotal_excl_tax = $line_price - $total_tax;
-
-        // Update item totals
-        $item->set_subtotal($subtotal_excl_tax);
-        $item->set_total($subtotal_excl_tax);
-        $item->set_taxes([
-            'total'    => $taxes,
-            'subtotal' => $taxes,
-        ]);
-
-        $item->save();
 
         return [
-            'subtotal_excl_tax' => $subtotal_excl_tax,
-            'total_tax'         => $total_tax,
-            'total_incl_tax'    => $line_price,
+            'updated_orders' => $updated_orders,
+            'new_status' => $status,
         ];
     }
 
-    public static function export_orders($date_from, $date_to, $format)
+    /**
+     * Export orders
+     * @param array $paramInfos
+     * @return array{file_base64: string, file_name: string, file_type: string|\WP_Error}
+     */
+    public static function export_orders(array $paramInfos)
     {
+        $date_from = sanitize_text_field($paramInfos['date_from'] ?? '');
+        $date_to   = sanitize_text_field($paramInfos['date_to'] ?? '');
+        $format    = sanitize_text_field($paramInfos['format'] ?? 'csv');
+
         $args = [
             'limit'   => -1,
             'return'  => 'objects',
@@ -200,7 +183,6 @@ class Order_Services
             return new \WP_Error('no_orders', 'No orders found for the selected date range.');
         }
 
-        // Chuẩn bị dữ liệu
         $order_rows = [];
         foreach ($orders as $order) {
             $order_rows[] = [
@@ -216,7 +198,7 @@ class Order_Services
             ];
         }
 
-        // Sinh nội dung file (không lưu server)
+        // Generate file content (do not save on server)
         $content = '';
         if ($format === 'csv') {
             $content = self::generate_csv($order_rows);
@@ -226,7 +208,6 @@ class Order_Services
             return new \WP_Error('invalid_format', 'Invalid export format.');
         }
 
-        // Encode base64 để gửi client tải
         $file_base64 = base64_encode($content);
         $file_name = 'orders_export_' . date('Y-m-d_H-i-s') . '.' . $format;
 
@@ -238,7 +219,7 @@ class Order_Services
     }
 
     /**
-     * Tạo CSV – trả về nội dung string
+     * Create CSV – return content string
      */
     private static function generate_csv($rows)
     {
@@ -278,7 +259,7 @@ class Order_Services
     }
 
     /**
-     * Tạo PDF – trả về nội dung binary
+     * Create PDF – return content string
      */
     private static function generate_pdf($rows)
     {
@@ -332,5 +313,20 @@ class Order_Services
         $dompdf->render();
 
         return $dompdf->output();
+    }
+
+    public static function move_orders_to_trash(array $order_ids)
+    {
+        $trashed = [];
+        foreach ($order_ids as $order_id) {
+            $order = wc_get_order($order_id);
+
+            if ($order) {
+                $order->delete(false);
+                $trashed[] = $order_id;
+            }
+        }
+
+        return $trashed;
     }
 }

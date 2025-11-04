@@ -31,11 +31,10 @@ const BulkAction = ({ selectedOrders, setOrders }) => {
 
         if (data.status === "success") {
           toast.success("Orders moved to trash!");
-          data.data.trashed_orders.forEach((orderId) => {
-            const row = document.querySelector(`#order-${orderId}`);
-            if (row) {
-              row.remove();
-            }
+          data.trashed_orders.forEach((orderId) => {
+            setOrders((prevOrders) =>
+              prevOrders.filter((o) => o.id !== orderId)
+            );
           });
         } else {
           toast.error(data.message || "Failed to move orders to trash.");
@@ -49,11 +48,12 @@ const BulkAction = ({ selectedOrders, setOrders }) => {
         if (data.status === "success") {
           toast.success("Orders updated!");
 
-          if (data.data.updated_orders) {
+          const updatedOrders = data.updated_orders || [];
+          if (updatedOrders.length > 0) {
             const statusText = getStatusFromAction(action);
             setOrders((prevOrders) =>
               prevOrders.map((order) =>
-                data.data.updated_orders.includes(order.id)
+                updatedOrders.includes(order.id)
                   ? { ...order, status: statusText }
                   : order
               )

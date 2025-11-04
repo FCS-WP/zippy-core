@@ -15,7 +15,7 @@ export const OrderProvider = ({ children }) => {
     try {
       setLoadingOrders(true);
       const res = await Api.getOrders(filters);
-      if (res.data.success) setOrders(res.data.result.orders);
+      if (res.data.status === "success") setOrders(res.data.orders);
     } catch (err) {
       console.error("Error fetching orders:", err);
     } finally {
