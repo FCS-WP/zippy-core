@@ -35,7 +35,7 @@ class Zippy_Admin
 		add_action('admin_init', [$this, 'hide_acf_options_menu'], 99);
 
 		//Disable search engines from indexing this site (Only for staging domain)
-		add_action('admin_init', [$this, 'disable_search_engine_indexing']);
+		//add_action('admin_init', [$this, 'disable_search_engine_indexing']);
 
 		/*  Disable All Update Notifications with Code  */
 
