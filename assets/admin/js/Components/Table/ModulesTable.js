@@ -38,7 +38,6 @@ const ModulesTable = () => {
 
   const fetchTableData = () => {
     if (modulesConfigs) {
-      console.log("modulesConfigs", modulesConfigs);
       const data = modulesConfigs.modules.map((item) => {
         return createData(item.key, item.value);
       });
@@ -92,6 +91,11 @@ const ModulesTable = () => {
     }
   };
 
+  const handleSelectedRows = (selected) => {
+    // Handle Selected ids here
+    console.log("selected ids: ", selected);
+  }
+
   return (
     <Box minHeight={"60vh"}>
       {modulesConfigs && dataRows.length > 0 ? (
@@ -100,6 +104,7 @@ const ModulesTable = () => {
             tableConfig={tableConfig}
             dataRows={dataRows}
             onUpdateTable={updateTableConfig}
+            onSelectedRows={handleSelectedRows}
           />
 
           <Button

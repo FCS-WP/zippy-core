@@ -23,6 +23,7 @@ import { visuallyHidden } from "@mui/utils";
 import { useState } from "react";
 import TableViewV2Pagination from "./TableViewV2Pagination";
 import { Button } from "@mui/material";
+import { useEffect } from "react";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -59,6 +60,7 @@ function EnhancedTableHead(props) {
       <TableRow>
         <TableCell padding="checkbox">
           <Checkbox
+            className="custom-switch"
             color="primary"
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
@@ -161,7 +163,7 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default function TableViewV2({ tableConfig, dataRows, onUpdateTable }) {
+export default function TableViewV2({ tableConfig, dataRows, onUpdateTable, onSelectedRows = () => {} }) {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("");
   const [selected, setSelected] = useState([]);
@@ -232,6 +234,10 @@ export default function TableViewV2({ tableConfig, dataRows, onUpdateTable }) {
     onUpdateTable({ itemsPerPage: newValue, page: 1 });
   };
 
+  useEffect(()=>{
+    onSelectedRows(selected);
+  }, [selected])
+
   return (
     <Box sx={{ width: "100%" }}>
       {tableConfig && (
@@ -264,13 +270,17 @@ export default function TableViewV2({ tableConfig, dataRows, onUpdateTable }) {
                     return (
                       <TableRow
                         hover
-                        aria-checked={isItemSelected}
                         tabIndex={-1}
                         key={row.id}
                         selected={isItemSelected}
-                        sx={{ cursor: "pointer" }}
                       >
-                        <TableCell padding="checkbox">
+                        <TableCell 
+                          padding="checkbox" 
+                          role="checkbox"
+                          aria-checked={isItemSelected}
+                          onClick={(event) => handleClick(event, row.id)}
+                          sx={{ cursor: "pointer" }}
+                        >
                           <Checkbox
                             color="primary"
                             checked={isItemSelected}
