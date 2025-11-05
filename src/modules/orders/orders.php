@@ -100,8 +100,7 @@ class Core_Orders extends Core_Module
         ], $atts, 'admin_order_table');
 
         $order_id = intval($atts['order_id']);
-        $enable_edit = filter_var($atts['enable_edit'], FILTER_VALIDATE_BOOLEAN);
-
+        $enable_edit = (isset($_GET['action']) && $_GET['action'] === 'edit');
         if (!$order_id) {
             return '';
         }

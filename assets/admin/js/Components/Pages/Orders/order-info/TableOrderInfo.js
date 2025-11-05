@@ -19,7 +19,7 @@ import { Api } from "../../../../api/admin";
 import ButtonAddProducts from "../products/ButtonAddProducts";
 import DownloadInvoiceButton from "../DownloadInvoiceButton";
 
-const TableOrder = ({ orderId, enableEdit }) => {
+const TableOrderInfo = ({ orderId, enableEdit }) => {
   const [orderInfo, setOrderInfo] = useState(null);
   const [editingItemId, setEditingItemId] = useState(null);
   const [tempQuantity, setTempQuantity] = useState(0);
@@ -227,4 +227,4 @@ const TableOrder = ({ orderId, enableEdit }) => {
   );
 };
 
-export default TableOrder;
+export default TableOrderInfo;
