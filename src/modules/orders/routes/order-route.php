@@ -75,5 +75,11 @@ class Order_Route extends Core_Route
             'permission_callback' => [Core_Middleware::class, 'admin_only'],
             'args' => Order_Arguments::get_order_details_args(),
         ]);
+        register_rest_route(ZIPPY_CORE_API_PREFIX, '/download-invoice', [
+            'methods'  => 'POST',
+            'callback' => [Order_Controllers::class, 'download_invoice'],
+            'permission_callback' => [Core_Middleware::class, 'admin_only'],
+            'args' => Order_Arguments::get_download_invoice_args(),
+        ]);
     }
 }

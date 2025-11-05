@@ -150,4 +150,20 @@ class Order_Controllers
             return Zippy_Response_Handler::error('An error occurred while exporting orders.');
         }
     }
+
+    public static function download_invoice(WP_REST_Request $request)
+    {
+        try {
+            $order_id = $request->get_param('order_id');
+            $result = Order_Detail_Services::download_invoice($order_id);
+
+            if (is_wp_error($result)) {
+                return Zippy_Response_Handler::error($result->get_error_message());
+            }
+
+            return Zippy_Response_Handler::success($result, 'Invoice downloaded successfully.');
+        } catch (\Exception $e) {
+            return Zippy_Response_Handler::error('An error occurred while downloading the invoice.');
+        }
+    }
 }

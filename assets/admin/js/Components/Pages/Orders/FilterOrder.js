@@ -28,15 +28,22 @@ const formatDate = (dateStr) => {
   return `${y}-${m}-${d}`;
 };
 
-const FilterOrder = ({ fromDate, setFromDate, toDate, setToDate }) => {
-  const [status, setStatus] = useState("");
-  const { handleFilterOrder } = useOrderProvider();
+const FilterOrder = () => {
+  const {
+    handleFilterOrder,
+    fromDate,
+    toDate,
+    setFromDate,
+    setToDate,
+    status,
+    setStatus,
+  } = useOrderProvider();
 
   const onFilter = () => {
     handleFilterOrder({
       date_from: formatDate(fromDate),
       date_to: formatDate(toDate),
-      status_order: status,
+      order_status: status,
     });
   };
 

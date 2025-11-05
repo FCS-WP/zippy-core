@@ -163,4 +163,14 @@ class Order_Arguments
             ],
         ];
     }
+
+    public static function get_download_invoice_args()
+    {
+        return [
+            'order_id' => [
+                'required' => true,
+                'type' => 'integer',
+            ],
+        ];
+    }
 }

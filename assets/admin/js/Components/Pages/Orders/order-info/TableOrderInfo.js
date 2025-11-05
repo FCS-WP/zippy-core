@@ -17,6 +17,7 @@ import OrderProductRow from "./OrderProductRow";
 import OrderSummary from "./OrderSummary";
 import { Api } from "../../../../api/admin";
 import ButtonAddProducts from "../products/ButtonAddProducts";
+import DownloadInvoiceButton from "../DownloadInvoiceButton";
 
 const TableOrder = ({ orderId, enableEdit }) => {
   const [orderInfo, setOrderInfo] = useState(null);
@@ -206,6 +207,7 @@ const TableOrder = ({ orderId, enableEdit }) => {
         <Box sx={{ p: 2, display: "flex", justifyContent: "flex-end", gap: 2 }}>
           <ApplyCouponButton onApply={handleApplyCoupon} />
           <ButtonAddProducts orderID={orderId} />
+          <DownloadInvoiceButton orderID={orderId} />
         </Box>
       ) : (
         <Box
