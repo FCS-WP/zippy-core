@@ -23,15 +23,10 @@ const ExportButton = () => {
   const handleExport = async (type) => {
     handleClose();
     const params = { date_from: fromDate, date_to: toDate };
-    const data = await Api.exportOrders({ format: type, ...params });
+    const { data } = await Api.exportOrders({ format: type, ...params });
 
-    if (data?.data?.status === "success") {
-      if (!data.data || data.data.length === 0) {
-        toast.warning("No data found for this date.");
-        return;
-      }
-
-      const { file_base64, file_name, file_type } = data.data.data;
+    if (data?.status === "success") {
+      const { file_base64, file_name, file_type } = data;
       if (!file_base64) {
         toast.warning("The file is empty. Nothing to download.");
         return;

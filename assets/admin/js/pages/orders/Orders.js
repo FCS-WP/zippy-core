@@ -4,11 +4,10 @@ import OrdersTable from "../../Components/Pages/Orders/OrdersTable";
 import { useOrderProvider } from "../../context/OrderContext";
 
 const Orders = () => {
-  const { orders, loadingOrders } = useOrderProvider();
+  const { orders, loadingOrders, page, setPage } = useOrderProvider();
 
   const [orderBy, setOrderBy] = useState("date_created");
   const [orderDirection, setOrderDirection] = useState("desc");
-  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const handleSort = (property) => {

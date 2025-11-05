@@ -5,7 +5,10 @@ const OrderContext = createContext();
 
 export const OrderProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
+  const [page, setPage] = useState(0);
+  const [totalOrders, setTotalOrders] = useState(0);
   const [loadingOrders, setLoadingOrders] = useState(true);
+  const [status, setStatus] = useState("");
 
   //Filter
   const [fromDate, setFromDate] = useState("");
@@ -14,8 +17,12 @@ export const OrderProvider = ({ children }) => {
   const fetchOrders = async (filters) => {
     try {
       setLoadingOrders(true);
-      const res = await Api.getOrders(filters);
-      if (res.data.status === "success") setOrders(res.data.orders);
+      const params = { ...filters, page: page + 1, per_page: 10 };
+      const res = await Api.getOrders(params);
+      if (res.data.status === "success") {
+        setOrders(res.data.orders);
+        setTotalOrders(res.data.total_orders);
+      }
     } catch (err) {
       console.error("Error fetching orders:", err);
     } finally {
@@ -25,7 +32,7 @@ export const OrderProvider = ({ children }) => {
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [page]);
 
   const handleFilterOrder = (filters) => {
     fetchOrders(filters);
@@ -33,9 +40,14 @@ export const OrderProvider = ({ children }) => {
 
   const value = {
     orders,
+    totalOrders,
     loadingOrders,
     fromDate,
     toDate,
+    page,
+    status,
+    setStatus,
+    setPage,
     setOrders,
     setFromDate,
     setToDate,

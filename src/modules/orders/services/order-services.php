@@ -74,7 +74,7 @@ class Order_Services
         );
     }
 
-    public static function parse_order_data($order)
+    public static function parse_order_data(\WC_Order $order)
     {
         $billing  = $order->get_address('billing');
         $shipping = $order->get_address('shipping');

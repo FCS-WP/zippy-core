@@ -36,7 +36,7 @@ const OrdersTable = ({
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [paginatedOrders, setPaginatedOrders] = useState([]);
 
-  const { fromDate, toDate, setFromDate, setToDate } = useOrderProvider();
+  const { totalOrders } = useOrderProvider();
 
   useEffect(() => {
     const sorted = [...orders].sort((a, b) => {
@@ -51,9 +51,7 @@ const OrdersTable = ({
       return 0;
     });
 
-    setPaginatedOrders(
-      sorted.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-    );
+    setPaginatedOrders(sorted);
   }, [orders, orderBy, orderDirection, page, rowsPerPage]);
 
   const isAllChecked = () =>
@@ -140,12 +138,7 @@ const OrdersTable = ({
           selectedOrders={selectedOrders}
           setOrders={setPaginatedOrders}
         />
-        <FilterOrder
-          fromDate={fromDate}
-          setFromDate={setFromDate}
-          toDate={toDate}
-          setToDate={setToDate}
-        />
+        <FilterOrder />
         <ExportButton />
       </Box>
 
@@ -245,7 +238,7 @@ const OrdersTable = ({
 
       <TablePagination
         component="div"
-        count={orders.length}
+        count={totalOrders}
         page={page}
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}
