@@ -12,7 +12,6 @@ class Order_Route extends Core_Route
 
     public function init_module_api()
     {
-        //Orders
         register_rest_route(ZIPPY_CORE_API_PREFIX, '/orders', [
             'methods'  => 'GET',
             'callback' => [Order_Controllers::class, 'get_all_orders_with_pagination'],
@@ -69,10 +68,9 @@ class Order_Route extends Core_Route
             'permission_callback' => [Core_Middleware::class, 'admin_only'],
             'args' => Order_Arguments::get_add_items_order_args(),
         ));
-        register_rest_route(ZIPPY_CORE_API_PREFIX, '/order-details', [
-            'methods'  => 'GET',
-            'callback' => [Order_Controllers::class, 'get_order_detail_by_id'],
-            'permission_callback' => [Core_Middleware::class, 'admin_only'],
-        ]);
+        register_rest_route(ZIPPY_CORE_API_PREFIX, '/export-orders', array(
+            'methods' => 'POST',
+            'callback' => [Order_Controllers::class, 'export_orders'],
+        ));
     }
 }

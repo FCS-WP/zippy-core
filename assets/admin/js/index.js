@@ -1,16 +1,15 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import Dashboard from "./pages/dashboard/Dashboad";
-import Settings from "./pages/setting/Settings";
-import { ThemeProvider } from "react-bootstrap";
-import ModuleSettings from "./pages/setting/ModuleSettings";
+import Settings from "./pages/settings/Settings";
+import ModuleSettings from "./pages/settings/ModuleSettings";
 import TableOrderInfo from "./Components/Pages/Orders/order-info/TableOrderInfo";
+import OrderSettings from "./pages/settings/Settings";
 import { ToastContainer } from "react-toastify";
 import { OrderProvider } from "./context/OrderContext";
 import Orders from "./pages/orders/Orders";
 
 // Zippy Dashboard
-
 document.addEventListener("DOMContentLoaded", function () {
   const zippyMain = document.getElementById("zippy-main");
 
@@ -71,5 +70,14 @@ document.addEventListener("DOMContentLoaded", function () {
   if (moduelsControl) {
     const root = ReactDOM.createRoot(moduelsControl);
     root.render(<ModuleSettings />);
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const orderPage = document.getElementById("core_settings_orders");
+
+  if (orderPage) {
+    const root = ReactDOM.createRoot(orderPage);
+    root.render(<OrderSettings />);
   }
 });
