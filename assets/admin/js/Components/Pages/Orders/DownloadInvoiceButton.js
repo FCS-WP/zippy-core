@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 export default function DownloadInvoiceButton({ orderID }) {
   const handleApply = async () => {
     const { data } = await Api.downloadInvoice({ order_id: orderID });
-    console.log(data);
 
     if (data?.status === "success") {
       const { file_base64, file_name, file_type } = data;
