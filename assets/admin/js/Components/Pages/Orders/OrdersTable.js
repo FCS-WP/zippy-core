@@ -23,20 +23,12 @@ import { useOrderProvider } from "../../../context/OrderContext";
 import DateCreatedCell from "./DateCreatedCell";
 import ExportButton from "./ExportButton";
 
-const OrdersTable = ({
-  orders,
-  orderBy,
-  orderDirection,
-  handleSort,
-  page,
-  rowsPerPage,
-  handleChangePage,
-  handleChangeRowsPerPage,
-}) => {
+const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [paginatedOrders, setPaginatedOrders] = useState([]);
 
-  const { totalOrders } = useOrderProvider();
+  const { totalOrders, rowsPerPage, setRowsPerPage, page, setPage } =
+    useOrderProvider();
 
   useEffect(() => {
     const sorted = [...orders].sort((a, b) => {
@@ -53,6 +45,15 @@ const OrdersTable = ({
 
     setPaginatedOrders(sorted);
   }, [orders, orderBy, orderDirection, page, rowsPerPage]);
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
   const isAllChecked = () =>
     paginatedOrders.length > 0 &&

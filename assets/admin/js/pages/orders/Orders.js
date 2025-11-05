@@ -4,11 +4,10 @@ import OrdersTable from "../../Components/Pages/Orders/OrdersTable";
 import { useOrderProvider } from "../../context/OrderContext";
 
 const Orders = () => {
-  const { orders, loadingOrders, page, setPage } = useOrderProvider();
+  const { orders, loadingOrders } = useOrderProvider();
 
   const [orderBy, setOrderBy] = useState("date_created");
   const [orderDirection, setOrderDirection] = useState("desc");
-  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const handleSort = (property) => {
     const isAsc = orderBy === property && orderDirection === "asc";
@@ -33,13 +32,6 @@ const Orders = () => {
       orderBy={orderBy}
       orderDirection={orderDirection}
       handleSort={handleSort}
-      page={page}
-      rowsPerPage={rowsPerPage}
-      handleChangePage={(e, newPage) => setPage(newPage)}
-      handleChangeRowsPerPage={(e) => {
-        setRowsPerPage(parseInt(e.target.value, 10));
-        setPage(0);
-      }}
     />
   );
 };

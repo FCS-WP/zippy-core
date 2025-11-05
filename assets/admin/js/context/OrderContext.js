@@ -9,15 +9,21 @@ export const OrderProvider = ({ children }) => {
   const [totalOrders, setTotalOrders] = useState(0);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [status, setStatus] = useState("");
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [filteredOrders, setFilteredOrders] = useState(null);
 
   //Filter
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  const fetchOrders = async (filters) => {
+  const fetchOrders = async () => {
     try {
       setLoadingOrders(true);
-      const params = { ...filters, page: page + 1, per_page: 10 };
+      const params = {
+        ...filteredOrders,
+        page: page + 1,
+        per_page: rowsPerPage,
+      };
       const res = await Api.getOrders(params);
       if (res.data.status === "success") {
         setOrders(res.data.orders);
@@ -32,10 +38,10 @@ export const OrderProvider = ({ children }) => {
 
   useEffect(() => {
     fetchOrders();
-  }, [page]);
+  }, [page, rowsPerPage, filteredOrders]);
 
   const handleFilterOrder = (filters) => {
-    fetchOrders(filters);
+    setFilteredOrders(filters);
   };
 
   const value = {
@@ -45,7 +51,10 @@ export const OrderProvider = ({ children }) => {
     fromDate,
     toDate,
     page,
+    rowsPerPage,
     status,
+    filteredOrders,
+    setRowsPerPage,
     setStatus,
     setPage,
     setOrders,
