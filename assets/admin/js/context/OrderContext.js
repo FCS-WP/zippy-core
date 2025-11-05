@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Api } from "../api/admin";
-
-const OrderContext = createContext();
+import { OrderContext } from "./CoreContext";
 
 export const OrderProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);

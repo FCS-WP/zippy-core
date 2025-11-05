@@ -2,22 +2,42 @@
 
 namespace Zippy_Core;
 
+use Zippy_Core\Settings\Routes\Setting_Routes;
+use Zippy_Core\Settings\Services\Setting_Services;
+
 class Core_Settings extends Core_Module
 {
 
     public function load_required_files()
     {
-        // 
+        $paths = [
+            __DIR__ . '/controllers',
+            __DIR__ . '/routes',
+            __DIR__ . '/services',
+            __DIR__ . '/models',
+        ];
+
+        foreach ($paths as $path) {
+            if (! is_dir($path)) {
+                continue;
+            }
+
+            foreach (glob($path . '/*.php') as $file) {
+                require_once $file;
+            }
+        }
     }
 
     public function init_module()
     {
+        Setting_Routes::get_instance();
+        Setting_Services::init_modules_option();
+        
         add_action('admin_menu', [$this, 'register_settings_page']);
     }
 
     public function register_settings_page()
     {
-
         add_menu_page(
             'Core Settings',          // Page title
             'Core Settings',          // Menu title

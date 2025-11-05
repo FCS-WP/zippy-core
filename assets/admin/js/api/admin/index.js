@@ -59,3 +59,14 @@ export const Api = {
     return await makeRequest("/export-orders", params, "POST");
   },
 };
+
+
+export const SettingApi = {
+  async getModulesConfigs(params) {
+    return await makeRequest("/core-settings", params);
+  },
+
+  async updateModulesConfigs(params) {
+    return await makeRequest("/core-settings", params, 'POST');
+  },
+}

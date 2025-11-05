@@ -15,7 +15,7 @@ class Order_Route extends Core_Route
         register_rest_route(ZIPPY_CORE_API_PREFIX, '/orders', [
             'methods'  => 'GET',
             'callback' => [Order_Controllers::class, 'get_all_orders_with_pagination'],
-            'permission_callback' => [Core_Middleware::class, 'admin_only'],
+            // 'permission_callback' => [Core_Middleware::class, 'admin_only'],
             'args' => Order_Arguments::get_orders_args(),
         ]);
         register_rest_route(ZIPPY_CORE_API_PREFIX, '/bulk-action-update-order-status', [

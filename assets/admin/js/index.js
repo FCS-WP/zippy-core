@@ -8,6 +8,7 @@ import OrderSettings from "./pages/settings/Settings";
 import { ToastContainer } from "react-toastify";
 import { OrderProvider } from "./context/OrderContext";
 import Orders from "./pages/orders/Orders";
+import { SettingsProvider } from "../providers/SettingsProvider";
 
 // Zippy Dashboard
 document.addEventListener("DOMContentLoaded", function () {
@@ -69,7 +70,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (moduelsControl) {
     const root = ReactDOM.createRoot(moduelsControl);
-    root.render(<ModuleSettings />);
+    root.render(
+      <>
+        <SettingsProvider>
+          <ModuleSettings />
+          <ToastContainer />
+        </SettingsProvider>
+      </>
+    );
   }
 });
 

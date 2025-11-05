@@ -1,71 +1,131 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TableViewV2 from "./ TableViewV2";
-import { Box } from "@mui/material";
+import { Box, Button, Switch, Typography } from "@mui/material";
+import { useSettingsProvider } from "../../../providers/SettingsProvider";
+import { settingsHeadcells } from "../../helper/table-helper";
+import { SettingApi } from "../../api/admin";
+import { toast } from "react-toastify";
 
 const ModulesTable = () => {
-  const headCells = [
-    {
-      id: "name",
-      numeric: false,
-      disablePadding: true,
-      label: "Dessert (100g serving)",
-    },
-    {
-      id: "calories",
-      numeric: true,
-      disablePadding: false,
-      label: "Calories",
-    },
-    {
-      id: "fat",
-      numeric: true,
-      disablePadding: false,
-      label: "Fat (g)",
-    },
-    {
-      id: "carbs",
-      numeric: true,
-      disablePadding: false,
-      label: "Carbs (g)",
-    },
-    {
-      id: "protein",
-      numeric: true,
-      disablePadding: false,
-      label: "Protein (g)",
-    },
-  ];
+  const { isApiLoading, modulesConfigs } = useSettingsProvider();
+  const [dataRows, setDataRows] = useState([]);
+  const [updatedValues, setUpdatedValues] = useState([]);
 
-  function createData(id, name, calories, fat, carbs, protein) {
-    return {
-      id,
-      name,
-      calories,
-      fat,
-      carbs,
-      protein,
+  const [tableConfig, setTableConfig] = useState({
+    page: 1,
+    itemsPerPage: 10,
+    totalItems: 0,
+    title: "Modules",
+    headCells: settingsHeadcells,
+  });
+
+  const convertSlugToName = (slug) => {
+    if (!slug || typeof slug !== "string") return "";
+    const name = slug.replace(/[-_]/g, " ");
+    return name.replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
+  const createData = (slug, value) => {
+    const title = convertSlugToName(slug);
+    const renderSwitch = <SwitchValue slug={slug} value={value} />;
+    return { id: slug, name: title, value: renderSwitch };
+  };
+
+  const updateTableConfig = (newValue) => {
+    const newData = { ...tableConfig, ...newValue };
+    setTableConfig(newData);
+  };
+
+  const fetchTableData = () => {
+    if (modulesConfigs) {
+      console.log("modulesConfigs", modulesConfigs);
+      const data = modulesConfigs.modules.map((item) => {
+        return createData(item.key, item.value);
+      });
+
+      setDataRows(data);
+      updateTableConfig({ totalItems: modulesConfigs.total_modules });
+    }
+  };
+
+  useEffect(() => {
+    fetchTableData();
+  }, [modulesConfigs]);
+
+  const onSwitchChangeValue = (newItem) => {
+    setUpdatedValues((prev) => {
+      const filtered = prev.filter((item) => item.key !== newItem.key);
+      const newArray = [...filtered, newItem];
+      return newArray;
+    });
+  };
+
+  const SwitchValue = ({ slug, value }) => {
+    const [isChecked, setIsChecked] = useState(value === "yes" ? true : false);
+
+    const handleChange = (event) => {
+      setIsChecked(event.target.checked);
+      onSwitchChangeValue({
+        key: slug,
+        active: event.target.checked ? "yes" : "no",
+      });
     };
-  }
+    return (
+      <Switch
+        className="custom-switch"
+        checked={isChecked}
+        onChange={handleChange}
+      />
+    );
+  };
 
-  const rows = [
-    createData(1, "Cupcake", 305, 3.7, 67, 4.3),
-    createData(2, "Donut", 452, 25.0, 51, 4.9),
-    createData(3, "Eclair", 262, 16.0, 24, 6.0),
-    createData(4, "Frozen yoghurt", 159, 6.0, 24, 4.0),
-    createData(5, "Gingerbread", 356, 16.0, 49, 3.9),
-    createData(6, "Honeycomb", 408, 3.2, 87, 6.5),
-    createData(7, "Ice cream sandwich", 237, 9.0, 37, 4.3),
-    createData(8, "Jelly Bean", 375, 0.0, 94, 0.0),
-    createData(9, "KitKat", 518, 26.0, 65, 7.0),
-    createData(10, "Lollipop", 392, 0.2, 98, 0.0),
-    createData(11, "Marshmallow", 318, 0, 81, 2.0),
-    createData(12, "Nougat", 360, 19.0, 9, 37.0),
-    createData(13, "Oreo", 437, 18.0, 63, 4.0),
-  ];
+  const triggerSaveConfigs = async () => {
+    try {
+      const params = {
+        new_values: updatedValues,
+      };
+      const { data: response } = await SettingApi.updateModulesConfigs(params);
+      toast.success("New changes have been updated!");
+    } catch (error) {
+      console.warn(error);
+      toast.warn("Failed to save changes. Please reload and try again!");
+    }
+  };
 
   return (
-    <Box>
-      <TableViewV2 headCells={headCells} dataRows={rows} />
+    <Box minHeight={"60vh"}>
+      {modulesConfigs && dataRows.length > 0 ? (
+        <>
+          <TableViewV2
+            tableConfig={tableConfig}
+            dataRows={dataRows}
+            onUpdateTable={updateTableConfig}
+          />
+
+          <Button
+            onClick={triggerSaveConfigs}
+            disabled={updatedValues.length === 0 ? true : false}
+            sx={{ mt: 2, textTransform: "capitalize" }}
+            variant="contained"
+            color="primary"
+          >
+            Save Changes
+          </Button>
+        </>
+      ) : (
+        <>
+          {modulesConfigs && (
+            <Typography
+              variant="h5"
+              fontWeight={600}
+              color="black"
+              textAlign={"center"}
+            >
+              Some thing went wrong!
+            </Typography>
+          )}
+        </>
+      )}
     </Box>
   );
 };
