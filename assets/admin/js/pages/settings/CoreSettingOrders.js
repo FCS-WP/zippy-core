@@ -1,22 +1,21 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
-import ModulesTable from "../../Components/Table/ModulesTable";
 import CustomLoader from "../../Components/Loaders/CustomLoader";
 import { useSettingsProvider } from "../../../providers/SettingsProvider";
+import SettingOrderTabs from "../../Components/CoreSettings/Orders/SettingOrderTabs";
 
-const ModuleSettings = () => {
+const CoreSettingOrders = () => {
   const {isApiLoading} = useSettingsProvider();
-
 
   return (
     <Box>
-      <Typography variant="h4" py={4}>Modules Configurations</Typography>
+      <Typography variant="h4" py={4}>Orders Configurations</Typography>
       <Box bgcolor={"white"} p={3}>
-        <ModulesTable />
+        <SettingOrderTabs />
         <CustomLoader loading={ isApiLoading }/>
       </Box>
     </Box>
   );
 };
 
-export default ModuleSettings;
+export default CoreSettingOrders;

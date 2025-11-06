@@ -5,9 +5,12 @@ import { useSettingsProvider } from "../../../providers/SettingsProvider";
 import { settingsHeadcells } from "../../helper/table-helper";
 import { SettingApi } from "../../api/admin";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+import { showAlert } from "../../helper/alert-helper";
 
 const ModulesTable = () => {
   const { isApiLoading, modulesConfigs } = useSettingsProvider();
+  const [isLoading, setIsLoading] = useState(false);
   const [dataRows, setDataRows] = useState([]);
   const [updatedValues, setUpdatedValues] = useState([]);
 
@@ -66,7 +69,7 @@ const ModulesTable = () => {
       setIsChecked(event.target.checked);
       onSwitchChangeValue({
         key: slug,
-        active: event.target.checked ? "yes" : "no",
+        input_value: event.target.checked ? "yes" : "no",
       });
     };
     return (
@@ -79,22 +82,41 @@ const ModulesTable = () => {
   };
 
   const triggerSaveConfigs = async () => {
+    setIsLoading(true);
     try {
       const params = {
         new_values: updatedValues,
       };
       const { data: response } = await SettingApi.updateModulesConfigs(params);
-      toast.success("New changes have been updated!");
+      if (response && response.status == "success") {
+        showAlert("success", "Successfully", "New changes have been updated!");
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      } else {
+        showAlert(
+          "error",
+          "Failed",
+          "Failed to save changes. Please reload and try again!"
+        );
+      }
+      setIsLoading(false);
+      return;
     } catch (error) {
       console.warn(error);
-      toast.warn("Failed to save changes. Please reload and try again!");
+      showAlert(
+        "error",
+        "Failed",
+        "Failed to save changes. Please reload and try again!"
+      );
+      setIsLoading(false);
+      return;
     }
   };
 
   const handleSelectedRows = (selected) => {
     // Handle Selected ids here
-    console.log("selected ids: ", selected);
-  }
+  };
 
   return (
     <Box minHeight={"60vh"}>
@@ -113,6 +135,7 @@ const ModulesTable = () => {
             sx={{ mt: 2, textTransform: "capitalize" }}
             variant="contained"
             color="primary"
+            loading={isLoading}
           >
             Save Changes
           </Button>

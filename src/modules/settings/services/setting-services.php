@@ -96,7 +96,7 @@ class Setting_Services
         }
 
         foreach ($data as $new_item) {
-            $configs[$new_item['key']] = $new_item['active'];
+            $configs[$new_item['key']] = $new_item['ipnut_value'];
         }
 
         update_option($option_key, $configs);

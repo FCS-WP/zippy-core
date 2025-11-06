@@ -3,6 +3,7 @@
 namespace Zippy_Core;
 
 use Zippy_Core\Settings\Routes\Setting_Routes;
+use Zippy_Core\Settings\Services\Order_Setting_Services;
 use Zippy_Core\Settings\Services\Setting_Services;
 
 class Core_Settings extends Core_Module
@@ -31,9 +32,16 @@ class Core_Settings extends Core_Module
     public function init_module()
     {
         Setting_Routes::get_instance();
-        Setting_Services::init_modules_option();
+
+        $this->init_required_options();
         
         add_action('admin_menu', [$this, 'register_settings_page']);
+    }
+
+    public function init_required_options () 
+    {
+        Setting_Services::init_modules_option();
+        Order_Setting_Services::init_invoices_option();
     }
 
     public function register_settings_page()

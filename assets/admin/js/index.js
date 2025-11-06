@@ -4,11 +4,11 @@ import Dashboard from "./pages/dashboard/Dashboad";
 import Settings from "./pages/settings/Settings";
 import ModuleSettings from "./pages/settings/ModuleSettings";
 import TableOrderInfo from "./Components/Pages/Orders/order-info/TableOrderInfo";
-import OrderSettings from "./pages/settings/Settings";
 import { ToastContainer } from "react-toastify";
 import { OrderProvider } from "./context/OrderContext";
 import Orders from "./pages/orders/Orders";
 import { SettingsProvider } from "../providers/SettingsProvider";
+import CoreSettingOrders from "./pages/settings/CoreSettingOrders";
 
 // Zippy Dashboard
 document.addEventListener("DOMContentLoaded", function () {
@@ -86,6 +86,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (orderPage) {
     const root = ReactDOM.createRoot(orderPage);
-    root.render(<OrderSettings />);
+    root.render(
+     <>
+        <SettingsProvider>
+          <CoreSettingOrders />
+          <ToastContainer />
+        </SettingsProvider>
+      </>
+    );
   }
 });
