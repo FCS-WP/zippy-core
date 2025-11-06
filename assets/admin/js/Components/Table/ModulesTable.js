@@ -69,7 +69,7 @@ const ModulesTable = () => {
       setIsChecked(event.target.checked);
       onSwitchChangeValue({
         key: slug,
-        input_value: event.target.checked ? "yes" : "no",
+        value: event.target.checked ? "yes" : "no",
       });
     };
     return (

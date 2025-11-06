@@ -21,7 +21,7 @@ class Order_Setting_Services
         foreach ($configs as $key => $value) {
             $formatted[] = [
                 'key'   => $key,
-                'input_value' => $value,
+                'data' => $value,
             ];
         }
 
@@ -35,9 +35,21 @@ class Order_Setting_Services
     public static function init_invoices_option()
     {
         $init_configs = [
-            'invoice_logo'      => esc_url(wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0]),
-            'company_address' => '',
-            'company_phone' => '',
+            'invoice-logo' => [
+                "value" => esc_url(wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0]),
+                "type" => 'logo',
+                "position" => 'logo'
+            ],
+            'company-address' => [
+                "value" => "9 DTH DASKOASd",
+                "type" => 'text',
+                "position" => 'header'
+            ],
+            'company-phone' => [
+                "value" => "0120310230",
+                "type" => 'text',
+                "position" => 'footer'
+            ],
         ];
 
         $option_key = 'core_module_configs_order_invoices';
@@ -67,7 +79,11 @@ class Order_Setting_Services
         }
 
         foreach ($data as $new_item) {
-            $configs[$new_item['key']] = $new_item['input_value'];
+            $configs[$new_item['key']] = [
+                'value' => $new_item['data']['value'],
+                'type' => $new_item['data']['type'],
+                'position' => $new_item['data']['position']
+            ];
         }
 
         update_option($option_key, $configs);

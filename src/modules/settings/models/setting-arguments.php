@@ -23,7 +23,7 @@ class Setting_Arguments
                             'required'    => true,
                             'description' => 'Module key name.',
                         ],
-                        'input_value' => [
+                        'value' => [
                             'type'        => 'string',
                             'required'    => true,
                             'description' => 'Module value (e.g. yes/no).',
@@ -48,10 +48,9 @@ class Setting_Arguments
                             'required'    => true,
                             'description' => 'key name.',
                         ],
-                        'input_value' => [
-                            'type'        => 'string',
+                        'data' => [
+                            'type'        => 'object',
                             'required'    => true,
-                            'description' => 'key value (e.g. yes/no).',
                         ],
                     ],
                 ],

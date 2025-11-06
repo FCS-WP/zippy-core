@@ -32,13 +32,14 @@ class Core_Settings extends Core_Module
     public function init_module()
     {
         Setting_Routes::get_instance();
+        add_action('admin_enqueue_scripts', array($this, 'remove_default_stylesheets'));
 
         $this->init_required_options();
-        
+
         add_action('admin_menu', [$this, 'register_settings_page']);
     }
 
-    public function init_required_options () 
+    public function init_required_options()
     {
         Setting_Services::init_modules_option();
         Order_Setting_Services::init_invoices_option();
@@ -74,5 +75,50 @@ class Core_Settings extends Core_Module
     function render_settings_orders_page()
     {
         echo '<div id="core_settings_orders"></div>';
+    }
+
+    public function remove_default_stylesheets($handle)
+    {
+        $apply_urls = [
+            'core-settings_page_core-settings-orders',
+            'toplevel_page_core-settings',
+        ];
+
+        if (in_array($handle, $apply_urls)) {
+            // Deregister the 'forms' stylesheet
+            wp_deregister_style('forms');
+
+            add_action('admin_head', function () {
+                $admin_url = get_admin_url();
+                $styles_to_load = [
+                    'dashicons',
+                    'admin-bar',
+                    'common',
+                    'admin-menu',
+                    'dashboard',
+                    'list-tables',
+                    'edit',
+                    'revisions',
+                    'media',
+                    'themes',
+                    'about',
+                    'nav-menus',
+                    'wp-pointer',
+                    'widgets',
+                    'site-icon',
+                    'l10n',
+                    'buttons',
+                    'wp-auth-check'
+                ];
+
+                $wp_version = get_bloginfo('version');
+
+                // Generate the styles URL
+                $styles_url = $admin_url . '/load-styles.php?c=0&dir=ltr&load=' . implode(',', $styles_to_load) . '&ver=' . $wp_version;
+
+                // Enqueue the stylesheet
+                echo '<link rel="stylesheet" href="' . esc_url($styles_url) . '" media="all">';
+            });
+        }
     }
 }
