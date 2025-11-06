@@ -17,8 +17,9 @@ import OrderProductRow from "./OrderProductRow";
 import OrderSummary from "./OrderSummary";
 import { Api } from "../../../../api/admin";
 import ButtonAddProducts from "../products/ButtonAddProducts";
+import DownloadInvoiceButton from "../DownloadInvoiceButton";
 
-const TableOrder = ({ orderId, enableEdit }) => {
+const TableOrderInfo = ({ orderId, enableEdit }) => {
   const [orderInfo, setOrderInfo] = useState(null);
   const [editingItemId, setEditingItemId] = useState(null);
   const [tempQuantity, setTempQuantity] = useState(0);
@@ -206,6 +207,7 @@ const TableOrder = ({ orderId, enableEdit }) => {
         <Box sx={{ p: 2, display: "flex", justifyContent: "flex-end", gap: 2 }}>
           <ApplyCouponButton onApply={handleApplyCoupon} />
           <ButtonAddProducts orderID={orderId} />
+          <DownloadInvoiceButton orderID={orderId} />
         </Box>
       ) : (
         <Box
@@ -225,4 +227,4 @@ const TableOrder = ({ orderId, enableEdit }) => {
   );
 };
 
-export default TableOrder;
+export default TableOrderInfo;

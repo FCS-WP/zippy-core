@@ -58,6 +58,9 @@ export const Api = {
   async exportOrders(params) {
     return await makeRequest("/export-orders", params, "POST");
   },
+  async downloadInvoice(params) {
+    return await makeRequest("/download-invoice", params, "POST");
+  },
 };
 
 

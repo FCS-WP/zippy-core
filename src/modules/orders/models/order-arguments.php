@@ -153,4 +153,24 @@ class Order_Arguments
             ],
         ];
     }
+
+    public static function get_order_details_args()
+    {
+        return [
+            'order_id' => [
+                'required' => true,
+                'type' => 'integer',
+            ],
+        ];
+    }
+
+    public static function get_download_invoice_args()
+    {
+        return [
+            'order_id' => [
+                'required' => true,
+                'type' => 'integer',
+            ],
+        ];
+    }
 }

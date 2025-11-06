@@ -6,6 +6,9 @@ use WC_Order_Item_Product;
 use WC_Tax;
 use Zippy_Core\Utils\Zippy_Wc_Calculate_Helper;
 use WC_Coupon;
+use WC_Order;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class Order_Detail_Services
 {
@@ -372,5 +375,130 @@ class Order_Detail_Services
             'quantity'   => $quantity,
             'item_id'    => $item_id,
         ];
+    }
+
+    public static function get_order_detail_by_id($order_id): array
+    {
+        $order = wc_get_order($order_id);
+
+        if (!$order) {
+            return [];
+        }
+
+        $data = Order_Services::parse_order_data($order);
+        return $data;
+    }
+
+    public static function download_invoice($order_id)
+    {
+        $format = 'pdf';
+
+        if (empty($order_id)) {
+            return false;
+        }
+
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            return false;
+        }
+
+        $content = self::generate_invoice_pdf($order);
+        $file_base64 = base64_encode($content);
+        $file_name = 'orders_export_' . date('Y-m-d_H-i-s') . '.' . $format;
+
+        return [
+            'file_base64' => $file_base64,
+            'file_name'   => $file_name,
+            'file_type'   => $format,
+        ];
+    }
+
+    private static function generate_invoice_pdf($order = null)
+    {
+        //Billing
+        $billing  = $order->get_address('billing');
+        $billing_parts = array_filter([
+            $billing['company'] ?? '',
+            $billing['address_1'] ?? '',
+            $billing['address_2'] ?? '',
+            $billing['city'] ?? '',
+            $billing['state'] ?? '',
+            $billing['postcode'] ?? '',
+            $billing['country'] ?? '',
+        ]);
+        $billing_to = implode(', ', $billing_parts);
+
+        //Date payment
+        $payment_due = $order->get_date_paid();
+        if ($payment_due) {
+            $payment_due = $payment_due->date_i18n('F j, Y');
+        } else {
+            $payment_due = 'N/A';
+        }
+
+        //Total
+        $total_amounts = $order->get_total();
+
+        //Items
+        $items = $order->get_items();
+        $shipping_items = $order->get_items('shipping');
+        $fee = $order->get_items('fee');
+        $coupon_items = $order->get_items('coupon');
+        $result = [];
+
+        [$result['products'], $subtotalOrder, $taxTotalOrder] = self::get_products_info($items);
+        [$result['shipping'], $totalShipping, $taxShipping] = self::get_shipping_info($shipping_items);
+        [$result['fees'], $totalFee, $taxFee] = self::get_fees_info($fee);
+        [$result['coupons'], $totalCoupon] = self::get_coupons_info($coupon_items);
+
+        //Calculate totals
+        $taxTotal = Zippy_Wc_Calculate_Helper::round_price_wc($taxTotalOrder + $taxShipping + $taxFee);
+        $totalCalculated = Zippy_Wc_Calculate_Helper::round_price_wc(
+            ($subtotalOrder + $totalShipping + $totalFee - $totalCoupon)
+        );
+
+        $data = [
+            'company_logo' => 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Logo_TV_2015.png',
+            'company_name' => 'EPOS Pte. Ltd.',
+            'company_address' => '2 Leng Kee Road<br>#02-07 Thye Hong Centre<br>Singapore 159086',
+            'company_phone' => '(+65) 6871 8833',
+            'company_mobile' => '(+65) 8482 1888',
+            'company_website' => 'www.epos.com.sg',
+            'gst_reg' => $order->get_id(),
+
+            'bill_to' => $billing_to,
+
+            'invoice_number' => $order->get_id(),
+            'invoice_date' => date('F j, Y'),
+            'payment_due' => $payment_due,
+            'amount_due' => $total_amounts,
+
+            'items' => $result['products'],
+
+            'subtotal' => $subtotalOrder,
+            'gst' => $taxTotal,
+            'total' => $totalCalculated,
+
+            'bank' => [
+                'name' => 'Maybank Singapore Limited',
+                'account' => '04061069943',
+            ],
+        ];
+
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+
+        $dompdf = new Dompdf($options);
+
+        ob_start();
+        include ZIPPY_CORE_DIR_PATH . 'src/modules/orders/templates/invoice-template.php';
+        $html = ob_get_clean();
+
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        return $dompdf->output();
     }
 }

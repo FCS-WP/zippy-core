@@ -8,8 +8,6 @@ const Orders = () => {
 
   const [orderBy, setOrderBy] = useState("date_created");
   const [orderDirection, setOrderDirection] = useState("desc");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const handleSort = (property) => {
     const isAsc = orderBy === property && orderDirection === "asc";
@@ -34,13 +32,6 @@ const Orders = () => {
       orderBy={orderBy}
       orderDirection={orderDirection}
       handleSort={handleSort}
-      page={page}
-      rowsPerPage={rowsPerPage}
-      handleChangePage={(e, newPage) => setPage(newPage)}
-      handleChangeRowsPerPage={(e) => {
-        setRowsPerPage(parseInt(e.target.value, 10));
-        setPage(0);
-      }}
     />
   );
 };
