@@ -116,7 +116,7 @@ const CustomTableRow = ({
       alignItems="center"
       justifyContent={"flex-end"}
     >
-      {renderQuantity()}
+      {<InputQuantity />}
 
       {Object.keys(row.ADDONS || {}).length == 0 && (
         <Button
@@ -144,7 +144,7 @@ const CustomTableRow = ({
     </Stack>
   );
 
-  const renderQuantity = () => (
+  const InputQuantity = () => (
     <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
       <span
         style={{
