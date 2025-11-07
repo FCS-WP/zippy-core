@@ -173,4 +173,28 @@ class Order_Arguments
             ],
         ];
     }
+
+    public static function send_order_email_args()
+    {
+        return [
+            'order_id' => [
+                'required' => true,
+                'type' => 'integer',
+            ],
+            'email_type' => [
+                'required' => false,
+                'type' => 'string',
+                'default' => 'customer_invoice',
+                'enum' => [
+                    'new_order',
+                    'cancelled_order',
+                    'customer_processing_order',
+                    'customer_completed_order',
+                    'customer_invoice',
+                    'customer_refunded_order',
+                    'customer_note',
+                ],
+            ],
+        ];
+    }
 }

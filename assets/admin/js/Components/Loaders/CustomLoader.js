@@ -1,10 +1,11 @@
 import React from "react";
+import Backdrop from '@mui/material/Backdrop';
 
 const CustomLoader = ({ loading = true }) => {
   if (!loading) return null;
 
   return (
-    <div className="customize-loader">
+    <Backdrop open={loading}>
       <div className="loader-wrapper">
         <div className="terminal-loader">
           <div className="terminal-header">
@@ -18,7 +19,7 @@ const CustomLoader = ({ loading = true }) => {
           <div className="text">Loading...</div>
         </div>
       </div>
-    </div>
+    </Backdrop>
   );
 };
 export default CustomLoader;

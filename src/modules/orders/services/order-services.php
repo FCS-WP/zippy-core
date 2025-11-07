@@ -14,8 +14,8 @@ class Order_Services
     {
         $page         = $infos['page'] ?? null;
         $per_page     = $infos['per_page'] ?? null;
-        $order_by     = $infos['order_by'] ?? null;
-        $order_val    = $infos['order_val'] ?? null;
+        $order_by     = $infos['order_by'] ?? 'date';
+        $order_val    = $infos['order_val'] ?? 'DESC';
         $order_status = $infos['order_status'] ?? null;
         $date_from    = $infos['date_from'] ?? null;
         $date_to      = $infos['date_to'] ?? null;
@@ -328,5 +328,82 @@ class Order_Services
         }
 
         return $trashed;
+    }
+
+    public static function search_orders($infos) {
+        
+    }
+
+
+    public static function custom_send_wc_email($order_id,  $email_type)
+    {
+        if (! function_exists('wc_get_order')) {
+            return new WP_Error('woocommerce_not_loaded', 'WooCommerce is not active.');
+        }
+        $order = wc_get_order($order_id);
+
+        $email_templates = [
+            'new_order'        => 'emails/admin-new-order.php',
+            'cancelled_order'  => 'emails/admin-cancelled-order.php',
+            'failed_order'     => 'emails/admin-failed-order.php',
+            'customer_invoice' => 'emails/customer-invoice.php',
+            'completed_order'  => 'emails/customer-completed-order.php',
+            'processing_order' => 'emails/customer-processing-order.php',
+        ];
+
+        if (! isset($email_templates[$email_type])) {
+            return new WP_Error('invalid_email_type', "Email type '$email_type' not supported.");
+        }
+        $template_file = $email_templates[$email_type];
+
+
+        // Load WooCommerce mailer
+        $mailer = WC()->mailer();
+
+        // Start buffering the template output
+        ob_start();
+
+        wc_get_template(
+            $template_file,
+            [
+                'order'         => $order,
+                'email_heading' => ucfirst(str_replace('_', ' ', $email_type)),
+                'sent_to_admin' => in_array($email_type, ['new_order', 'cancelled_order', 'failed_order']),
+                'plain_text'    => false,
+                'email'         => $mailer,
+            ]
+        );
+
+        $message = ob_get_clean();
+
+        // Get subject based on type
+        $subjects = [
+            'new_order'        => sprintf(__('New order #%s', 'woocommerce'), $order->get_order_number()),
+            'cancelled_order'  => sprintf(__('Cancelled order #%s', 'woocommerce'), $order->get_order_number()),
+            'failed_order'     => sprintf(__('Failed order #%s', 'woocommerce'), $order->get_order_number()),
+            'customer_invoice' => sprintf(__('Invoice for order #%s', 'woocommerce'), $order->get_order_number()),
+            'completed_order'  => sprintf(__('Your order #%s is complete', 'woocommerce'), $order->get_order_number()),
+            'processing_order' => sprintf(__('Your order #%s is being processed', 'woocommerce'), $order->get_order_number()),
+        ];
+
+        $subject = $subjects[$email_type] ?? 'Order Update';
+
+        // Set recipient based on email type
+        $to = in_array($email_type, ['new_order', 'cancelled_order', 'failed_order'])
+            ? 'hau.nguyen@floatingcube.com'
+            : $order->get_billing_email();
+
+        // Wrap email with WooCommerce header/footer
+        $wrapped_message = $mailer->wrap_message($subject, $message);
+
+        // Get headers from WooCommerce settings
+        $headers = [
+            'Content-Type: text/html; charset=UTF-8',
+            'From: ' . wp_specialchars_decode(get_option('woocommerce_email_from_name'), ENT_QUOTES) .
+                ' <' . get_option('woocommerce_email_from_address') . '>',
+        ];
+
+        $sent = wp_mail($to, $subject, $wrapped_message, $headers);
+        return $sent;
     }
 }

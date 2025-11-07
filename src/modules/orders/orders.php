@@ -3,6 +3,7 @@
 namespace Zippy_Core;
 
 use Zippy_Core\Core_Module;
+use Zippy_Core\Orders\Controllers\Order_Controllers;
 use Zippy_Core\Orders\Routes\Order_Route;
 
 class Core_Orders extends Core_Module
