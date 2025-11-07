@@ -13,106 +13,219 @@ const destChildTheme = "./";
 
 // Define Work path
 const destOutput = destChildTheme + "/assets/dist";
+// Admin sources
 const destAdminFileCss = destChildTheme + "/assets/admin/sass/app.scss";
 const destAdminFileJs = destChildTheme + "/assets/admin/js/index.js";
 
-module.exports = [
-  {
-    mode: "development",
-    stats: "minimal",
-    entry: {
-      admin: [destAdminFileCss, destAdminFileJs],
-    },
-    output: {
-      filename: destOutput + "/js/[name].min.js",
-      path: path.resolve(__dirname),
-    },
-    module: {
-      rules: [
-        // js babelization
-        {
-          test: /\.(js|jsx)$/,
-          exclude: /node_modules/,
-          loader: "babel-loader",
-        },
-        // sass compilation
-        {
-          test: /\.(sass|scss)$/,
-          use: [
-            MiniCssExtractPlugin.loader,
-            {
-              loader: "css-loader",
-              options: { url: false },
-            },
-            {
-              loader: "sass-loader",
-              options: {
-                sourceMap: true,
-                sassOptions: {
-                  outputStyle: "compressed",
-                },
-              },
-            },
-          ],
-        },
-        // Font files
-        {
-          test: /\.(woff|woff2|ttf|otf)$/,
-          loader: "file-loader",
-          include: path.resolve(__dirname, "../"),
+// Web (frontend) source files
+const destWebFileCss = destChildTheme + "/assets/web/sass/app.scss";
+const destWebFileJs = destChildTheme + "/assets/web/js/index.js";
 
-          options: {
-            name: "[hash].[ext]",
-            outputPath: "fonts/",
-          },
+const commonRules = [
+  {
+    test: /\.(js|jsx)$/,
+    exclude: /node_modules/,
+    loader: "babel-loader",
+  },
+  {
+    test: /\.(sass|scss)$/,
+    use: [
+      MiniCssExtractPlugin.loader,
+      {
+        loader: "css-loader",
+        options: { url: false },
+      },
+      {
+        loader: "sass-loader",
+        options: {
+          sourceMap: true,
+          sassOptions: { outputStyle: "compressed" },
         },
-        // loader for images and icons (only required if css references image files)
-        {
-          test: /\.(png|jpg|gif)$/,
-          type: "asset/resource",
-          generator: {
-            filename: destOutput + "/build/img/[name][ext]",
-          },
-        },
-        //load svg
-        {
-          test: /\.svg$/,
-          use: ["@svgr/webpack"],
-          issuer: {
-            and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
-          },
-        },
-      ],
-    },
-    // externals: {
-    //   react: "React",
-    // },
-    plugins: [
-      // Get ENV Variables
-      // clear out build directories on each build
-      new CleanWebpackPlugin({
-        cleanOnceBeforeBuildPatterns: [
-          destOutput + "/css/*",
-          destOutput + "/js/*",
-        ],
-      }),
-      // css extraction into dedicated file
-      new MiniCssExtractPlugin({
-        filename: destOutput + "/css/[name].min.css",
-      }),
-      new webpack.ProvidePlugin({
-        $: "jquery",
-        jQuery: "jquery",
-      }),
+      },
     ],
-    optimization: {
-      // minification - only performed when mode = production
-      minimizer: [
-        // js minification - special syntax enabling webpack 5 default terser-webpack-plugin
-        `...`,
-        // css minification
-        new CssMinimizerPlugin(),
-      ],
+  },
+  {
+    test: /\.(woff|woff2|ttf|otf)$/,
+    loader: "file-loader",
+    include: path.resolve(__dirname, "../"),
+    options: {
+      name: "[hash].[ext]",
+      outputPath: "fonts/",
+    },
+  },
+  {
+    test: /\.(png|jpg|gif)$/,
+    type: "asset/resource",
+    generator: {
+      filename: destOutput + "/build/img/[name][ext]",
+    },
+  },
+  {
+    test: /\.svg$/,
+    use: ["@svgr/webpack"],
+    issuer: {
+      and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
     },
   },
 ];
+
+// Shared optimization
+const commonOptimization = {
+  minimizer: [`...`, new CssMinimizerPlugin()],
+};
+
+// Shared plugins (with dynamic folder cleaning)
+const getPlugins = (outputName) => [
+  new CleanWebpackPlugin({
+    cleanOnceBeforeBuildPatterns: [
+      `${destOutput}/css/${outputName}*`,
+      `${destOutput}/js/${outputName}*`,
+    ],
+  }),
+  new MiniCssExtractPlugin({
+    filename: `${destOutput}/css/[name].min.css`,
+  }),
+  new webpack.ProvidePlugin({
+    $: "jquery",
+    jQuery: "jquery",
+  }),
+];
+
+// ================================
+// ADMIN CONFIG
+// ================================
+const adminConfig = {
+  mode: "development",
+  stats: "minimal",
+  entry: {
+    admin: [destAdminFileCss, destAdminFileJs],
+  },
+  output: {
+    filename: `${destOutput}/js/[name].min.js`,
+    path: path.resolve(__dirname),
+  },
+  module: { rules: commonRules },
+  plugins: getPlugins("admin"),
+  optimization: commonOptimization,
+};
+
+// ================================
+// WEB CONFIG
+// ================================
+const webConfig = {
+  mode: "development",
+  stats: "minimal",
+  entry: {
+    web: [destWebFileCss, destWebFileJs],
+  },
+  output: {
+    filename: `${destOutput}/js/[name].min.js`,
+    path: path.resolve(__dirname),
+  },
+  module: { rules: commonRules },
+  plugins: getPlugins("web"),
+  optimization: commonOptimization,
+};
+
+module.exports = [adminConfig, webConfig];
+
+// module.exports = [
+//   {
+//     mode: "development",
+//     stats: "minimal",
+//     entry: {
+//       admin: [destAdminFileCss, destAdminFileJs],
+//     },
+//     output: {
+//       filename: destOutput + "/js/[name].min.js",
+//       path: path.resolve(__dirname),
+//     },
+//     module: {
+//       rules: [
+//         // js babelization
+//         {
+//           test: /\.(js|jsx)$/,
+//           exclude: /node_modules/,
+//           loader: "babel-loader",
+//         },
+//         // sass compilation
+//         {
+//           test: /\.(sass|scss)$/,
+//           use: [
+//             MiniCssExtractPlugin.loader,
+//             {
+//               loader: "css-loader",
+//               options: { url: false },
+//             },
+//             {
+//               loader: "sass-loader",
+//               options: {
+//                 sourceMap: true,
+//                 sassOptions: {
+//                   outputStyle: "compressed",
+//                 },
+//               },
+//             },
+//           ],
+//         },
+//         // Font files
+//         {
+//           test: /\.(woff|woff2|ttf|otf)$/,
+//           loader: "file-loader",
+//           include: path.resolve(__dirname, "../"),
+
+//           options: {
+//             name: "[hash].[ext]",
+//             outputPath: "fonts/",
+//           },
+//         },
+//         // loader for images and icons (only required if css references image files)
+//         {
+//           test: /\.(png|jpg|gif)$/,
+//           type: "asset/resource",
+//           generator: {
+//             filename: destOutput + "/build/img/[name][ext]",
+//           },
+//         },
+//         //load svg
+//         {
+//           test: /\.svg$/,
+//           use: ["@svgr/webpack"],
+//           issuer: {
+//             and: [/\.(ts|tsx|js|jsx|md|mdx)$/],
+//           },
+//         },
+//       ],
+//     },
+//     // externals: {
+//     //   react: "React",
+//     // },
+//     plugins: [
+//       // Get ENV Variables
+//       // clear out build directories on each build
+//       new CleanWebpackPlugin({
+//         cleanOnceBeforeBuildPatterns: [
+//           destOutput + "/css/*",
+//           destOutput + "/js/*",
+//         ],
+//       }),
+//       // css extraction into dedicated file
+//       new MiniCssExtractPlugin({
+//         filename: destOutput + "/css/[name].min.css",
+//       }),
+//       new webpack.ProvidePlugin({
+//         $: "jquery",
+//         jQuery: "jquery",
+//       }),
+//     ],
+//     optimization: {
+//       // minification - only performed when mode = production
+//       minimizer: [
+//         // js minification - special syntax enabling webpack 5 default terser-webpack-plugin
+//         `...`,
+//         // css minification
+//         new CssMinimizerPlugin(),
+//       ],
+//     },
+//   },
+// ];
