@@ -69,7 +69,7 @@ const ModulesTable = () => {
       setIsChecked(event.target.checked);
       onSwitchChangeValue({
         key: slug,
-        input_value: event.target.checked ? "yes" : "no",
+        value: event.target.checked ? "yes" : "no",
       });
     };
     return (
@@ -134,7 +134,7 @@ const ModulesTable = () => {
             disabled={updatedValues.length === 0 ? true : false}
             sx={{ mt: 2, textTransform: "capitalize" }}
             variant="contained"
-            color="primary"
+            color="warning"
             loading={isLoading}
           >
             Save Changes

@@ -17,3 +17,22 @@ export const settingsHeadcells = [
     label: "Active",
   },
 ];
+
+export const convertSlugToName = (slug) => {
+  if (!slug || typeof slug !== "string") return "";
+  const name = slug.replace(/[-_]/g, " ");
+  return name.replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+export const convertNameToSlug = (name) => {
+  if (typeof name !== 'string') return '';
+
+  return name
+    .trim()                              
+    .toLowerCase()                    
+    .normalize('NFD')            
+    .replace(/[\u0300-\u036f]/g, '')   
+    .replace(/[^a-z0-9]+/g, '-')    
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-');
+};

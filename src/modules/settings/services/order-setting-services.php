@@ -21,7 +21,7 @@ class Order_Setting_Services
         foreach ($configs as $key => $value) {
             $formatted[] = [
                 'key'   => $key,
-                'input_value' => $value,
+                'data' => $value,
             ];
         }
 
@@ -35,9 +35,21 @@ class Order_Setting_Services
     public static function init_invoices_option()
     {
         $init_configs = [
-            'invoice_logo'      => esc_url(wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0]),
-            'company_address' => '',
-            'company_phone' => '',
+            'invoice-logo' => [
+                "value" => esc_url(wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0]),
+                "type" => 'link',
+                "position" => 'logo'
+            ],
+            'company-address' => [
+                "value" => "Example Address",
+                "type" => 'text',
+                "position" => 'header'
+            ],
+            'company-phone' => [
+                "value" => "65 6665 5566",
+                "type" => 'text',
+                "position" => 'footer'
+            ],
         ];
 
         $option_key = 'core_module_configs_order_invoices';
@@ -57,20 +69,26 @@ class Order_Setting_Services
     public static function update_invoices_options($data)
     {
         $option_key = 'core_module_configs_order_invoices';
-
-        // Get current config
-        $configs = get_option($option_key, []);
-
-        // Normalize: if the option doesn’t exist, make it an array
-        if (! is_array($configs)) {
-            $configs = [];
-        }
+        $new_config = [];
 
         foreach ($data as $new_item) {
-            $configs[$new_item['key']] = $new_item['input_value'];
+            $key = $new_item['key'];
+            $type = $new_item['data']['type'];
+            $position =  $new_item['data']['position'];
+            $value = $type == 'link' ? esc_url($new_item['data']['value']) : $new_item['data']['value'] ;
+
+            if ($key == 'invoice-logo' && empty($value)) {
+                $value = esc_url(wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0]);
+            }
+
+            $new_config[$key] = [
+                'type' => $type,
+                'value' => $value,
+                'position' => $position
+            ];
         }
 
-        update_option($option_key, $configs);
-        return $configs;
+        update_option($option_key, $new_config);
+        return $new_config;
     }
 }

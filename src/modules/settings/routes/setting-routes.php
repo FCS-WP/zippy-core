@@ -38,7 +38,7 @@ class Setting_Routes extends Core_Route
         register_rest_route(ZIPPY_CORE_API_PREFIX, '/core-settings/orders/invoices', [
             'methods'  => 'GET',
             'callback' => [Order_Setting_Controllers::class, 'get_invoices_options'],
-            'permission_callback' => [Core_Middleware::class, 'admin_only'],
+            // 'permission_callback' => [Core_Middleware::class, 'admin_only'],
         ]);
         register_rest_route(ZIPPY_CORE_API_PREFIX, '/core-settings/orders/invoices', [
             'methods'  => 'POST',
