@@ -1,8 +1,11 @@
 <?php
 namespace Zippy_Core;
 
-class Core_Settings extends Core_Module {
-    
+class Core_Settings extends Core_Module
+{
+
+    const OPTIONS_KEY_ORDER_INVOICES_CONFIGS = 'core_module_configs_order_invoices';
+
     public function load_required_files()
     {
         // 
