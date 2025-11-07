@@ -8,6 +8,7 @@ use Zippy_Core\Settings\Services\Setting_Services;
 
 class Core_Settings extends Core_Module
 {
+    const OPTIONS_KEY_ORDER_INVOICES_CONFIGS = 'core_module_configs_order_invoices';
 
     public function load_required_files()
     {

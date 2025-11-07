@@ -128,17 +128,17 @@
     <table class="header-table">
         <tr>
             <td class="logo" width="40%">
-                <img src="<?= $data['company_logo'] ?>" />
+                <img src="<?= $data['store_logo'] ?>" />
             </td>
             <td class="invoice-title" width="60%">
                 <h1>TAX INVOICE</h1>
                 <p style="color: #888">GST Reg. No. <?= $data['gst_reg'] ?></p>
                 <p>
-                    <strong><?= $data['company_name'] ?></strong><br />
-                    <?= $data['company_address'] ?><br />
-                    Phone: <?= $data['company_phone'] ?><br />
-                    Mobile: <?= $data['company_mobile'] ?><br />
-                    <?= $data['company_website'] ?>
+                    <strong><?= $data['store_name'] ?></strong><br />
+                    <?= $data['store_address'] ?><br />
+                    Phone: <?= $data['store_phone'] ?><br />
+                    Mobile: <?= $data['store_mobile'] ?><br />
+                    <?= $data['store_website'] ?>
                 </p>
             </td>
         </tr>
@@ -234,7 +234,7 @@
         <strong>Notes / Terms</strong><br />
         FULL PAYMENT BEFORE DELIVERY<br />
         Full payment must be made and verified by EPOS Finance Department before delivery of any goods or services.<br /><br />
-        Please kindly make payment via transfer to: <strong><?= $data['company_name'] ?></strong><br />
+        Please kindly make payment via transfer to: <strong><?= $data['store_name'] ?></strong><br />
         Bank Name: <?= $data['bank']['name'] ?><br />
         Account Number: <?= $data['bank']['account'] ?>
     </div>
