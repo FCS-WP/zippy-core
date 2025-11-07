@@ -5,7 +5,7 @@ import Authentication from "../../Components/Pages/Settings/Authentication";
 import PostalCode from "../../Components/Pages/Settings/PostalCode";
 import { Api } from "../../api";
 
-const Settings = () => {
+const OrderSettings = () => {
   const [key, setKey] = useState("dashboad");
 
   const [postalCode, setPostalCode] = useState(0);
@@ -74,4 +74,4 @@ const Settings = () => {
     </Form>
   );
 };
-export default Settings;
+export default OrderSettings;

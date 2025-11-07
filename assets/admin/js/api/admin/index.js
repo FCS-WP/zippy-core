@@ -62,3 +62,22 @@ export const Api = {
     return await makeRequest("/download-invoice", params, "POST");
   },
 };
+
+
+export const SettingApi = {
+  async getModulesConfigs(params) {
+    return await makeRequest("/core-settings", params);
+  },
+
+  async updateModulesConfigs(params) {
+    return await makeRequest("/core-settings", params, 'POST');
+  },
+
+  // Invoices
+  async getInvoiceOptions(params) {
+    return await makeRequest("/core-settings/orders/invoices", params);
+  },
+   async updateInvoiceOptions(params) {
+    return await makeRequest("/core-settings/orders/invoices", params, 'POST');
+  },
+}

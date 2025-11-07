@@ -7,7 +7,8 @@ use Zippy_Core\Orders\Routes\Order_Route;
 
 class Core_Orders extends Core_Module
 {
-
+    protected $module_key = 'orders';
+    
     public function load_required_files()
     {
         $paths = [

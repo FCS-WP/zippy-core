@@ -18,7 +18,7 @@ class Zippy_Activate
     {
         include_once(ABSPATH . 'wp-admin/includes/plugin.php');
 
-        self::check_active_required_plugins();
+        // self::check_active_required_plugins();
         self::create_default_dev_account();
     }
 
