@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import InvoiceSettings from "./InvoiceSettings";
 import { SettingApi } from "../../../api/admin";
 import { toast } from "react-toastify";
+import GeneralInfo from "./GeneralInfo";
 
 const CustomTabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -54,12 +55,12 @@ const SettingOrderTabs = () => {
         onChange={handleChange}
         aria-label="basic tabs example"
       >
-        <Tab label="Common" />
+        <Tab label="General" />
         <Tab label="Invoices" />
       </Tabs>
       <Box>
         <CustomTabPanel value={value} index={0}>
-          Common content of Orders
+          <GeneralInfo />
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
           <InvoiceSettings data={invoiceSettings}/>

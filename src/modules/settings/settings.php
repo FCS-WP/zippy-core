@@ -57,14 +57,17 @@ class Core_Settings extends Core_Module
             3                          // Position
         );
 
-        add_submenu_page(
-            'core-settings',          // Parent slug
-            'Orders Settings',        // Page title
-            'Orders',                 // Menu title
-            'manage_options',          // Capability
-            'core-settings-orders',  // Menu slug
-            [$this, 'render_settings_orders_page']  // Callback
-        );
+        $is_active_orders = Setting_Services::get_core_config("orders");
+        if ($is_active_orders == 'yes') {
+            add_submenu_page(
+                'core-settings',          // Parent slug
+                'Orders Settings',        // Page title
+                'Orders',                 // Menu title
+                'manage_options',          // Capability
+                'core-settings-orders',  // Menu slug
+                [$this, 'render_settings_orders_page']  // Callback
+            );
+        }
     }
 
     function render_settings_page()

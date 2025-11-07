@@ -37,16 +37,16 @@ class Order_Setting_Services
         $init_configs = [
             'invoice-logo' => [
                 "value" => esc_url(wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0]),
-                "type" => 'logo',
+                "type" => 'link',
                 "position" => 'logo'
             ],
             'company-address' => [
-                "value" => "9 DTH DASKOASd",
+                "value" => "Example Address",
                 "type" => 'text',
                 "position" => 'header'
             ],
             'company-phone' => [
-                "value" => "0120310230",
+                "value" => "65 6665 5566",
                 "type" => 'text',
                 "position" => 'footer'
             ],
@@ -69,24 +69,26 @@ class Order_Setting_Services
     public static function update_invoices_options($data)
     {
         $option_key = 'core_module_configs_order_invoices';
-
-        // Get current config
-        $configs = get_option($option_key, []);
-
-        // Normalize: if the option doesn’t exist, make it an array
-        if (! is_array($configs)) {
-            $configs = [];
-        }
+        $new_config = [];
 
         foreach ($data as $new_item) {
-            $configs[$new_item['key']] = [
-                'value' => $new_item['data']['value'],
-                'type' => $new_item['data']['type'],
-                'position' => $new_item['data']['position']
+            $key = $new_item['key'];
+            $type = $new_item['data']['type'];
+            $position =  $new_item['data']['position'];
+            $value = $type == 'link' ? esc_url($new_item['data']['value']) : $new_item['data']['value'] ;
+
+            if ($key == 'invoice-logo' && empty($value)) {
+                $value = esc_url(wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0]);
+            }
+
+            $new_config[$key] = [
+                'type' => $type,
+                'value' => $value,
+                'position' => $position
             ];
         }
 
-        update_option($option_key, $configs);
-        return $configs;
+        update_option($option_key, $new_config);
+        return $new_config;
     }
 }

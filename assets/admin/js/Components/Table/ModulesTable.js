@@ -134,7 +134,7 @@ const ModulesTable = () => {
             disabled={updatedValues.length === 0 ? true : false}
             sx={{ mt: 2, textTransform: "capitalize" }}
             variant="contained"
-            color="primary"
+            color="warning"
             loading={isLoading}
           >
             Save Changes

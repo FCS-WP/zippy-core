@@ -7,6 +7,10 @@ import {
   TextField,
   Typography,
   Paper,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import {
@@ -21,16 +25,19 @@ const InvoiceSettings = ({ data }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAddRow = () => {
-    setRows((prev) => [...prev, { key: "", data: {type: 'text', value: '', position: 'header' } }]);
+    setRows((prev) => [
+      ...prev,
+      { key: "", data: { type: "text", value: "", position: "header" } },
+    ]);
   };
 
   const handleChange = (index, field, value) => {
     setRows((prev) => {
       const updated = [...prev];
-      if (field == 'key') {
-        updated[index]['key'] = value;
+      if (field == "key") {
+        updated[index]["key"] = value;
       } else {
-        updated[index]['data'][field] = value;
+        updated[index]["data"][field] = value;
       }
       return updated;
     });
@@ -50,14 +57,14 @@ const InvoiceSettings = ({ data }) => {
       new_invoices_options: newData,
     };
     const { data: response } = await SettingApi.updateInvoiceOptions(params);
-    console.log("response update", response);
     if (response && response.status == "success") {
-      showAlert("success", "Successfully", "New changes have been updated!");
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
+      await showAlert(
+        "success",
+        "Successfully",
+        "New changes have been updated!"
+      );
     } else {
-      showAlert(
+      await showAlert(
         "error",
         "Failed",
         "Failed to save changes. Please reload and try again!"
@@ -66,7 +73,6 @@ const InvoiceSettings = ({ data }) => {
 
     setIsLoading(false);
     return;
-
   };
 
   const checkAndRefactorData = () => {
@@ -74,6 +80,12 @@ const InvoiceSettings = ({ data }) => {
     let error = null;
     const refactoredData = rows.map((row) => {
       const new_key = convertNameToSlug(row.key);
+      if (!new_key) {
+        let message = `Field name is required!`;
+        error = {
+          message,
+        };
+      }
       if (existed_keys.includes(new_key)) {
         let message = `Field name ${row.key} has been duplicated!`;
         error = {
@@ -121,7 +133,9 @@ const InvoiceSettings = ({ data }) => {
               <Grid size={4}>
                 <TextField
                   size="small"
-                  label="Field Value"
+                  label={
+                    row?.key === "invoice-logo" ? "Logo url" : "Field value"
+                  }
                   variant="outlined"
                   required
                   fullWidth
@@ -130,30 +144,41 @@ const InvoiceSettings = ({ data }) => {
                 />
               </Grid>
               <Grid size={2}>
-                <TextField
-                  size="small"
-                  label="Field Type"
-                  disabled={row?.key === "invoice-logo" ? true : false}
-                  variant="outlined"
-                  required
-                  fullWidth
-                  value={row?.data.type ?? ""}
-                  onChange={(e) => handleChange(index, "type", e.target.value)}
-                />
+                <FormControl fullWidth size="small">
+                  <InputLabel id="invoice-type">Type</InputLabel>
+                  <Select
+                    labelId="invoice-type"
+                    value={row?.data.type ?? "text"}
+                    disabled={row?.key === "invoice-logo" ? true : false}
+                    label="Type"
+                    onChange={(e) =>
+                      handleChange(index, "type", e.target.value)
+                    }
+                  >
+                    <MenuItem value={"text"}>Text</MenuItem>
+                    <MenuItem value={"link"}>Link</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid size={2}>
-                <TextField
-                  size="small"
-                  label="Field Position"
-                  variant="outlined"
-                  disabled={row?.key === "invoice-logo" ? true : false}
-                  fullWidth
-                  required
-                  value={row?.data.position ?? ""}
-                  onChange={(e) =>
-                    handleChange(index, "position", e.target.value)
-                  }
-                />
+                <FormControl fullWidth size="small">
+                  <InputLabel id="field-position">Position</InputLabel>
+                  <Select
+                    labelId="field-position"
+                    value={row?.data.position ?? "header"}
+                    disabled={row?.key === "invoice-logo" ? true : false}
+                    label="Position"
+                    onChange={(e) =>
+                      handleChange(index, "position", e.target.value)
+                    }
+                  >
+                    <MenuItem value={"header"}>Header</MenuItem>
+                    <MenuItem value={"footer"}>Footer</MenuItem>
+                    <MenuItem value={"logo"} disabled>
+                      Logo
+                    </MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid size={1} textAlign="center">
                 {rows.length > 1 && (
@@ -161,6 +186,7 @@ const InvoiceSettings = ({ data }) => {
                     color="error"
                     onClick={() => handleRemoveRow(index)}
                     aria-label="delete"
+                    disabled={row?.key === "invoice-logo" ? true : false}
                   >
                     <Delete />
                   </IconButton>
@@ -172,15 +198,16 @@ const InvoiceSettings = ({ data }) => {
 
         <Button
           variant="contained"
+          color="info"
           startIcon={<Add />}
           onClick={handleAddRow}
-          sx={{ mt: 2 }}
+          sx={{ mt: 2, textTransform: "capitalize" }}
         >
           Add Row
         </Button>
       </Grid>
       {/* Preview */}
-      <Grid size={12}>
+      {/* <Grid size={12}>
         <Typography variant="subtitle1" sx={{ fontWeight: 500, mb: 1 }}>
           Current Values:
         </Typography>
@@ -194,13 +221,13 @@ const InvoiceSettings = ({ data }) => {
         >
           {JSON.stringify(rows, null, 2)}
         </Paper>
-      </Grid>
+      </Grid> */}
       <Button
         onClick={triggerSaveConfigs}
         disabled={rows.length === 0 ? true : false}
         sx={{ mt: 2, textTransform: "capitalize" }}
         variant="contained"
-        color="primary"
+        color="warning"
         loading={isLoading}
       >
         Save Changes
