@@ -9,6 +9,7 @@ use WC_Coupon;
 use WC_Order;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Zippy_Core\Core_Settings;
 
 class Order_Detail_Services
 {
@@ -457,13 +458,14 @@ class Order_Detail_Services
             ($subtotalOrder + $totalShipping + $totalFee - $totalCoupon)
         );
 
+        $options_custom_value = get_option(Core_Settings::OPTIONS_KEY_ORDER_INVOICES_CONFIGS, []);
         $data = [
-            'company_logo' => 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Logo_TV_2015.png',
-            'company_name' => 'EPOS Pte. Ltd.',
-            'company_address' => '2 Leng Kee Road<br>#02-07 Thye Hong Centre<br>Singapore 159086',
-            'company_phone' => '(+65) 6871 8833',
-            'company_mobile' => '(+65) 8482 1888',
-            'company_website' => 'www.epos.com.sg',
+            'store_logo' => $options_custom_value['invoice-logo']['value'] ?? '',
+            'store_name' => $options_custom_value['store-name']['value'] ?? '',
+            'store_address' => $options_custom_value['store-address']['value'] ?? '',
+            'store_phone' => $options_custom_value['store-phone']['value'] ?? '',
+            'store_mobile' => $options_custom_value['store-mobile']['value'] ?? '',
+            'store_website' => $options_custom_value['store-website']['value'] ?? '',
             'gst_reg' => $order->get_id(),
 
             'bill_to' => $billing_to,
@@ -480,8 +482,8 @@ class Order_Detail_Services
             'total' => $totalCalculated,
 
             'bank' => [
-                'name' => 'Maybank Singapore Limited',
-                'account' => '04061069943',
+                'name' => $options_custom_value['bank-name']['value'] ?? '',
+                'account' => $options_custom_value['bank-account']['value'] ?? '',
             ],
         ];
 

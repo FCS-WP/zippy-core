@@ -2,6 +2,8 @@
 
 namespace Zippy_Core\Settings\Services;
 
+use Zippy_Core\Core_Settings;
+
 class Order_Setting_Services
 {
     /**
@@ -10,7 +12,7 @@ class Order_Setting_Services
 
     public static function get_invoices_options()
     {
-        $option_key = 'core_module_configs_order_invoices';
+        $option_key = Core_Settings::OPTIONS_KEY_ORDER_INVOICES_CONFIGS;
         $configs = get_option($option_key, []);
 
         if (! is_array($configs)) {
@@ -52,7 +54,7 @@ class Order_Setting_Services
             ],
         ];
 
-        $option_key = 'core_module_configs_order_invoices';
+        $option_key = Core_Settings::OPTIONS_KEY_ORDER_INVOICES_CONFIGS;
         $existing = get_option($option_key);
 
         if (! is_array($existing)) {
@@ -68,14 +70,14 @@ class Order_Setting_Services
 
     public static function update_invoices_options($data)
     {
-        $option_key = 'core_module_configs_order_invoices';
+        $option_key = Core_Settings::OPTIONS_KEY_ORDER_INVOICES_CONFIGS;
         $new_config = [];
 
         foreach ($data as $new_item) {
             $key = $new_item['key'];
             $type = $new_item['data']['type'];
             $position =  $new_item['data']['position'];
-            $value = $type == 'link' ? esc_url($new_item['data']['value']) : $new_item['data']['value'] ;
+            $value = $type == 'link' ? esc_url($new_item['data']['value']) : $new_item['data']['value'];
 
             if ($key == 'invoice-logo' && empty($value)) {
                 $value = esc_url(wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0]);
