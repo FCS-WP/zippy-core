@@ -7,30 +7,6 @@ use Zippy_Core\Core_Settings;
 class Order_Setting_Services
 {
     /**
-     * Get configs
-     */
-
-    public static function get_invoices_options()
-    {
-        $option_key = Core_Settings::OPTIONS_KEY_ORDER_INVOICES_CONFIGS;
-        $configs = get_option($option_key, []);
-
-        if (! is_array($configs)) {
-            $configs = [];
-        }
-        $formatted = [];
-
-        foreach ($configs as $key => $value) {
-            $formatted[] = [
-                'key'   => $key,
-                'data' => $value,
-            ];
-        }
-
-        return $formatted;
-    }
-
-    /**
      * init core configs
      */
 
@@ -40,6 +16,11 @@ class Order_Setting_Services
             'invoice-logo' => [
                 "value" => esc_url(wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0]),
                 "type" => 'link',
+                "position" => 'logo'
+            ],
+            'store-name' => [
+                "value" => get_bloginfo('name'),
+                "type" => 'text',
                 "position" => 'logo'
             ],
             'company-address' => [
@@ -61,6 +42,23 @@ class Order_Setting_Services
             add_option($option_key, $init_configs);
             $existing = $init_configs;
         }
+        return $existing;
+    }
+
+    public static function init_order_detail_option()
+    {
+        $configs = [
+            'custom_order_items'      => 'no',
+        ];
+
+        $option_key = Core_Settings::OPTIONS_KEY_ORDER_DETAILS_CONFIGS;
+        $existing = get_option($option_key);
+
+        if (! is_array($existing)) {
+            add_option($option_key, $configs);
+            $existing = $configs;
+        }
+
         return $existing;
     }
 

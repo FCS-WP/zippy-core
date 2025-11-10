@@ -36,3 +36,18 @@ export const convertNameToSlug = (name) => {
     .replace(/^-+|-+$/g, '')
     .replace(/-{2,}/g, '-');
 };
+
+export const orderSettingCells = [
+  {
+    id: "name",
+    numeric: false,
+    disablePadding: true,
+    label: "Name",
+  },
+  {
+    id: "active",
+    numeric: false,
+    disablePadding: true,
+    label: "Active",
+  },
+]

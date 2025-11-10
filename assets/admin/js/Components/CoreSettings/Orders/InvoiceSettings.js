@@ -23,7 +23,7 @@ import { SettingApi } from "../../../api/admin";
 const InvoiceSettings = ({ data }) => {
   const [rows, setRows] = useState(data);
   const [isLoading, setIsLoading] = useState(false);
-
+  const requiredField = ['invoice-logo', 'store-name'];
   const handleAddRow = () => {
     setRows((prev) => [
       ...prev,
@@ -125,7 +125,7 @@ const InvoiceSettings = ({ data }) => {
                   variant="outlined"
                   required
                   fullWidth
-                  disabled={row?.key === "invoice-logo" ? true : false}
+                  disabled={requiredField.includes(row?.key) ? true : false}
                   value={convertSlugToName(row?.key)}
                   onChange={(e) => handleChange(index, "key", e.target.value)}
                 />
@@ -134,7 +134,7 @@ const InvoiceSettings = ({ data }) => {
                 <TextField
                   size="small"
                   label={
-                    row?.key === "invoice-logo" ? "Logo url" : "Field value"
+                    requiredField.includes(row?.key) ? "Logo url" : "Field value"
                   }
                   variant="outlined"
                   required
@@ -149,7 +149,7 @@ const InvoiceSettings = ({ data }) => {
                   <Select
                     labelId="invoice-type"
                     value={row?.data.type ?? "text"}
-                    disabled={row?.key === "invoice-logo" ? true : false}
+                    disabled={requiredField.includes(row?.key) ? true : false}
                     label="Type"
                     onChange={(e) =>
                       handleChange(index, "type", e.target.value)
@@ -166,7 +166,7 @@ const InvoiceSettings = ({ data }) => {
                   <Select
                     labelId="field-position"
                     value={row?.data.position ?? "header"}
-                    disabled={row?.key === "invoice-logo" ? true : false}
+                    disabled={requiredField.includes(row?.key) ? true : false}
                     label="Position"
                     onChange={(e) =>
                       handleChange(index, "position", e.target.value)
@@ -186,7 +186,7 @@ const InvoiceSettings = ({ data }) => {
                     color="error"
                     onClick={() => handleRemoveRow(index)}
                     aria-label="delete"
-                    disabled={row?.key === "invoice-logo" ? true : false}
+                    disabled={requiredField.includes(row?.key) ? true : false}
                   >
                     <Delete />
                   </IconButton>

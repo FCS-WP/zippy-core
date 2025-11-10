@@ -3,12 +3,13 @@
 namespace Zippy_Core;
 
 use Zippy_Core\Core_Module;
+use Zippy_Core\Orders\Controllers\Order_Controllers;
 use Zippy_Core\Orders\Routes\Order_Route;
 
 class Core_Orders extends Core_Module
 {
     protected $module_key = 'orders';
-    
+
     public function load_required_files()
     {
         $paths = [
@@ -34,28 +35,30 @@ class Core_Orders extends Core_Module
         Order_Route::get_instance();
 
         /**
-         * Handle setting tabs
-         */
-        add_filter('woocommerce_settings_tabs_array', [$this, 'add_zippy_woo_tab'], 50);
-        add_action('woocommerce_settings_tabs_zippy_woo', [$this, 'zippy_woo_settings_tab']);
-        add_action('woocommerce_update_options_zippy_woo', [$this, 'update_zippy_woo_settings']);
-
-        /**
          * Add cutomize orders pages
          * 
          */
 
-        // enable this code after done
-        // $enable_custom_orders_page = get_option('zippy_woo_custom_orders_enabled', 'no');
-        // if ($enable_custom_orders_page === 'yes') {
-        //     add_action('admin_menu', [$this, 'add_custom_orders_page']);
-        // }
-
-        // remove this code after done
         add_action('admin_menu', [$this, 'add_custom_orders_page']);
-        add_shortcode('admin_order_table', array($this, 'generate_admin_order_table_div'));
-        add_action('woocommerce_admin_order_items_after_line_items', [$this, 'render_admin_order_table']);
-        add_action('admin_head', [$this, 'custom_admin_order_styles']);
+        add_action('admin_menu', [$this, 'hide_default_orders'], 999);
+
+        if ($this->is_custom_order_items_active()) {
+            add_shortcode('admin_order_table', array($this, 'generate_admin_order_table_div'));
+            add_action('woocommerce_admin_order_items_after_line_items', [$this, 'render_admin_order_table']);
+            add_action('admin_head', [$this, 'custom_admin_order_styles']);
+        }
+    }
+
+    protected function is_custom_order_items_active()
+    {
+        $configs = get_option('core_module_configs_order_details', []);
+
+        if (! is_array($configs)) {
+            $configs = [];
+        }
+
+        $status = isset($configs['custom_order_items']) ? $configs['custom_order_items'] : 'no';
+        return $status === 'yes';
     }
 
     function custom_admin_order_styles()
@@ -109,27 +112,20 @@ class Core_Orders extends Core_Module
         return '<div id="admin-table-order" data-order-id="' . esc_attr($order_id) . '" data-enable-edit="' . esc_attr($enable_edit) . '"></div>';
     }
 
-    function zippy_woo_settings_tab()
+    /**
+     * Hide defaults orders
+     * 
+     */
+
+    function hide_default_orders()
     {
-        // Get saved promotions
-        $enable_custom_orders_page = get_option('zippy_woo_custom_orders_enabled', 'no');
-?>
-        <div class="zippy-woo-configs">
-            <label>
-                <input type="checkbox" name="zippy_woo_custom_orders_enabled" value="yes" <?php checked($enable_custom_orders_page, 'yes'); ?> />
-                <?php _e('Enable customize orders page', 'Zippy'); ?>
-            </label>
-        </div>
-    <?php
+        add_action('admin_enqueue_scripts', [$this, 'add_scripts_to_hide_menu_items']);
     }
 
-    function update_zippy_woo_settings()
+    function add_scripts_to_hide_menu_items()
     {
-        $enabled = isset($_POST['zippy_woo_custom_orders_enabled']) ? 'yes' : 'no';
-        update_option('zippy_woo_custom_orders_enabled', $enabled);
+        wp_enqueue_script('ordee-admin-scripts', ZIPPY_CORE_URL . '/assets/admin/js/custom-order-scripts.js', [], '1.0', true);
     }
-    // End handle setting tabs
-
 
     /**
      * Add custom orders page
@@ -137,14 +133,10 @@ class Core_Orders extends Core_Module
 
     function add_custom_orders_page()
     {
-        // Remove default WooCommerce Orders submenu
-        // enable this code after done
-        // remove_submenu_page( 'woocommerce', 'wc-orders' );
-
         add_submenu_page(
             'woocommerce',                 // Parent slug (WooCommerce menu)
-            'Custom Orders',               // Page title
-            'Custom Orders',               // Menu title
+            'Orders - v2',               // Page title
+            'Orders - v2',               // Menu title
             'manage_woocommerce',          // Capability
             'custom-orders',               // Menu slug
             [$this, 'render_custom_orders_page']    // Callback function
@@ -153,8 +145,6 @@ class Core_Orders extends Core_Module
 
     function render_custom_orders_page()
     {
-    ?>
-        <div id="orders-page"></div>
-<?php
+        echo '<div id="orders-page"></div>';
     }
 }

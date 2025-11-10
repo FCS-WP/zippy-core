@@ -9,7 +9,6 @@ use Zippy_Core\Products\Routes\Product_Route;
 
 class Core_Products extends Core_Module
 {
-
     public function load_required_files()
     {
         $paths = [

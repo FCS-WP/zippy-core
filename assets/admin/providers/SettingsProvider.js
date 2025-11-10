@@ -8,9 +8,10 @@ export const SettingsProvider = ({ children }) => {
     modulesConfigs: null,
     isApiLoading: true,
     selectedModules: null,
+    ordersConfigs: null
   });
 
-  const { modulesConfigs, isApiLoading, selectedModules } = settingsState;
+  const { modulesConfigs, isApiLoading, selectedModules, detailsConfigs } = settingsState;
 
   const updateSettingsState = (updates) =>
     setSettingsState((prev) => ({ ...prev, ...updates }));
@@ -19,6 +20,7 @@ export const SettingsProvider = ({ children }) => {
     modulesConfigs,
     isApiLoading,
     selectedModules,
+    detailsConfigs,
     updateSettingsState,
   };
 
