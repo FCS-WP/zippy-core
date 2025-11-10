@@ -1,3 +1,9 @@
+<?php
+
+use Zippy_Core\Utils\Zippy_String_Helpers;
+
+?>
+
 <!DOCTYPE html>
 <html>
 
@@ -135,10 +141,10 @@
                 <p style="color: #888">GST Reg. No. <?= $data['gst_reg'] ?></p>
                 <p>
                     <strong><?= $data['store_name'] ?></strong><br />
-                    <?= $data['store_address'] ?><br />
-                    Phone: <?= $data['store_phone'] ?><br />
-                    Mobile: <?= $data['store_mobile'] ?><br />
-                    <?= $data['store_website'] ?>
+                    <?
+                    foreach ($header_options as $key => $header_option): ?>
+                        <?= Zippy_String_Helpers::convert_slug_to_name($key) . ': ' . $header_option ?> <br />
+                    <? endforeach; ?>
                 </p>
             </td>
         </tr>
@@ -235,10 +241,11 @@
         FULL PAYMENT BEFORE DELIVERY<br />
         Full payment must be made and verified by EPOS Finance Department before delivery of any goods or services.<br /><br />
         Please kindly make payment via transfer to: <strong><?= $data['store_name'] ?></strong><br />
-        Bank Name: <?= $data['bank']['name'] ?><br />
-        Account Number: <?= $data['bank']['account'] ?>
-    </div>
 
+        <? foreach ($footer_options as $key => $footer_option): ?>
+            <?= Zippy_String_Helpers::convert_slug_to_name($key) . ': ' . $footer_option ?> <br />
+        <? endforeach; ?>
+    </div>
 </body>
 
 </html>
