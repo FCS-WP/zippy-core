@@ -40,9 +40,25 @@ class Core_Orders extends Core_Module
          */
 
         add_action('admin_menu', [$this, 'add_custom_orders_page']);
-        add_shortcode('admin_order_table', array($this, 'generate_admin_order_table_div'));
-        add_action('woocommerce_admin_order_items_after_line_items', [$this, 'render_admin_order_table']);
-        add_action('admin_head', [$this, 'custom_admin_order_styles']);
+        add_action('admin_menu', [$this, 'hide_default_orders'], 999);
+
+        if ($this->is_custom_order_items_active()) {
+            add_shortcode('admin_order_table', array($this, 'generate_admin_order_table_div'));
+            add_action('woocommerce_admin_order_items_after_line_items', [$this, 'render_admin_order_table']);
+            add_action('admin_head', [$this, 'custom_admin_order_styles']);
+        }
+    }
+
+    protected function is_custom_order_items_active()
+    {
+        $configs = get_option('core_module_configs_order_details', []);
+
+        if (! is_array($configs)) {
+            $configs = [];
+        }
+
+        $status = isset($configs['custom_order_items']) ? $configs['custom_order_items'] : 'no';
+        return $status === 'yes';
     }
 
     function custom_admin_order_styles()
@@ -97,14 +113,26 @@ class Core_Orders extends Core_Module
     }
 
     /**
+     * Hide defaults orders
+     * 
+     */
+
+    function hide_default_orders()
+    {
+        add_action('admin_enqueue_scripts', [$this, 'add_scripts_to_hide_menu_items']);
+    }
+
+    function add_scripts_to_hide_menu_items()
+    {
+        wp_enqueue_script('ordee-admin-scripts', ZIPPY_CORE_URL . '/assets/admin/js/custom-order-scripts.js', [], '1.0', true);
+    }
+
+    /**
      * Add custom orders page
      */
 
     function add_custom_orders_page()
     {
-        // Remove default WooCommerce Orders submenu
-        remove_submenu_page('woocommerce', 'wc-orders');
-
         add_submenu_page(
             'woocommerce',                 // Parent slug (WooCommerce menu)
             'Orders - v2',               // Page title

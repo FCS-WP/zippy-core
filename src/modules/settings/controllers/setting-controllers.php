@@ -3,6 +3,7 @@
 namespace Zippy_Core\Settings\Controllers;
 
 use WP_REST_Request;
+use Zippy_Core\Core_Settings;
 use Zippy_Core\Settings\Services\Setting_Services;
 use Zippy_Core\Utils\Zippy_Response_Handler;
 
@@ -11,7 +12,7 @@ class Setting_Controllers
     public static function get_modules(WP_REST_Request $request)
     {
         try {
-            $configs = Setting_Services::get_all_modules_option();
+            $configs = Setting_Services::get_saved_options(Core_Settings::OPTIONS_KEY_CORE_MODULES);
             $result = array(
                 'result' => [
                     'modules' => $configs,
@@ -28,7 +29,7 @@ class Setting_Controllers
     {
         try {
             $data = $request->get_param('new_values');
-            $newConfigs = Setting_Services::update_module_configs($data);
+            $newConfigs = Setting_Services::update_saved_options(Core_Settings::OPTIONS_KEY_CORE_MODULES, $data);
 
             $result = array(
                 'result' => [

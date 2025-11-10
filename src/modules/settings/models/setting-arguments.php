@@ -57,4 +57,28 @@ class Setting_Arguments
             ],
         ];
     }
+
+    public static function update_order_detail_options_args()
+    {
+        return [
+            'new_values' => [
+                'required' => true,
+                'type' => 'array',
+                'items' => [
+                    'type'       => 'object',
+                    'properties' => [
+                        'key' => [
+                            'type'        => 'string',
+                            'required'    => true,
+                        ],
+                        'value' => [
+                            'type'        => 'string',
+                            'required'    => true,
+                            'description' => 'value (e.g. yes/no).',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
 }

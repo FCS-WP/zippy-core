@@ -8,8 +8,10 @@ use Zippy_Core\Settings\Services\Setting_Services;
 
 class Core_Settings extends Core_Module
 {
+    const OPTIONS_KEY_CORE_MODULES = 'core_module_configs';
+    const OPTIONS_KEY_MODULES_CONFIGS = 'core_module_configs_order_details';
     const OPTIONS_KEY_ORDER_INVOICES_CONFIGS = 'core_module_configs_order_invoices';
-
+    const OPTIONS_KEY_ORDER_DETAILS_CONFIGS = 'core_module_configs_order_details';
     public function load_required_files()
     {
         $paths = [
@@ -44,6 +46,7 @@ class Core_Settings extends Core_Module
     {
         Setting_Services::init_modules_option();
         Order_Setting_Services::init_invoices_option();
+        Order_Setting_Services::init_order_detail_option();
     }
 
     public function register_settings_page()

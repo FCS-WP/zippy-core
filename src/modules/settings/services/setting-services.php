@@ -2,6 +2,8 @@
 
 namespace Zippy_Core\Settings\Services;
 
+use Zippy_Core\Core_Settings;
+
 class Setting_Services
 {
 
@@ -32,9 +34,9 @@ class Setting_Services
      * Get configs
      */
 
-    public static function get_all_modules_option()
+    public static function get_saved_options($option_key)
     {
-        $option_key = 'core_module_configs';
+        if (!$option_key) return [];
         $configs = get_option($option_key, []);
 
         if (! is_array($configs)) {
@@ -45,7 +47,7 @@ class Setting_Services
         foreach ($configs as $key => $value) {
             $formatted[] = [
                 'key'   => $key,
-                'value' => $value,
+                'data' => $value,
             ];
         }
 
@@ -83,11 +85,8 @@ class Setting_Services
         return $configs;
     }
 
-    public static function update_module_configs($data)
+    public static function update_saved_options($option_key, $data)
     {
-        $option_key = 'core_module_configs';
-
-        // Get current config
         $configs = get_option($option_key, []);
 
         // Normalize: if the option doesn’t exist, make it an array
@@ -109,8 +108,24 @@ class Setting_Services
 
     public static function get_core_config($key = null)
     {
-        $option_key = 'core_module_configs';
+        $option_key = Core_Settings::OPTIONS_KEY_CORE_MODULES;
 
+        $configs = get_option($option_key, []);
+
+        if (! is_array($configs)) {
+            $configs = [];
+        }
+
+        if ($key === null) {
+            return $configs;
+        }
+
+        return isset($configs[$key]) ? $configs[$key] : 'no';
+    }
+
+    public static function get_sub_configs($option_key, $key = null)
+    {
+        if (!$option_key) return 'no';
         $configs = get_option($option_key, []);
 
         if (! is_array($configs)) {
