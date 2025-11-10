@@ -42,6 +42,11 @@ class Order_Setting_Services
                 "type" => 'link',
                 "position" => 'logo'
             ],
+            'store-name' => [
+                "value" => get_bloginfo('name'),
+                "type" => 'text',
+                "position" => 'logo'
+            ],
             'company-address' => [
                 "value" => "Example Address",
                 "type" => 'text',
