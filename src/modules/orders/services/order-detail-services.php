@@ -459,33 +459,23 @@ class Order_Detail_Services
         );
 
         $options_custom_value = get_option(Core_Settings::OPTIONS_KEY_ORDER_INVOICES_CONFIGS, []);
+
         $data = [
             'store_logo' => $options_custom_value['invoice-logo']['value'] ?? '',
             'store_name' => $options_custom_value['store-name']['value'] ?? '',
-            'store_address' => $options_custom_value['store-address']['value'] ?? '',
-            'store_phone' => $options_custom_value['store-phone']['value'] ?? '',
-            'store_mobile' => $options_custom_value['store-mobile']['value'] ?? '',
-            'store_website' => $options_custom_value['store-website']['value'] ?? '',
             'gst_reg' => $order->get_id(),
-
             'bill_to' => $billing_to,
-
             'invoice_number' => $order->get_id(),
             'invoice_date' => date('F j, Y'),
             'payment_due' => $payment_due,
             'amount_due' => $total_amounts,
-
             'items' => $result['products'],
-
             'subtotal' => $subtotalOrder,
             'gst' => $taxTotal,
             'total' => $totalCalculated,
-
-            'bank' => [
-                'name' => $options_custom_value['bank-name']['value'] ?? '',
-                'account' => $options_custom_value['bank-account']['value'] ?? '',
-            ],
         ];
+        $header_options = self::get_options_by_position($options_custom_value, 'header');
+        $footer_options = self::get_options_by_position($options_custom_value, 'footer');
 
         $options = new Options();
         $options->set('isHtml5ParserEnabled', true);
@@ -502,5 +492,16 @@ class Order_Detail_Services
         $dompdf->render();
 
         return $dompdf->output();
+    }
+
+    private static function get_options_by_position(array $options_custom_value, string $position): array
+    {
+        $options = [];
+        foreach ($options_custom_value as $key => $option) {
+            if ($option['position'] === $position) {
+                $options[$key] = $option['value'];
+            }
+        }
+        return $options;
     }
 }

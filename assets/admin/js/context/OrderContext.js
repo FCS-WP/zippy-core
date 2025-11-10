@@ -40,6 +40,7 @@ export const OrderProvider = ({ children }) => {
   }, [page, rowsPerPage, filteredOrders]);
 
   const handleFilterOrder = (filters) => {
+    setPage(0);
     setFilteredOrders(filters);
   };
 
