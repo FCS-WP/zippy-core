@@ -86,7 +86,7 @@ class Zippy_Wc_Calculate_Helper
             $all_tax_rates = array_merge($all_tax_rates, $taxes);
         }
 
-        if (empty($all_tax_rates)) return false;
+        if (empty($all_tax_rates)) return null;
         return $all_tax_rates[0];
     }
 }
