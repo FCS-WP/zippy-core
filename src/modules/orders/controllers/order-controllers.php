@@ -166,4 +166,30 @@ class Order_Controllers
             return Zippy_Response_Handler::error('An error occurred while downloading the invoice.');
         }
     }
+
+    public static function handle_send_order_email(WP_REST_Request $request)
+    {
+        try {
+            $order_id = $request->get_param('order_id');
+            $email_type = $request->get_param('email_type');
+            $sent = Order_Services::custom_send_wc_email($order_id, $email_type);
+            return $sent
+                ? Zippy_Response_Handler::success([], "Email '$email_type' sent successfully")
+                : Zippy_Response_Handler::error('Failed to send email');
+        } catch (\Exception $e) {
+            return Zippy_Response_Handler::error('An error occurred while downloading the invoice.');
+        }
+    }
+
+    public static function get_orders_by_keyword(WP_REST_Request $request)
+    {
+       try {
+            $infos = Zippy_Request_Helper::get_params($request);
+            $data = Order_Services::search_orders($infos);
+
+            return Zippy_Response_Handler::success($data, 'Get orders successfully!');
+        } catch (\Exception $e) {
+            return Zippy_Response_Handler::error($e->getMessage());
+        }
+    }
 }

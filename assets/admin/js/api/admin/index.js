@@ -77,7 +77,15 @@ export const SettingApi = {
   async getInvoiceOptions(params) {
     return await makeRequest("/core-settings/orders/invoices", params);
   },
-   async updateInvoiceOptions(params) {
+  async updateInvoiceOptions(params) {
     return await makeRequest("/core-settings/orders/invoices", params, 'POST');
+  },
+
+  // Orders Details
+  async getOrderDetailSettings(params) {
+    return await makeRequest("core-settings/orders/details")
+  },
+  async updateDetailSettings(params) {
+    return await makeRequest("/core-settings/orders/details", params, 'POST');
   },
 }

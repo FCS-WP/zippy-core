@@ -4,6 +4,7 @@ import InvoiceSettings from "./InvoiceSettings";
 import { SettingApi } from "../../../api/admin";
 import { toast } from "react-toastify";
 import GeneralInfo from "./GeneralInfo";
+import OrderSettings from "./OrderSettings";
 
 const CustomTabPanel = (props) => {
   const { children, value, index, ...other } = props;
@@ -25,6 +26,7 @@ const SettingOrderTabs = () => {
   const [value, setValue] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [invoiceSettings, setInvoiceSetting] = useState([]);
+  const [orderSettings, setOrderSettings] = useState([]);
 
   const init_data = async () => {
     await get_invoice_settings();
@@ -57,6 +59,7 @@ const SettingOrderTabs = () => {
       >
         <Tab label="General" />
         <Tab label="Invoices" />
+        <Tab label="Details" />
       </Tabs>
       <Box>
         <CustomTabPanel value={value} index={0}>
@@ -64,6 +67,9 @@ const SettingOrderTabs = () => {
         </CustomTabPanel>
         <CustomTabPanel value={value} index={1}>
           <InvoiceSettings data={invoiceSettings}/>
+        </CustomTabPanel>
+         <CustomTabPanel value={value} index={2}>
+          <OrderSettings/>
         </CustomTabPanel>
       </Box>
     </Box>

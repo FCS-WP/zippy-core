@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
-import TableViewV2 from "./ TableViewV2";
+import {
+  convertSlugToName,
+  orderSettingCells,
+} from "../../helper/table-helper";
 import { Box, Button, Switch, Typography } from "@mui/material";
+import TableViewV2 from "./ TableViewV2";
 import { useSettingsProvider } from "../../../providers/SettingsProvider";
-import { settingsHeadcells } from "../../helper/table-helper";
 import { SettingApi } from "../../api/admin";
 import { toast } from "react-toastify";
-import Swal from "sweetalert2";
 import { showAlert } from "../../helper/alert-helper";
 
-const ModulesTable = () => {
-  const { isApiLoading, modulesConfigs } = useSettingsProvider();
+const ordersConfigsTable = () => {
+  const { isApiLoading, detailsConfigs, updateSettingsState } =
+    useSettingsProvider();
+
   const [isLoading, setIsLoading] = useState(false);
   const [dataRows, setDataRows] = useState([]);
   const [updatedValues, setUpdatedValues] = useState([]);
@@ -18,15 +22,9 @@ const ModulesTable = () => {
     page: 1,
     itemsPerPage: 10,
     totalItems: 0,
-    title: "Modules",
-    headCells: settingsHeadcells,
+    title: "",
+    headCells: orderSettingCells,
   });
-
-  const convertSlugToName = (slug) => {
-    if (!slug || typeof slug !== "string") return "";
-    const name = slug.replace(/[-_]/g, " ");
-    return name.replace(/\b\w/g, (char) => char.toUpperCase());
-  };
 
   const createData = (slug, value) => {
     const title = convertSlugToName(slug);
@@ -34,25 +32,29 @@ const ModulesTable = () => {
     return { id: slug, name: title, value: renderSwitch };
   };
 
-  const updateTableConfig = (newValue) => {
-    const newData = { ...tableConfig, ...newValue };
-    setTableConfig(newData);
-  };
-
-  const fetchTableData = () => {
-    if (modulesConfigs) {
-      const data = modulesConfigs.modules.map((item) => {
+  const fetchTableData = async () => {
+    if (detailsConfigs) {
+      const data = detailsConfigs.map((item) => {
         return createData(item.key, item.data);
       });
 
       setDataRows(data);
-      updateTableConfig({ totalItems: modulesConfigs.total_modules });
+      updateTableConfig({ totalItems: detailsConfigs.length });
+      return;
     }
+    const { data: response } = await SettingApi.getOrderDetailSettings();
+
+    if (!response || response.status !== "success") {
+      toast.error("Can not get details configs");
+      return false;
+    }
+    updateSettingsState({ detailsConfigs: response.result });
   };
 
-  useEffect(() => {
-    fetchTableData();
-  }, [modulesConfigs]);
+  const updateTableConfig = (newValue) => {
+    const newData = { ...tableConfig, ...newValue };
+    setTableConfig(newData);
+  };
 
   const onSwitchChangeValue = (newItem) => {
     setUpdatedValues((prev) => {
@@ -87,12 +89,9 @@ const ModulesTable = () => {
       const params = {
         new_values: updatedValues,
       };
-      const { data: response } = await SettingApi.updateModulesConfigs(params);
+      const { data: response } = await SettingApi.updateDetailSettings(params);
       if (response && response.status == "success") {
         showAlert("success", "Successfully", "New changes have been updated!");
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
       } else {
         showAlert(
           "error",
@@ -118,9 +117,15 @@ const ModulesTable = () => {
     // Handle Selected ids here
   };
 
+  useEffect(() => {
+    fetchTableData();
+
+    return () => {};
+  }, [detailsConfigs]);
+
   return (
     <Box minHeight={"60vh"}>
-      {modulesConfigs && dataRows.length > 0 ? (
+      {detailsConfigs && dataRows.length > 0 ? (
         <>
           <TableViewV2
             tableConfig={tableConfig}
@@ -142,7 +147,7 @@ const ModulesTable = () => {
         </>
       ) : (
         <>
-          {modulesConfigs && (
+          {detailsConfigs && (
             <Typography
               variant="h5"
               fontWeight={600}
@@ -158,4 +163,4 @@ const ModulesTable = () => {
   );
 };
 
-export default ModulesTable;
+export default ordersConfigsTable;
