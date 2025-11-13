@@ -10,13 +10,9 @@ const SummaryOrders = () => {
 
   const [orderSummary, setOrderSummary] = useState({
     total_orders: 0,
-    total_orders_change: 0,
     pending_orders: 0,
-    pending_orders_change: 0,
     completed_orders: 0,
-    completed_orders_change: 0,
     cancelled_orders: 0,
-    cancelled_orders_change: 0,
   });
 
   const getSummaryOrders = async () => {
@@ -42,25 +38,21 @@ const SummaryOrders = () => {
       <SummaryCard
         title="Total Orders"
         value={orderSummary.total_orders}
-        change={orderSummary.total_orders_change}
         changeText="last week"
       />
       <SummaryCard
         title="Pending Orders"
         value={orderSummary.pending_orders}
-        change={orderSummary.pending_orders_change}
         changeText="last week"
       />
       <SummaryCard
         title="Completed Orders"
         value={orderSummary.completed_orders}
-        change={orderSummary.completed_orders_change}
         changeText="last week"
       />
       <SummaryCard
         title="Cancelled Orders"
         value={orderSummary.cancelled_orders}
-        change={orderSummary.cancelled_orders_change}
         changeText="last week"
       />
     </Box>

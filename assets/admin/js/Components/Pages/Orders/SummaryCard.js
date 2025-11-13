@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
 
-const SummaryCard = ({ title, value, change, changeText }) => {
+const SummaryCard = ({ title, value }) => {
   return (
     <Box
       sx={{
