@@ -46,6 +46,11 @@ class Order_Controllers
     {
         $infos = Zippy_Request_Helper::get_params($request);
         $result = Order_Services::bulk_action_update_order_status($infos);
+
+        if (empty($result)) {
+            return Zippy_Response_Handler::error('Orders updated fail');
+        }
+
         return Zippy_Response_Handler::success($result, 'Orders updated successfully.');
     }
 

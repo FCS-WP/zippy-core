@@ -132,6 +132,7 @@ class Order_Services
     {
         $order_ids = $data['order_ids'] ?? [];
         $status    = $data['status'] ?? '';
+        $action    = $data['action'] ?? '';
 
         $valid_statuses = wc_get_order_statuses();
         if (!array_key_exists($status, $valid_statuses)) {
@@ -141,6 +142,10 @@ class Order_Services
         $updated_orders = [];
         foreach ($order_ids as $order_id) {
             $order = wc_get_order($order_id);
+            if ($action == 'restore' && $order && $order->get_status() !== 'trash') {
+                return [];
+            }
+
             if ($order) {
                 $order->update_status($status, 'Order status updated via API', true);
                 $updated_orders[] = $order_id;
@@ -407,41 +412,36 @@ class Order_Services
 
     public static function get_summary_orders($filters)
     {
+        global $wpdb;
+
         $start_date = !empty($filters['date_from']) ? $filters['date_from'] : null;
         $end_date   = !empty($filters['date_to']) ? $filters['date_to'] : null;
 
-        $date_query = null;
+        $table = $wpdb->prefix . 'wc_orders';
+        $where = "WHERE 1=1";
+
+        $where .= " AND status NOT IN ('trash', 'auto-draft')";
+
         if ($start_date) {
             $end_date = $end_date ?: gmdate('Y-m-d');
-            $date_query = sprintf('%s...%s', $start_date, $end_date);
+            $where .= $wpdb->prepare(
+                " AND date_created_gmt BETWEEN %s AND %s",
+                $start_date . ' 00:00:00',
+                $end_date . ' 23:59:59'
+            );
         }
 
-        $args = [
-            'limit'        => -1,
-            'return'       => 'ids',
-        ];
+        $total_orders = (int) $wpdb->get_var("SELECT COUNT(*) FROM $table $where");
 
-        if ($date_query) {
-            $args['date_created'] = $date_query;
-        }
-
-        $all_orders = wc_get_orders($args);
-        $total_orders = count($all_orders);
-
-        $args['status'] = 'completed';
-        $completed_orders = count(wc_get_orders($args));
-
-        $args['status'] = 'cancelled';
-        $cancelled_orders = count(wc_get_orders($args));
-
-        $args['status'] = 'pending';
-        $pending_orders = count(wc_get_orders($args));
+        $completed_orders = (int) $wpdb->get_var("SELECT COUNT(*) FROM $table $where AND status = 'wc-completed'");
+        $cancelled_orders = (int) $wpdb->get_var("SELECT COUNT(*) FROM $table $where AND status = 'wc-cancelled'");
+        $pending_orders   = (int) $wpdb->get_var("SELECT COUNT(*) FROM $table $where AND status = 'wc-pending'");
 
         $results = [
-            'total_orders'      => $total_orders,
-            'completed_orders'  => $completed_orders,
-            'cancelled_orders'  => $cancelled_orders,
-            'pending_orders'    => $pending_orders,
+            'total_orders'     => $total_orders,
+            'completed_orders' => $completed_orders,
+            'cancelled_orders' => $cancelled_orders,
+            'pending_orders'   => $pending_orders,
         ];
 
         return [

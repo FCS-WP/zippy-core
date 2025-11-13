@@ -50,6 +50,10 @@ class Order_Arguments
                 'required' => true,
                 'type' => 'string',
             ],
+            'action' => [
+                'required' => true,
+                'type' => 'string',
+            ],
         ];
     }
 
