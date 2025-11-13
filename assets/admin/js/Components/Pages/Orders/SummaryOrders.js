@@ -29,10 +29,6 @@ const SummaryOrders = () => {
     getSummaryOrders();
   }, [filteredOrders]);
 
-  useEffect(() => {
-    console.log("Order Summary:", orderSummary);
-  }, [orderSummary]);
-
   return (
     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, paddingBottom: 2 }}>
       <SummaryCard
