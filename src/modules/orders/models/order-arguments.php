@@ -197,4 +197,18 @@ class Order_Arguments
             ],
         ];
     }
+
+    public static function get_summary_orders_args()
+    {
+        return [
+            'date_from' => [
+                'required' => false,
+                'type' => 'string',
+            ],
+            'date_to' => [
+                'required' => false,
+                'type' => 'string',
+            ],
+        ];
+    }
 }

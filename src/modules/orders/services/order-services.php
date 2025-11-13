@@ -330,9 +330,7 @@ class Order_Services
         return $trashed;
     }
 
-    public static function search_orders($infos) {
-        
-    }
+    public static function search_orders($infos) {}
 
 
     public static function custom_send_wc_email($order_id,  $email_type)
@@ -405,5 +403,49 @@ class Order_Services
 
         $sent = wp_mail($to, $subject, $wrapped_message, $headers);
         return $sent;
+    }
+
+    public static function get_summary_orders($filters)
+    {
+        $start_date = !empty($filters['date_from']) ? $filters['date_from'] : null;
+        $end_date   = !empty($filters['date_to']) ? $filters['date_to'] : null;
+
+        $date_query = null;
+        if ($start_date) {
+            $end_date = $end_date ?: gmdate('Y-m-d');
+            $date_query = sprintf('%s...%s', $start_date, $end_date);
+        }
+
+        $args = [
+            'limit'        => -1,
+            'return'       => 'ids',
+        ];
+
+        if ($date_query) {
+            $args['date_created'] = $date_query;
+        }
+
+        $all_orders = wc_get_orders($args);
+        $total_orders = count($all_orders);
+
+        $args['status'] = 'completed';
+        $completed_orders = count(wc_get_orders($args));
+
+        $args['status'] = 'cancelled';
+        $cancelled_orders = count(wc_get_orders($args));
+
+        $args['status'] = 'pending';
+        $pending_orders = count(wc_get_orders($args));
+
+        $results = [
+            'total_orders'      => $total_orders,
+            'completed_orders'  => $completed_orders,
+            'cancelled_orders'  => $cancelled_orders,
+            'pending_orders'    => $pending_orders,
+        ];
+
+        return [
+            'results' => $results,
+        ];
     }
 }

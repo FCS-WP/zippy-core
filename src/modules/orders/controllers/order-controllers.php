@@ -183,11 +183,22 @@ class Order_Controllers
 
     public static function get_orders_by_keyword(WP_REST_Request $request)
     {
-       try {
+        try {
             $infos = Zippy_Request_Helper::get_params($request);
             $data = Order_Services::search_orders($infos);
 
             return Zippy_Response_Handler::success($data, 'Get orders successfully!');
+        } catch (\Exception $e) {
+            return Zippy_Response_Handler::error($e->getMessage());
+        }
+    }
+
+    public static function get_summary_orders(WP_REST_Request $request)
+    {
+        try {
+            $filterParams = Zippy_Request_Helper::get_params($request);
+            $data = Order_Services::get_summary_orders($filterParams);
+            return Zippy_Response_Handler::success($data, 'Get summary orders successfully!');
         } catch (\Exception $e) {
             return Zippy_Response_Handler::error($e->getMessage());
         }

@@ -22,6 +22,7 @@ import FilterOrder from "./FilterOrder";
 import { useOrderProvider } from "../../../context/OrderContext";
 import DateCreatedCell from "./DateCreatedCell";
 import ExportButton from "./ExportButton";
+import SummaryOrders from "./SummaryOrders";
 
 const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
   const [selectedOrders, setSelectedOrders] = useState([]);
@@ -125,6 +126,9 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
           Add Order
         </Button>
       </Box>
+
+      <SummaryOrders />
+
       <Box
         sx={{
           display: "flex",
