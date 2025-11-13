@@ -20,6 +20,7 @@ const getStatusOptions = () => [
   { value: "cancelled", label: "Cancelled" },
   { value: "refunded", label: "Refunded" },
   { value: "failed", label: "Failed" },
+  { value: "trash", label: "Trash" },
 ];
 
 const formatDate = (dateStr) => {

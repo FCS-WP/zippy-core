@@ -104,5 +104,11 @@ class Order_Route extends Core_Route
             // 'permission_callback' => [Core_Middleware::class, 'admin_only'],
             'args' => Order_Arguments::send_order_email_args(),
         ]);
+        register_rest_route(ZIPPY_CORE_API_PREFIX, '/summary-orders', [
+            'methods'  => 'GET',
+            'callback' => [Order_Controllers::class, 'get_summary_orders'],
+            'permission_callback' => [Core_Middleware::class, 'admin_only'],
+            'args' => Order_Arguments::get_summary_orders_args(),
+        ]);
     }
 }
