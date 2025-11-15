@@ -38,7 +38,9 @@ class Zippy_Core
 
     add_action('login_enqueue_scripts', array($this, 'my_login_stylesheet'));
 
-    add_filter('plugin_action_links', array($this, 'disable_plugin_deactivation'), 10, 4); //Prevent deactive 
+    add_filter('plugin_action_links', array($this, 'disable_plugin_deactivation'), 10, 4); //Prevent deactive
+
+    add_filter('rest_authentication_errors',  array($this, 'authentication_rest_api_not_logged_in'));
   }
 
   public function setup_phpmailer_init($phpmailer)
@@ -73,5 +75,22 @@ class Zippy_Core
   </style>';
 
     echo $style;
+  }
+  public function authentication_rest_api_not_logged_in($errors)
+  {
+
+    if (is_wp_error($errors)) {
+      return $errors;
+    }
+
+    if (! is_user_logged_in() || ! current_user_can('administrator')) {
+      return new WP_Error(
+        'no_rest_api_sorry',
+        'REST API not allowed',
+        array('status' => 401)
+      );
+    }
+
+    return $errors;
   }
 }
