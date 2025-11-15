@@ -27,9 +27,14 @@ class Zippy_Wc_Calculate_Helper
     public static function get_tax($priceIncludeTax)
     {
         $tax = self::get_tax_percent();
+
+        if (empty($tax)) {
+            return self::round_price_wc(0);
+        }
+
         $tax_rate = floatval($tax->tax_rate);
-        $shipping_tax = $priceIncludeTax - $priceIncludeTax / (1 + $tax_rate / 100);
-        return self::round_price_wc($shipping_tax);
+        $tax_price = $priceIncludeTax - $priceIncludeTax / (1 + $tax_rate / 100);
+        return self::round_price_wc($tax_price);
     }
 
     /**
@@ -51,7 +56,12 @@ class Zippy_Wc_Calculate_Helper
      */
     public static function get_total_price_including_tax($priceExcludeTax): string
     {
-        $tax       = self::get_tax_percent();
+        $tax = self::get_tax_percent();
+
+        if (empty($tax)) {
+            return self::round_price_wc($priceExcludeTax);
+        }
+
         $tax_rate  = floatval($tax->tax_rate);
         return self::round_price_wc($priceExcludeTax * (1 + $tax_rate / 100));
     }
@@ -76,7 +86,7 @@ class Zippy_Wc_Calculate_Helper
             $all_tax_rates = array_merge($all_tax_rates, $taxes);
         }
 
-        if (empty($all_tax_rates)) return;
+        if (empty($all_tax_rates)) return null;
         return $all_tax_rates[0];
     }
 }

@@ -23,20 +23,12 @@ import { useOrderProvider } from "../../../context/OrderContext";
 import DateCreatedCell from "./DateCreatedCell";
 import ExportButton from "./ExportButton";
 
-const OrdersTable = ({
-  orders,
-  orderBy,
-  orderDirection,
-  handleSort,
-  page,
-  rowsPerPage,
-  handleChangePage,
-  handleChangeRowsPerPage,
-}) => {
+const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [paginatedOrders, setPaginatedOrders] = useState([]);
 
-  const { fromDate, toDate, setFromDate, setToDate } = useOrderProvider();
+  const { totalOrders, rowsPerPage, setRowsPerPage, page, setPage } =
+    useOrderProvider();
 
   useEffect(() => {
     const sorted = [...orders].sort((a, b) => {
@@ -51,10 +43,17 @@ const OrdersTable = ({
       return 0;
     });
 
-    setPaginatedOrders(
-      sorted.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-    );
+    setPaginatedOrders(sorted);
   }, [orders, orderBy, orderDirection, page, rowsPerPage]);
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
   const isAllChecked = () =>
     paginatedOrders.length > 0 &&
@@ -140,12 +139,7 @@ const OrdersTable = ({
           selectedOrders={selectedOrders}
           setOrders={setPaginatedOrders}
         />
-        <FilterOrder
-          fromDate={fromDate}
-          setFromDate={setFromDate}
-          toDate={toDate}
-          setToDate={setToDate}
-        />
+        <FilterOrder />
         <ExportButton />
       </Box>
 
@@ -245,7 +239,7 @@ const OrdersTable = ({
 
       <TablePagination
         component="div"
-        count={orders.length}
+        count={totalOrders}
         page={page}
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}

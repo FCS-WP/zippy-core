@@ -7,26 +7,26 @@ export default function FilterDateRange({
   toDate,
   setToDate,
 }) {
-  const setDateRange = (update) => {
-    if (update[0]) {
-      const from = update[0];
+  const handleSetFromDate = (date) => {
+    if (date) {
       setFromDate(
-        `${from.getFullYear()}-${String(from.getMonth() + 1).padStart(
+        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
           2,
           "0"
-        )}-${String(from.getDate()).padStart(2, "0")}`
+        )}-${String(date.getDate()).padStart(2, "0")}`
       );
     } else {
       setFromDate("");
     }
+  };
 
-    if (update[1]) {
-      const to = update[1];
+  const handleSetToDate = (date) => {
+    if (date) {
       setToDate(
-        `${to.getFullYear()}-${String(to.getMonth() + 1).padStart(
+        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
           2,
           "0"
-        )}-${String(to.getDate()).padStart(2, "0")}`
+        )}-${String(date.getDate()).padStart(2, "0")}`
       );
     } else {
       setToDate("");
@@ -34,14 +34,29 @@ export default function FilterDateRange({
   };
 
   return (
-    <DatePicker
-      startDate={fromDate ? new Date(fromDate) : null}
-      endDate={toDate ? new Date(toDate) : null}
-      onChange={(update) => {
-        setDateRange(update);
-      }}
-      selectsRange
-      isClearable
-    />
+    <>
+      <DatePicker
+        selected={fromDate ? new Date(fromDate) : null}
+        onChange={(date) => handleSetFromDate(date)}
+        isClearable
+        placeholderText="From"
+      />
+      <DatePicker
+        selected={toDate ? new Date(toDate) : null}
+        onChange={(date) => handleSetToDate(date)}
+        isClearable
+        placeholderText="To"
+      />
+    </>
+
+    // <DatePicker
+    //   startDate={fromDate ? new Date(fromDate) : null}
+    //   endDate={toDate ? new Date(toDate) : null}
+    //   onChange={(update) => {
+    //     setDateRange(update);
+    //   }}
+    //   selectsRange
+    //   isClearable
+    // />
   );
 }

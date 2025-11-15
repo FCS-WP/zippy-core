@@ -1,21 +1,33 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Api } from "../api/admin";
-
-const OrderContext = createContext();
+import { OrderContext } from "./CoreContext";
 
 export const OrderProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
+  const [page, setPage] = useState(0);
+  const [totalOrders, setTotalOrders] = useState(0);
   const [loadingOrders, setLoadingOrders] = useState(true);
+  const [status, setStatus] = useState("");
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [filteredOrders, setFilteredOrders] = useState(null);
 
   //Filter
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  const fetchOrders = async (filters) => {
+  const fetchOrders = async () => {
     try {
       setLoadingOrders(true);
-      const res = await Api.getOrders(filters);
-      if (res.data.success) setOrders(res.data.result.orders);
+      const params = {
+        ...filteredOrders,
+        page: page + 1,
+        per_page: rowsPerPage,
+      };
+      const res = await Api.getOrders(params);
+      if (res.data.status === "success") {
+        setOrders(res.data.orders);
+        setTotalOrders(res.data.total_orders);
+      }
     } catch (err) {
       console.error("Error fetching orders:", err);
     } finally {
@@ -25,17 +37,26 @@ export const OrderProvider = ({ children }) => {
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [page, rowsPerPage, filteredOrders]);
 
   const handleFilterOrder = (filters) => {
-    fetchOrders(filters);
+    setPage(0);
+    setFilteredOrders(filters);
   };
 
   const value = {
     orders,
+    totalOrders,
     loadingOrders,
     fromDate,
     toDate,
+    page,
+    rowsPerPage,
+    status,
+    filteredOrders,
+    setRowsPerPage,
+    setStatus,
+    setPage,
     setOrders,
     setFromDate,
     setToDate,

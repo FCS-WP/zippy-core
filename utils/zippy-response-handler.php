@@ -17,15 +17,17 @@ class Zippy_Response_Handler
   // Handle success responses
   public static function success($data, $message = 'Success', $status_code = 200)
   {
-    return new WP_REST_Response(array(
+    $response = [
       'status' => 'success',
       'message' => $message,
-      'data' => $data,
-    ), $status_code);
+    ];
+
+    $response = array_merge($response, (array) $data);
+    return new WP_REST_Response($response, $status_code);
   }
 
   // Handle error responses
-  public static function error($message = 'Error', $status_code = 400)
+  public static function error($message = 'Error', $status_code = 200)
   {
     return new WP_REST_Response(array(
       'status' => 'error',

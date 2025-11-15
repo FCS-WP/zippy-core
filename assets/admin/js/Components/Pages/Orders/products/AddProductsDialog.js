@@ -45,12 +45,13 @@ const AddProductsDialog = ({ onClose, open, orderID }) => {
     setLoading(true);
     try {
       const { data } = await Api.products(params);
+      console.log(data);
 
-      if (data?.status === "success" && Array.isArray(data.data?.data)) {
-        setData(convertRows(data.data.data));
+      if (data?.status === "success" && Array.isArray(data?.data)) {
+        setData(convertRows(data.data));
         setPagination((prev) => ({
           ...prev,
-          total: data.data.pagination?.total || 0,
+          total: data.pagination?.total || 0,
         }));
       } else {
         setData([]);

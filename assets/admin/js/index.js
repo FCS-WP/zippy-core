@@ -1,14 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import Dashboard from "./pages/dashboard/Dashboad";
-import Settings from "./pages/setting/Settings";
-import { ThemeProvider } from "react-bootstrap";
-import OrdersPage from "./pages/orders/OrdersPage";
-import ModuleSettings from "./pages/setting/ModuleSettings";
+import Settings from "./pages/settings/Settings";
+import ModuleSettings from "./pages/settings/ModuleSettings";
 import TableOrderInfo from "./Components/Pages/Orders/order-info/TableOrderInfo";
+import { ToastContainer } from "react-toastify";
+import { OrderProvider } from "./context/OrderContext";
+import Orders from "./pages/orders/Orders";
+import { SettingsProvider } from "../providers/SettingsProvider";
+import CoreSettingOrders from "./pages/settings/CoreSettingOrders";
 
 // Zippy Dashboard
-
 document.addEventListener("DOMContentLoaded", function () {
   const zippyMain = document.getElementById("zippy-main");
 
@@ -34,7 +36,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (zippyOrdersPage) {
     const root = ReactDOM.createRoot(zippyOrdersPage);
-    root.render(<OrdersPage />);
+    root.render(
+      <>
+        <OrderProvider>
+          <Orders />
+          <ToastContainer />
+        </OrderProvider>
+      </>
+    );
   }
 });
 
@@ -45,7 +54,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const root = ReactDOM.createRoot(adminOrderTable);
     const orderId = adminOrderTable.getAttribute("data-order-id");
     const enableEdit = adminOrderTable.getAttribute("data-enable-edit");
-    root.render(<TableOrderInfo orderId={orderId} enableEdit={enableEdit} />);
+    root.render(
+      <>
+        <TableOrderInfo orderId={orderId} enableEdit={enableEdit} />
+        <ToastContainer />
+      </>
+    );
   }
 });
 
@@ -56,6 +70,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (moduelsControl) {
     const root = ReactDOM.createRoot(moduelsControl);
-    root.render(<ModuleSettings />);
+    root.render(
+      <>
+        <SettingsProvider>
+          <ModuleSettings />
+          <ToastContainer />
+        </SettingsProvider>
+      </>
+    );
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const orderPage = document.getElementById("core_settings_orders");
+
+  if (orderPage) {
+    const root = ReactDOM.createRoot(orderPage);
+    root.render(
+     <>
+        <SettingsProvider>
+          <CoreSettingOrders />
+          <ToastContainer />
+        </SettingsProvider>
+      </>
+    );
   }
 });

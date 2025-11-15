@@ -26,15 +26,16 @@ class Product_Route extends Core_Route
                 ],
             ],
         ]);
-        register_rest_route(ZIPPY_CORE_API_PREFIX, '/product', array(
-            'methods' => 'GET',
-            'callback' => [Product_Controllers::class, 'get_product'],
-            'permission_callback' => [Core_Middleware::class, 'admin_only'],
-        ));
         register_rest_route(ZIPPY_CORE_API_PREFIX, '/categories', array(
             'methods' => 'GET',
             'callback' => [Product_Controllers::class, 'get_categories'],
             'permission_callback' => [Core_Middleware::class, 'admin_only'],
+            'args' => [
+                'category' => [
+                    'default' => 0,
+                    'sanitize_callback' => 'absint',
+                ],
+            ],
         ));
     }
 }

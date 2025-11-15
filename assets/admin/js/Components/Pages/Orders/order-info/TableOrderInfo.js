@@ -17,8 +17,9 @@ import OrderProductRow from "./OrderProductRow";
 import OrderSummary from "./OrderSummary";
 import { Api } from "../../../../api/admin";
 import ButtonAddProducts from "../products/ButtonAddProducts";
+import DownloadInvoiceButton from "../DownloadInvoiceButton";
 
-const TableOrder = ({ orderId, enableEdit }) => {
+const TableOrderInfo = ({ orderId, enableEdit }) => {
   const [orderInfo, setOrderInfo] = useState(null);
   const [editingItemId, setEditingItemId] = useState(null);
   const [tempQuantity, setTempQuantity] = useState(0);
@@ -77,19 +78,11 @@ const TableOrder = ({ orderId, enableEdit }) => {
     );
   }
 
-  if (!orderInfo) {
-    return (
-      <Box textAlign="center" py={3}>
-        <Typography>No order data available.</Typography>
-      </Box>
-    );
-  }
-
-  const products = Object.entries(orderInfo.products || {});
-  const shipping = orderInfo.shipping || [];
-  const fees = orderInfo.fees || [];
-  const coupons = orderInfo.coupons || [];
-  const priceOrderInfo = orderInfo.order_info || {};
+  const products = Object.entries(orderInfo?.products || {});
+  const shipping = orderInfo?.shipping || [];
+  const fees = orderInfo?.fees || [];
+  const coupons = orderInfo?.coupons || [];
+  const priceOrderInfo = orderInfo?.order_info || {};
 
   // Calculate totals per product
   const subtotal = priceOrderInfo?.subtotal;
@@ -174,21 +167,29 @@ const TableOrder = ({ orderId, enableEdit }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {products.map(([item_id, item]) => (
-              <OrderProductRow
-                key={item_id}
-                item_id={item_id}
-                item={item}
-                editingItemId={editingItemId}
-                tempQuantity={tempQuantity}
-                setTempQuantity={setTempQuantity}
-                setEditingItemId={setEditingItemId}
-                orderId={orderId}
-                refreshOrderInfo={getOrderInfo}
-                handleDeleteItem={handleDeleteItem}
-                enableEdit={enableEdit}
-              />
-            ))}
+            {!products || products.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
+                  <Typography>No order data available.</Typography>
+                </TableCell>
+              </TableRow>
+            ) : (
+              products.map(([item_id, item]) => (
+                <OrderProductRow
+                  key={item_id}
+                  item_id={item_id}
+                  item={item}
+                  editingItemId={editingItemId}
+                  tempQuantity={tempQuantity}
+                  setTempQuantity={setTempQuantity}
+                  setEditingItemId={setEditingItemId}
+                  orderId={orderId}
+                  refreshOrderInfo={getOrderInfo}
+                  handleDeleteItem={handleDeleteItem}
+                  enableEdit={enableEdit}
+                />
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
@@ -206,6 +207,7 @@ const TableOrder = ({ orderId, enableEdit }) => {
         <Box sx={{ p: 2, display: "flex", justifyContent: "flex-end", gap: 2 }}>
           <ApplyCouponButton onApply={handleApplyCoupon} />
           <ButtonAddProducts orderID={orderId} />
+          <DownloadInvoiceButton orderID={orderId} />
         </Box>
       ) : (
         <Box
@@ -225,4 +227,4 @@ const TableOrder = ({ orderId, enableEdit }) => {
   );
 };
 
-export default TableOrder;
+export default TableOrderInfo;
