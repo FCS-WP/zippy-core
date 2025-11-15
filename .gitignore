@@ -6,3 +6,7 @@ node_modules
 assets/dist
 
 composer.lock
+
+vendor
+
+yarn.lock
