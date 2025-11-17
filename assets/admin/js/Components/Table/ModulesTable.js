@@ -16,7 +16,7 @@ const ModulesTable = () => {
 
   const [tableConfig, setTableConfig] = useState({
     page: 1,
-    itemsPerPage: 10,
+    itemsPerPage: 5,
     totalItems: 0,
     title: "Modules",
     headCells: settingsHeadcells,
