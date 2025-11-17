@@ -37,8 +37,6 @@ export const OrderProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    console.log(filteredOrders);
-
     fetchOrders();
   }, [page, rowsPerPage, filteredOrders]);
 
