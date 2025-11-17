@@ -224,9 +224,8 @@ export default function TableViewV2({ tableConfig, dataRows, onUpdateTable, onSe
   );
 
   const handlePagination = (value) => {
-    const newPage = tableConfig.page + value;
-    if (newPage > 0 && newPage <= maxPage) {
-      onUpdateTable({ page: tableConfig.page + value });
+    if (value > 0 && value <= maxPage) {
+      onUpdateTable({ page: value });
     }
   };
 
@@ -322,18 +321,9 @@ export default function TableViewV2({ tableConfig, dataRows, onUpdateTable, onSe
                 </TableBody>
               </Table>
             </TableContainer>
-            <Box p={2} display={"flex"} justifyContent={"end"}>
-              <Button onClick={() => handleChangeRowsPerPage(5)}>5 rows</Button>
-              <Button onClick={() => handleChangeRowsPerPage(10)}>
-                10 rows
-              </Button>
-              <Button onClick={() => handleChangeRowsPerPage(15)}>
-                15 rows
-              </Button>
-              <Button onClick={() => handlePagination(1)}>Next</Button>
-              <Button onClick={() => handlePagination(-1)}>Prev</Button>
-            </Box>
             <TableViewV2Pagination
+              onChangeRowsPerPage={handleChangeRowsPerPage}
+              onChangePage={handlePagination}
               currentPage={page}
               rowsPerPage={rowsPerPage}
               totalRows={totalItems}
