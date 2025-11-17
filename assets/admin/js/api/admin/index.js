@@ -61,8 +61,10 @@ export const Api = {
   async downloadInvoice(params) {
     return await makeRequest("/download-invoice", params, "POST");
   },
+  async getSummaryOrders(params) {
+    return await makeRequest("/summary-orders", params);
+  },
 };
-
 
 export const SettingApi = {
   async getModulesConfigs(params) {
@@ -70,7 +72,7 @@ export const SettingApi = {
   },
 
   async updateModulesConfigs(params) {
-    return await makeRequest("/core-settings", params, 'POST');
+    return await makeRequest("/core-settings", params, "POST");
   },
 
   // Invoices
@@ -78,14 +80,14 @@ export const SettingApi = {
     return await makeRequest("/core-settings/orders/invoices", params);
   },
   async updateInvoiceOptions(params) {
-    return await makeRequest("/core-settings/orders/invoices", params, 'POST');
+    return await makeRequest("/core-settings/orders/invoices", params, "POST");
   },
 
   // Orders Details
   async getOrderDetailSettings(params) {
-    return await makeRequest("core-settings/orders/details")
+    return await makeRequest("core-settings/orders/details");
   },
   async updateDetailSettings(params) {
-    return await makeRequest("/core-settings/orders/details", params, 'POST');
+    return await makeRequest("/core-settings/orders/details", params, "POST");
   },
-}
+};
