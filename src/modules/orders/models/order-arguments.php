@@ -33,6 +33,9 @@ class Order_Arguments
             'date_to' => [
                 'sanitize_callback' => 'sanitize_text_field',
             ],
+            'customer_id' => [
+                'sanitize_callback' => 'absint',
+            ],
         ];
     }
 
@@ -211,6 +214,16 @@ class Order_Arguments
             ],
             'date_to' => [
                 'required' => false,
+                'type' => 'string',
+            ],
+        ];
+    }
+
+    public static function get_search_customers_args()
+    {
+        return [
+            'q' => [
+                'required' => true,
                 'type' => 'string',
             ],
         ];

@@ -1,7 +1,13 @@
 import { Box, Typography } from "@mui/material";
 import React from "react";
+import { statusColors } from "../../../const/pages/orders/order-constants";
 
-const SummaryCard = ({ title, value }) => {
+const SummaryCard = ({ title, value, status }) => {
+  const info = statusColors[status] || {};
+
+  const borderColor = info.customColor || (info.color ? info.color : "#ccc");
+  const textColor = info.customColor || undefined;
+
   return (
     <Box
       sx={{
@@ -9,8 +15,10 @@ const SummaryCard = ({ title, value }) => {
         p: 2,
         m: 1,
         bgcolor: "#fff",
+        color: textColor,
         borderRadius: 2,
-        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+        border: `2px solid ${borderColor}`,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
         minWidth: 150,
       }}
     >

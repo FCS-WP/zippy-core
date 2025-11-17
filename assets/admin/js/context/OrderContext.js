@@ -10,6 +10,7 @@ export const OrderProvider = ({ children }) => {
   const [status, setStatus] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filteredOrders, setFilteredOrders] = useState(null);
+  const [customerSearchSelected, setCustomerSearchSelected] = useState(null);
 
   //Filter
   const [fromDate, setFromDate] = useState("");
@@ -36,6 +37,8 @@ export const OrderProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    console.log(filteredOrders);
+
     fetchOrders();
   }, [page, rowsPerPage, filteredOrders]);
 
@@ -54,6 +57,7 @@ export const OrderProvider = ({ children }) => {
     rowsPerPage,
     status,
     filteredOrders,
+    customerSearchSelected,
     setRowsPerPage,
     setStatus,
     setPage,
@@ -62,6 +66,7 @@ export const OrderProvider = ({ children }) => {
     setToDate,
     handleFilterOrder,
     fetchOrders,
+    setCustomerSearchSelected,
   };
 
   return (

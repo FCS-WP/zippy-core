@@ -7,6 +7,7 @@ use WC_Tax;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Zippy_Core\Utils\Zippy_Wc_Calculate_Helper;
+use Automattic\WooCommerce\Admin\Overrides\OrderRefund;
 
 class Order_Services
 {
@@ -19,6 +20,7 @@ class Order_Services
         $order_status = $infos['order_status'] ?? null;
         $date_from    = $infos['date_from'] ?? null;
         $date_to      = $infos['date_to'] ?? null;
+        $customer_id  = $infos['customer_id'] ?? null;
 
         $args = [
             'limit'   => $per_page,
@@ -41,11 +43,19 @@ class Order_Services
             $args['date_created'] = '<' . $date_to . ' 23:59:59';
         }
 
+        if (!empty($customer_id)) {
+            $args['customer_id'] = $customer_id;
+        }
+
         $orders = wc_get_orders($args);
 
         $data = [];
 
         foreach ($orders as $order) {
+            if ($order instanceof OrderRefund) {
+                continue;
+            }
+
             $data[] = self::parse_order_data($order);
         }
 
@@ -74,7 +84,7 @@ class Order_Services
         );
     }
 
-    public static function parse_order_data(\WC_Order $order)
+    public static function parse_order_data($order)
     {
         $billing  = $order->get_address('billing');
         $shipping = $order->get_address('shipping');
@@ -190,6 +200,10 @@ class Order_Services
 
         $order_rows = [];
         foreach ($orders as $order) {
+            if ($order instanceof OrderRefund) {
+                continue;
+            }
+
             $order_rows[] = [
                 'order_id'       => $order->get_id(),
                 'phone'          => $order->get_billing_phone(),
@@ -443,6 +457,30 @@ class Order_Services
             'cancelled_orders' => $cancelled_orders,
             'pending_orders'   => $pending_orders,
         ];
+
+        return [
+            'results' => $results,
+        ];
+    }
+
+    public static function search_customers($q)
+    {
+        $customers = get_users([
+            'role'           => 'customer',
+            'search'         => '*' . esc_attr($q) . '*',
+            'search_columns' => ['user_email', 'display_name', 'user_login'],
+            'orderby'        => 'user_registered',
+            'order'          => 'DESC',
+        ]);
+
+        $results = [];
+
+        foreach ($customers as $customer) {
+            $results[] = [
+                'id'    => $customer->ID,
+                'label' =>  $customer->display_name . ' (' . $customer->user_email . ')',
+            ];
+        }
 
         return [
             'results' => $results,
