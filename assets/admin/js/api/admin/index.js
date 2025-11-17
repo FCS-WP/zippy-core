@@ -64,6 +64,9 @@ export const Api = {
   async getSummaryOrders(params) {
     return await makeRequest("/summary-orders", params);
   },
+  async searchCustomers(params) {
+    return await makeRequest("/search-customers", params);
+  },
 };
 
 export const SettingApi = {

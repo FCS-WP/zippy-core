@@ -168,7 +168,7 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
                 { id: "order_number", label: "Order #" },
                 { id: "phone_number", label: "Phone Number" },
                 { id: "status", label: "Status" },
-                { id: "total", label: "Total (VND)" },
+                { id: "total", label: "Total" },
                 { id: "payment_method", label: "Payment Method" },
                 { id: "shipping_info", label: "Shipping Info" },
                 { id: "date_created", label: "Date Created" },
@@ -225,7 +225,23 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
                 </TableCell>
 
                 <TableCell>
-                  {parseInt(order.total).toLocaleString()} {order.currency}
+                  {order.status === "refunded" ? (
+                    <>
+                      <span
+                        style={{
+                          textDecoration: "line-through",
+                          marginRight: 6,
+                        }}
+                      >
+                        {parseInt(order.total).toLocaleString()}
+                      </span>
+                      0 {order.currency}
+                    </>
+                  ) : (
+                    <>
+                      {parseInt(order.total).toLocaleString()} {order.currency}
+                    </>
+                  )}
                 </TableCell>
 
                 <TableCell>{order.payment_method?.title || "N/A"}</TableCell>

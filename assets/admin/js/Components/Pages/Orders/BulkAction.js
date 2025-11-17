@@ -2,19 +2,11 @@ import React, { useState } from "react";
 import { Button, Select, MenuItem, FormControl, Stack } from "@mui/material";
 import { toast } from "react-toastify";
 import { Api } from "../../../api/admin";
+import { statusWooCommerceOrders } from "../../../const/pages/orders/order-constants";
 
 const BulkAction = ({ selectedOrders, setOrders }) => {
   const [action, setAction] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const statusOptions = {
-    "wc-pending": "Pending payment",
-    "wc-processing": "Processing",
-    "wc-on-hold": "On hold",
-    "wc-packed": "Packed",
-    "wc-completed": "Completed",
-    "wc-cancelled": "Cancelled",
-  };
 
   const getStatusFromAction = (action) => {
     return action.replace(/^wc-/, "");
@@ -90,8 +82,8 @@ const BulkAction = ({ selectedOrders, setOrders }) => {
       ? "Move to Trash"
       : action === "restore"
       ? "Restore from Trash"
-      : statusOptions[action]
-      ? `Change to ${statusOptions[action]}`
+      : statusWooCommerceOrders[action]
+      ? `Change to ${statusWooCommerceOrders[action]}`
       : "Apply Action";
 
   return (
@@ -112,7 +104,7 @@ const BulkAction = ({ selectedOrders, setOrders }) => {
           }}
         >
           <MenuItem value="">Bulk Actions</MenuItem>
-          {Object.entries(statusOptions).map(([key, label]) => (
+          {Object.entries(statusWooCommerceOrders).map(([key, label]) => (
             <MenuItem key={key} value={key}>
               Change status to {label}
             </MenuItem>
@@ -134,7 +126,7 @@ const BulkAction = ({ selectedOrders, setOrders }) => {
           boxShadow: "none",
           "&:hover": { background: "#e1e4e6", boxShadow: "none" },
           "@media (max-width: 600px)": {
-            height: "40px",
+            height: "32px",
             fontSize: "10px",
           },
         }}

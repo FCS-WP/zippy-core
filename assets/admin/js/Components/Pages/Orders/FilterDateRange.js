@@ -40,12 +40,15 @@ export default function FilterDateRange({
         onChange={(date) => handleSetFromDate(date)}
         isClearable
         placeholderText="From"
+        wrapperClassName="date-input"
       />
+
       <DatePicker
         selected={toDate ? new Date(toDate) : null}
         onChange={(date) => handleSetToDate(date)}
         isClearable
         placeholderText="To"
+        wrapperClassName="date-input"
       />
     </>
 

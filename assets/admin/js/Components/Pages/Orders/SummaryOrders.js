@@ -31,25 +31,21 @@ const SummaryOrders = () => {
 
   return (
     <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, paddingBottom: 2 }}>
-      <SummaryCard
-        title="Total Orders"
-        value={orderSummary.total_orders}
-        changeText="last week"
-      />
+      <SummaryCard title="Total Orders" value={orderSummary.total_orders} />
       <SummaryCard
         title="Pending Orders"
         value={orderSummary.pending_orders}
-        changeText="last week"
+        status="pending"
       />
       <SummaryCard
         title="Completed Orders"
         value={orderSummary.completed_orders}
-        changeText="last week"
+        status="completed"
       />
       <SummaryCard
         title="Cancelled Orders"
         value={orderSummary.cancelled_orders}
-        changeText="last week"
+        status="cancelled"
       />
     </Box>
   );

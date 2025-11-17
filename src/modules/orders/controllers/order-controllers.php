@@ -208,4 +208,20 @@ class Order_Controllers
             return Zippy_Response_Handler::error($e->getMessage());
         }
     }
+
+    public static function search_customers(WP_REST_Request $request)
+    {
+        try {
+            $q = $request->get_param('q');
+            $data = Order_Services::search_customers($q);
+
+            if (empty($data)) {
+                return Zippy_Response_Handler::error('Customer not found.');
+            }
+
+            return Zippy_Response_Handler::success($data, 'Get customer successfully!');
+        } catch (\Exception $e) {
+            return Zippy_Response_Handler::error($e->getMessage());
+        }
+    }
 }
