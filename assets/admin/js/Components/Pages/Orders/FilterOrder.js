@@ -15,21 +15,23 @@ import CustomerFilterOrder from "./CustomerFilterOrder";
 
 const formatDate = (dateStr) => {
   if (!dateStr) return "";
+
+  dateStr = `${dateStr.getFullYear()}-${String(dateStr.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(dateStr.getDate()).padStart(2, "0")}`;
+
   const [y, m, d] = dateStr.split("-");
   return `${y}-${m}-${d}`;
 };
 
 const FilterOrder = () => {
-  const {
-    handleFilterOrder,
-    fromDate,
-    toDate,
-    setFromDate,
-    setToDate,
-    status,
-    setStatus,
-    customerSearchSelected,
-  } = useOrderProvider();
+  const { filteredOrders, handleFilterOrder } = useOrderProvider();
+
+  const [status, setStatus] = useState("");
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+  const [customerSearchSelected, setCustomerSearchSelected] = useState(null);
 
   const onFilter = () => {
     handleFilterOrder({
@@ -37,8 +39,22 @@ const FilterOrder = () => {
       date_to: formatDate(toDate),
       order_status: status,
       customer_id: customerSearchSelected ? customerSearchSelected.id : null,
+      customer_selected: customerSearchSelected,
     });
   };
+
+  useEffect(() => {
+    if (filteredOrders) {
+      setStatus(filteredOrders.order_status || "");
+      setFromDate(
+        filteredOrders.date_from ? new Date(filteredOrders.date_from) : null
+      );
+      setToDate(
+        filteredOrders.date_to ? new Date(filteredOrders.date_to) : null
+      );
+      setCustomerSearchSelected(filteredOrders.customer_selected || null);
+    }
+  }, [filteredOrders]);
 
   return (
     <Stack
@@ -81,7 +97,10 @@ const FilterOrder = () => {
       </FormControl>
 
       {/* Filter by customer email */}
-      <CustomerFilterOrder />
+      <CustomerFilterOrder
+        customerSearchSelected={customerSearchSelected}
+        setCustomerSearchSelected={setCustomerSearchSelected}
+      />
 
       {/* Filter button */}
       <Button

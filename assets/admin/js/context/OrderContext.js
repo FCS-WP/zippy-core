@@ -5,16 +5,11 @@ import { OrderContext } from "./CoreContext";
 export const OrderProvider = ({ children }) => {
   const [orders, setOrders] = useState([]);
   const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalOrders, setTotalOrders] = useState(0);
   const [loadingOrders, setLoadingOrders] = useState(true);
-  const [status, setStatus] = useState("");
-  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [filteredOrders, setFilteredOrders] = useState(null);
-  const [customerSearchSelected, setCustomerSearchSelected] = useState(null);
 
-  //Filter
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
 
   const fetchOrders = async () => {
     try {
@@ -49,22 +44,14 @@ export const OrderProvider = ({ children }) => {
     orders,
     totalOrders,
     loadingOrders,
-    fromDate,
-    toDate,
     page,
     rowsPerPage,
-    status,
     filteredOrders,
-    customerSearchSelected,
     setRowsPerPage,
-    setStatus,
     setPage,
     setOrders,
-    setFromDate,
-    setToDate,
     handleFilterOrder,
     fetchOrders,
-    setCustomerSearchSelected,
   };
 
   return (
