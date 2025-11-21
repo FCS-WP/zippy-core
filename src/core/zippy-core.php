@@ -5,6 +5,7 @@ namespace Zippy_Core\Src\Core;
 use Zippy_Core\Src\Core\Zippy_Admin;
 use Zippy_Core\Src\Core\Zippy_Optimise;
 use Zippy_Core\Src\Core\Zippy_Settings;
+use Dotenv\Dotenv;
 
 
 defined('ABSPATH') or die();
@@ -22,6 +23,11 @@ class Zippy_Core
     if (is_null(self::$_instance)) {
       self::$_instance = new self();
     }
+
+    // Load project_ENV
+    $dotenv = Dotenv::createImmutable(ABSPATH);
+    $dotenv->safeLoad();
+
     return self::$_instance;
   }
 
@@ -31,14 +37,15 @@ class Zippy_Core
     new Zippy_Admin;
     new Zippy_Optimise;
 
-
     add_action('phpmailer_init', array($this, 'setup_phpmailer_init'));
 
     add_filter('login_headerurl', array($this, 'custom_loginlogo_url'));
 
     add_action('login_enqueue_scripts', array($this, 'my_login_stylesheet'));
 
-    add_filter('plugin_action_links', array($this, 'disable_plugin_deactivation'), 10, 4); //Prevent deactive 
+    add_filter('plugin_action_links', array($this, 'disable_plugin_deactivation'), 10, 4); //Prevent deactive
+
+    add_filter('rest_authentication_errors',  array($this, 'remove_rest_api_users'));
   }
 
   public function setup_phpmailer_init($phpmailer)
@@ -73,5 +80,19 @@ class Zippy_Core
   </style>';
 
     echo $style;
+  }
+
+  function remove_rest_api_users($rest_endpoints)
+  {
+
+    if (isset($rest_endpoints['/wp/v2/users'])) {
+      unset($rest_endpoints['/wp/v2/users']);
+    }
+
+    if (isset($rest_endpoints['/wp/v2/users/(?P<id>[\d]+)'])) {
+      unset($rest_endpoints['/wp/v2/users/(?P<id>[\d]+)']);
+    }
+
+    return $rest_endpoints;
   }
 }

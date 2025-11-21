@@ -8,8 +8,6 @@
 
 namespace Zippy_Core\Src\Core;
 
-use WP_User;
-
 defined('ABSPATH') or die();
 
 class Zippy_Admin
@@ -35,7 +33,7 @@ class Zippy_Admin
 		add_action('admin_init', [$this, 'hide_acf_options_menu'], 99);
 
 		//Disable search engines from indexing this site (Only for staging domain)
-		//add_action('admin_init', [$this, 'disable_search_engine_indexing']);
+		add_action('admin_init', [$this, 'disable_search_engine_indexing']);
 
 		/*  Disable All Update Notifications with Code  */
 
@@ -60,9 +58,9 @@ class Zippy_Admin
 
 	public function disable_search_engine_indexing()
 	{
-		$current_domain = $_SERVER['HTTP_HOST'] ?? '';
+		if (!isset($_ENV['SITE_MODE']) || empty($_ENV['SITE_MODE'])) return;
 
-		if (strpos($current_domain, getenv('ZIPPY_CORE_STAGING_DOMAIN')) !== false) {
+		if ($_ENV['SITE_MODE'] == 'local') {
 			update_option('blog_public', 0);
 		} else {
 			update_option('blog_public', 1);
