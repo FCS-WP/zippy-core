@@ -3,7 +3,9 @@
 namespace Zippy_Core\Src\User;
 
 defined('ABSPATH') or die();
+
 use Zippy_Core\Utils\Zippy_Utils_Core;
+
 class Zippy_User_Account_Expiry
 {
     protected static $_instance = null;
@@ -191,14 +193,18 @@ class Zippy_User_Account_Expiry
 
     public function initialize_datepicker()
     {
-    ?>
-        <script type="text/javascript">
-            jQuery(document).ready(function($) {
-                $('.datepicker').datepicker({
-                    dateFormat: 'dd/mm/yy'
+        // is not user page
+        if (isset($_GET['user_id'])) : ?>
+
+            <script type="text/javascript">
+                jQuery(document).ready(function($) {
+                    $('.datepicker').datepicker({
+                        dateFormat: 'dd/mm/yy'
+                    });
                 });
-            });
-        </script>
+            </script>
+
+        <?php endif; ?>
 <?php
     }
 
