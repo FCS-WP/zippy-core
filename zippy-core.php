@@ -63,6 +63,15 @@ if (!defined('ZIPPY_CORE_API_PREFIX')) {
   define('ZIPPY_CORE_API_PREFIX', 'zippy-core/v2');
 }
 
+/* Set API Portal prefix url */
+if (!defined('PORTAL_CUSTOM_NAMESPACE')) {
+  define('PORTAL_CUSTOM_NAMESPACE', 'portal/v1');
+}
+if (!defined('PORTAL_INTERNAL_URL')) {
+  define('PORTAL_INTERNAL_URL', 'http://host.docker.internal:8000');
+}
+
+
 
 /* ------------------------------------------
 // i18n
@@ -98,6 +107,7 @@ use Zippy_Core\Src\User\Zippy_MPDA_Consent;
 use Zippy_Core\Src\User\Zippy_User_Account_Expiry;
 
 use Zippy_Core\Src\Analytics\Zippy_Analytics;
+
 use Zippy_Core\Src\Woocommerce\Zippy_Woocommerce;
 
 use YahnisElsts\PluginUpdateChecker\v5p6\PucFactory;
@@ -149,6 +159,7 @@ Zippy_User_Account_Expiry::get_instance();
 Zippy_Analytics::get_instance();
 
 Zippy_Woocommerce::get_instance();
+
 
 
 /**

@@ -5,6 +5,8 @@ namespace Zippy_Core\Src\Core;
 use Zippy_Core\Src\Core\Zippy_Admin;
 use Zippy_Core\Src\Core\Zippy_Optimise;
 use Zippy_Core\Src\Core\Zippy_Settings;
+use Zippy_Core\Src\Core\Portal_Gateway;
+
 use Dotenv\Dotenv;
 
 
@@ -36,6 +38,7 @@ class Zippy_Core
     new Zippy_Settings;
     new Zippy_Admin;
     new Zippy_Optimise;
+    new Portal_Gateway;
 
     add_action('phpmailer_init', array($this, 'setup_phpmailer_init'));
 
