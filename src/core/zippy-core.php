@@ -5,6 +5,8 @@ namespace Zippy_Core\Src\Core;
 use Zippy_Core\Src\Core\Zippy_Admin;
 use Zippy_Core\Src\Core\Zippy_Optimise;
 use Zippy_Core\Src\Core\Zippy_Settings;
+use Zippy_Core\Src\Core\Portal_Gateway;
+
 use Dotenv\Dotenv;
 
 
@@ -43,9 +45,17 @@ class Zippy_Core
 
     add_action('login_enqueue_scripts', array($this, 'my_login_stylesheet'));
 
+    add_action('init', array($this, 'init_portal_gateway'));
+
     add_filter('plugin_action_links', array($this, 'disable_plugin_deactivation'), 10, 4); //Prevent deactive
 
     add_filter('rest_authentication_errors',  array($this, 'remove_rest_api_users'));
+  }
+
+
+  public function init_portal_gateway()
+  {
+    new Portal_Gateway();
   }
 
   public function setup_phpmailer_init($phpmailer)
@@ -53,7 +63,7 @@ class Zippy_Core
     $phpmailer->Host = 'smtp.gmail.com';
     $phpmailer->Port = 587;
     $phpmailer->Username = 'dev@zippy.sg';
-    $phpmailer->Password = 'cqoyfqhbywzguowa';
+    $phpmailer->Password = 'obmndywxkcywmean';
     $phpmailer->SMTPAuth = true;
     $phpmailer->SMTPSecure = 'tls';
     $phpmailer->IsSMTP();
