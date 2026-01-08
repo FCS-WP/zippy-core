@@ -38,7 +38,6 @@ class Zippy_Core
     new Zippy_Settings;
     new Zippy_Admin;
     new Zippy_Optimise;
-    new Portal_Gateway;
 
     add_action('phpmailer_init', array($this, 'setup_phpmailer_init'));
 
@@ -46,9 +45,17 @@ class Zippy_Core
 
     add_action('login_enqueue_scripts', array($this, 'my_login_stylesheet'));
 
+    add_action('init', array($this, 'init_portal_gateway'));
+
     add_filter('plugin_action_links', array($this, 'disable_plugin_deactivation'), 10, 4); //Prevent deactive
 
     add_filter('rest_authentication_errors',  array($this, 'remove_rest_api_users'));
+  }
+
+
+  public function init_portal_gateway()
+  {
+    new Portal_Gateway();
   }
 
   public function setup_phpmailer_init($phpmailer)
