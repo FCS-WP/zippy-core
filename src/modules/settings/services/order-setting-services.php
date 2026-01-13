@@ -14,7 +14,7 @@ class Order_Setting_Services
     {
         $init_configs = [
             'invoice-logo' => [
-                "value" => esc_url(wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0]),
+                "value" => esc_url(self::get_custom_logo_url()),
                 "type" => 'link',
                 "position" => 'logo'
             ],
@@ -43,6 +43,14 @@ class Order_Setting_Services
             $existing = $init_configs;
         }
         return $existing;
+    }
+
+    public static function get_custom_logo_url()
+    {
+        $logo_id = get_theme_mod('custom_logo');
+        if (!$logo_id) return '';
+        $src = wp_get_attachment_image_src($logo_id, 'full');
+        return is_array($src) ? $src[0] : '';
     }
 
     public static function init_order_detail_option()
@@ -78,7 +86,7 @@ class Order_Setting_Services
             $value = $type == 'link' ? esc_url($new_item['data']['value']) : $new_item['data']['value'];
 
             if ($key == 'invoice-logo' && empty($value)) {
-                $value = esc_url(wp_get_attachment_image_src(get_theme_mod('custom_logo'), 'full')[0]);
+                $value = esc_url(self::get_custom_logo_url());
             }
 
             $new_config[$key] = [
