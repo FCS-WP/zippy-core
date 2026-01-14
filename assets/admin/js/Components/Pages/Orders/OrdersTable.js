@@ -168,6 +168,7 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
                 { id: "payment_method", label: "Payment Method" },
                 { id: "shipping_info", label: "Shipping Info" },
                 { id: "date_created", label: "Date Created" },
+                { id: "source", label: "Source" },
               ].map((col) => (
                 <TableCell
                   key={col.id}
@@ -221,7 +222,7 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
                 </TableCell>
 
                 <TableCell>
-                  {parseInt(order.total).toLocaleString()} {order.currency}
+                  {(order.total).toLocaleString()} {order.currency}
                 </TableCell>
 
                 <TableCell>{order.payment_method?.title || "N/A"}</TableCell>
@@ -231,6 +232,7 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
                 <TableCell>
                   <DateCreatedCell dateString={order.date_created} />
                 </TableCell>
+                <TableCell>{order.source || "website"}</TableCell>
               </TableRow>
             ))}
           </TableBody>
