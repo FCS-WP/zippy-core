@@ -7,6 +7,7 @@ use WC_Tax;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Zippy_Core\Utils\Zippy_Wc_Calculate_Helper;
+use Automattic\WooCommerce\Admin\Overrides\OrderRefund;
 
 class Order_Services
 {
@@ -19,6 +20,7 @@ class Order_Services
         $order_status = $infos['order_status'] ?? null;
         $date_from    = $infos['date_from'] ?? null;
         $date_to      = $infos['date_to'] ?? null;
+        $customer_id  = $infos['customer_id'] ?? null;
 
         $args = [
             'limit'   => $per_page,
@@ -41,11 +43,19 @@ class Order_Services
             $args['date_created'] = '<' . $date_to . ' 23:59:59';
         }
 
+        if (!empty($customer_id)) {
+            $args['customer_id'] = $customer_id;
+        }
+
         $orders = wc_get_orders($args);
 
         $data = [];
 
         foreach ($orders as $order) {
+            if ($order instanceof OrderRefund) {
+                continue;
+            }
+
             $data[] = self::parse_order_data($order);
         }
 
@@ -74,7 +84,7 @@ class Order_Services
         );
     }
 
-    public static function parse_order_data(\WC_Order $order)
+    public static function parse_order_data($order)
     {
         $billing  = $order->get_address('billing');
         $shipping = $order->get_address('shipping');
@@ -132,6 +142,7 @@ class Order_Services
     {
         $order_ids = $data['order_ids'] ?? [];
         $status    = $data['status'] ?? '';
+        $action    = $data['action'] ?? '';
 
         $valid_statuses = wc_get_order_statuses();
         if (!array_key_exists($status, $valid_statuses)) {
@@ -141,6 +152,10 @@ class Order_Services
         $updated_orders = [];
         foreach ($order_ids as $order_id) {
             $order = wc_get_order($order_id);
+            if ($action == 'restore' && $order && $order->get_status() !== 'trash') {
+                return [];
+            }
+
             if ($order) {
                 $order->update_status($status, 'Order status updated via API', true);
                 $updated_orders[] = $order_id;
@@ -185,6 +200,10 @@ class Order_Services
 
         $order_rows = [];
         foreach ($orders as $order) {
+            if ($order instanceof OrderRefund) {
+                continue;
+            }
+
             $order_rows[] = [
                 'order_id'       => $order->get_id(),
                 'phone'          => $order->get_billing_phone(),
@@ -330,9 +349,7 @@ class Order_Services
         return $trashed;
     }
 
-    public static function search_orders($infos) {
-        
-    }
+    public static function search_orders($infos) {}
 
 
     public static function custom_send_wc_email($order_id,  $email_type)
@@ -405,5 +422,68 @@ class Order_Services
 
         $sent = wp_mail($to, $subject, $wrapped_message, $headers);
         return $sent;
+    }
+
+    public static function get_summary_orders($filters)
+    {
+        global $wpdb;
+
+        $start_date = !empty($filters['date_from']) ? $filters['date_from'] : null;
+        $end_date   = !empty($filters['date_to']) ? $filters['date_to'] : null;
+
+        $table = $wpdb->prefix . 'wc_orders';
+        $where = "WHERE 1=1";
+
+        $where .= " AND status NOT IN ('trash', 'auto-draft')";
+
+        if ($start_date) {
+            $end_date = $end_date ?: gmdate('Y-m-d');
+            $where .= $wpdb->prepare(
+                " AND date_created_gmt BETWEEN %s AND %s",
+                $start_date . ' 00:00:00',
+                $end_date . ' 23:59:59'
+            );
+        }
+
+        $total_orders = (int) $wpdb->get_var("SELECT COUNT(*) FROM $table $where");
+
+        $completed_orders = (int) $wpdb->get_var("SELECT COUNT(*) FROM $table $where AND status = 'wc-completed'");
+        $cancelled_orders = (int) $wpdb->get_var("SELECT COUNT(*) FROM $table $where AND status = 'wc-cancelled'");
+        $pending_orders   = (int) $wpdb->get_var("SELECT COUNT(*) FROM $table $where AND status = 'wc-pending'");
+
+        $results = [
+            'total_orders'     => $total_orders,
+            'completed_orders' => $completed_orders,
+            'cancelled_orders' => $cancelled_orders,
+            'pending_orders'   => $pending_orders,
+        ];
+
+        return [
+            'results' => $results,
+        ];
+    }
+
+    public static function search_customers($q)
+    {
+        $customers = get_users([
+            'role'           => 'customer',
+            'search'         => '*' . esc_attr($q) . '*',
+            'search_columns' => ['user_email', 'display_name', 'user_login'],
+            'orderby'        => 'user_registered',
+            'order'          => 'DESC',
+        ]);
+
+        $results = [];
+
+        foreach ($customers as $customer) {
+            $results[] = [
+                'id'    => $customer->ID,
+                'label' =>  $customer->display_name . ' (' . $customer->user_email . ')',
+            ];
+        }
+
+        return [
+            'results' => $results,
+        ];
     }
 }

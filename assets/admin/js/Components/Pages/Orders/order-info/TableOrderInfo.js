@@ -203,13 +203,18 @@ const TableOrderInfo = ({ orderId, enableEdit }) => {
         total={total}
       />
 
-      {enableEdit ? (
-        <Box sx={{ p: 2, display: "flex", justifyContent: "flex-end", gap: 2 }}>
-          <ApplyCouponButton onApply={handleApplyCoupon} />
-          <ButtonAddProducts orderID={orderId} />
-          <DownloadInvoiceButton orderID={orderId} />
-        </Box>
-      ) : (
+      <Box sx={{ p: 2, display: "flex", justifyContent: "flex-end", gap: 2 }}>
+        {enableEdit && (
+          <>
+            <ApplyCouponButton onApply={handleApplyCoupon} />
+            <ButtonAddProducts orderID={orderId} />
+          </>
+        )}
+
+        <DownloadInvoiceButton orderID={orderId} />
+      </Box>
+
+      {!enableEdit && (
         <Box
           sx={{
             p: 2,
