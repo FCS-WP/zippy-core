@@ -194,11 +194,17 @@ class Order_Services
 
             $order_rows[] = [
                 'order_id'       => $order->get_id(),
-                'phone'          => $order->get_billing_phone(),
+            'phone'          => $order->get_billing_phone(),
                 'name'      => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(),
                 'email'       => $order->get_billing_email(),
                 'company'           => $order->get_billing_company(),
+                'street'        => trim(
+                    $order->get_billing_address_1() . ' ' . $order->get_billing_address_2()
+                ),
+                'city'          => $order->get_billing_city(),
+                'postcode'     => $order->get_billing_postcode(),
                 'state'           => $state_name,
+                'items'         => self::get_items_data($order),
                 'status'         => wc_get_order_status_name($order->get_status()),
                 'total' => html_entity_decode(wp_strip_all_tags(wc_price($order->get_total()))),
                 'payment_method' => $order->get_payment_method_title(),
@@ -236,30 +242,36 @@ class Order_Services
         fwrite($handle, "\xEF\xBB\xBF"); // UTF-8 BOM
 
         fputcsv($handle, [
-            'Order ID',
-            'Phone',
             'Name',
+            'Phone',
             'Email',
             'Company',
+            'Street',
+            'City',
+            'Postcode',
             'State',
+            'Order ID',
+            "Products",
             'Status',
             'Total',
-            'Payment Method',
             'Date Created',
             'Source',
         ]);
 
         foreach ($rows as $r) {
             fputcsv($handle, [
-                $r['order_id'],
-                $r['phone'],
                 $r['name'],
+                $r['phone'],
                 $r['email'],
                 $r['company'] ?? '',
+                $r['street'],
+                $r['city'],
+                $r['postcode'],
                 $r['state'] ?? '',
+                $r['order_id'],
+                $r['items'],
                 $r['status'],
                 $r['total'],
-                $r['payment_method'],
                 $r['date_created'],
                 $r['source'],
             ]);
@@ -270,6 +282,25 @@ class Order_Services
         fclose($handle);
         return $content;
     }
+
+    private static function get_items_data($order)
+    {
+        $items = [];
+
+        foreach ($order->get_items() as $item) {
+            if ($item instanceof WC_Order_Item_Product) {
+                $items[] = sprintf(
+                    '%s (x%d) - %s',
+                    $item->get_name(),
+                    $item->get_quantity(),
+                    html_entity_decode(wp_strip_all_tags(wc_price($item->get_total())))
+                );
+            }
+        }
+
+        return implode("\n", $items);
+    }
+
 
     /**
      * Create PDF – return content string
