@@ -77,7 +77,7 @@ class Order_Services
     public static function parse_order_data(\WC_Order $order)
     {
         $billing  = $order->get_address('billing');
-        $shipping = $order->get_address('shipping');
+        $shipping = !array_filter($order->get_address('shipping')) ? $billing : $order->get_address('shipping');
 
         $data = [
             'id'           => $order->get_id(),
@@ -123,6 +123,7 @@ class Order_Services
                     'total'      => $item->get_total(),
                 ];
             }, $order->get_items()),
+            'source'      => $order->get_meta('_wc_order_attribution_utm_source') ?: 'website',
         ];
 
         return $data;
@@ -185,16 +186,30 @@ class Order_Services
 
         $order_rows = [];
         foreach ($orders as $order) {
+            $country = $order->get_billing_country();
+            $state   = $order->get_billing_state();
+
+            $states = WC()->countries->get_states($country);
+            $state_name = $states[$state] ?? $state;
+
             $order_rows[] = [
                 'order_id'       => $order->get_id(),
-                'phone'          => $order->get_billing_phone(),
-                'firstname'      => $order->get_billing_first_name(),
-                'lastname'       => $order->get_billing_last_name(),
-                'user'           => $order->get_user_id() ? get_userdata($order->get_user_id())->user_login : 'Guest',
+            'phone'          => $order->get_billing_phone(),
+                'name'      => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(),
+                'email'       => $order->get_billing_email(),
+                'company'           => $order->get_billing_company(),
+                'street'        => trim(
+                    $order->get_billing_address_1() . ' ' . $order->get_billing_address_2()
+                ),
+                'city'          => $order->get_billing_city(),
+                'postcode'     => $order->get_billing_postcode(),
+                'state'           => $state_name,
+                'items'         => self::get_items_data($order),
                 'status'         => wc_get_order_status_name($order->get_status()),
-                'total'          => strip_tags(wc_price($order->get_total())),
+                'total' => html_entity_decode(wp_strip_all_tags(wc_price($order->get_total()))),
                 'payment_method' => $order->get_payment_method_title(),
                 'date_created'   => $order->get_date_created()->date_i18n('Y-m-d H:i:s'),
+                'source'      => $order->get_meta('_wc_order_attribution_utm_source') ?: 'website',
             ];
         }
 
@@ -227,28 +242,38 @@ class Order_Services
         fwrite($handle, "\xEF\xBB\xBF"); // UTF-8 BOM
 
         fputcsv($handle, [
-            'Order ID',
+            'Name',
             'Phone',
-            'First Name',
-            'Last Name',
-            'User',
+            'Email',
+            'Company',
+            'Street',
+            'City',
+            'Postcode',
+            'State',
+            'Order ID',
+            "Products",
             'Status',
             'Total',
-            'Payment Method',
             'Date Created',
+            'Source',
         ]);
 
         foreach ($rows as $r) {
             fputcsv($handle, [
-                $r['order_id'],
+                $r['name'],
                 $r['phone'],
-                $r['firstname'],
-                $r['lastname'],
-                $r['user'],
+                $r['email'],
+                $r['company'] ?? '',
+                $r['street'],
+                $r['city'],
+                $r['postcode'],
+                $r['state'] ?? '',
+                $r['order_id'],
+                $r['items'],
                 $r['status'],
                 $r['total'],
-                $r['payment_method'],
                 $r['date_created'],
+                $r['source'],
             ]);
         }
 
@@ -257,6 +282,25 @@ class Order_Services
         fclose($handle);
         return $content;
     }
+
+    private static function get_items_data($order)
+    {
+        $items = [];
+
+        foreach ($order->get_items() as $item) {
+            if ($item instanceof WC_Order_Item_Product) {
+                $items[] = sprintf(
+                    '%s (x%d) - %s',
+                    $item->get_name(),
+                    $item->get_quantity(),
+                    html_entity_decode(wp_strip_all_tags(wc_price($item->get_total())))
+                );
+            }
+        }
+
+        return implode("\n", $items);
+    }
+
 
     /**
      * Create PDF – return content string
@@ -282,13 +326,15 @@ class Order_Services
                 <tr>
                     <th>Order ID</th>
                     <th>Phone</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>User</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Company</th>
+                    <th>State</th>
                     <th>Status</th>
                     <th>Total</th>
-                    <th>Payment Method</th>
                     <th>Date Created</th>
+                    <th>Source</th>
+                    
                 </tr>
             </thead>
             <tbody>';
@@ -297,13 +343,14 @@ class Order_Services
             $html .= '<tr>
                 <td>' . esc_html($r['order_id']) . '</td>
                 <td>' . esc_html($r['phone']) . '</td>
-                <td>' . esc_html($r['firstname']) . '</td>
-                <td>' . esc_html($r['lastname']) . '</td>
-                <td>' . esc_html($r['user']) . '</td>
+                <td>' . esc_html($r['name']) . '</td>
+                <td>' . esc_html($r['email']) . '</td>
+                <td>' . esc_html($r['company']) . '</td>
+                <td>' . esc_html($r['state']) . '</td>
                 <td>' . esc_html($r['status']) . '</td>
                 <td>' . esc_html($r['total']) . '</td>
-                <td>' . esc_html($r['payment_method']) . '</td>
                 <td>' . esc_html($r['date_created']) . '</td>
+                <td>' . esc_html($r['source']) . '</td>
             </tr>';
         }
 
@@ -330,9 +377,7 @@ class Order_Services
         return $trashed;
     }
 
-    public static function search_orders($infos) {
-        
-    }
+    public static function search_orders($infos) {}
 
 
     public static function custom_send_wc_email($order_id,  $email_type)
