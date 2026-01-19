@@ -33,6 +33,9 @@ class Order_Arguments
             'date_to' => [
                 'sanitize_callback' => 'sanitize_text_field',
             ],
+            'customer_id' => [
+                'sanitize_callback' => 'absint',
+            ],
         ];
     }
 
@@ -47,6 +50,10 @@ class Order_Arguments
                 ],
             ],
             'status' => [
+                'required' => true,
+                'type' => 'string',
+            ],
+            'action' => [
                 'required' => true,
                 'type' => 'string',
             ],
@@ -194,6 +201,30 @@ class Order_Arguments
                     'customer_refunded_order',
                     'customer_note',
                 ],
+            ],
+        ];
+    }
+
+    public static function get_summary_orders_args()
+    {
+        return [
+            'date_from' => [
+                'required' => false,
+                'type' => 'string',
+            ],
+            'date_to' => [
+                'required' => false,
+                'type' => 'string',
+            ],
+        ];
+    }
+
+    public static function get_search_customers_args()
+    {
+        return [
+            'q' => [
+                'required' => true,
+                'type' => 'string',
             ],
         ];
     }
