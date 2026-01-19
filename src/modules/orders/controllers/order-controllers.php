@@ -224,4 +224,20 @@ class Order_Controllers
             return Zippy_Response_Handler::error($e->getMessage());
         }
     }
+
+    public static function refund_order(WP_REST_Request $request)
+    {
+        try {
+            $paramsInfo = Zippy_Request_Helper::get_params($request);
+            $result = Order_Detail_Services::refund_full_order($paramsInfo);
+
+            if (is_wp_error($result)) {
+                return Zippy_Response_Handler::error($result->get_error_message());
+            }
+
+            return Zippy_Response_Handler::success($result, 'Order refunded successfully.');
+        } catch (\Exception $e) {
+            return Zippy_Response_Handler::error('An error occurred while processing the refund.');
+        }
+    }
 }
