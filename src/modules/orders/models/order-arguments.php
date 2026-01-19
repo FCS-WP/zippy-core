@@ -228,4 +228,19 @@ class Order_Arguments
             ],
         ];
     }
+
+    public static function get_refund_order_args()
+    {
+        return [
+            'order_id' => [
+                'required' => true,
+                'type' => 'integer',
+            ],
+            'reason' => [
+                'required' => false,
+                'type' => 'string',
+                'default' => 'Refund full order',
+            ],
+        ];
+    }
 }
