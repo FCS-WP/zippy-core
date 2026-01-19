@@ -58,4 +58,16 @@ class Core_Shipping extends Core_Module
         }
         return false;
     }
+
+    public function recalculate_shipping_rates($rates, $package)
+    {
+        foreach ($rates as $rate_id => $rate) {
+            $cost   = $rate->get_cost();
+            $costExclTax = Zippy_Wc_Calculate_Helper::get_total_price_exclude_tax($cost);
+            $taxes  = Zippy_Wc_Calculate_Helper::get_tax($cost);
+            $rate->set_cost($costExclTax);
+            $rate->set_taxes([1 => $taxes]);
+            return $rate;
+        }
+    }
 }
