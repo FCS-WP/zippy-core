@@ -8,7 +8,7 @@ export const Api = {
     return await makeRequest(
       "/bulk-action-update-order-status",
       params,
-      "POST"
+      "POST",
     );
   },
   async moveToTrashOrder(params) {
@@ -24,7 +24,7 @@ export const Api = {
     return await makeRequest(
       `/update-quantity-order-item?order_id=${orderId}&action=${action}`,
       params,
-      "POST"
+      "POST",
     );
   },
   async applyCouponToOrder(params) {
@@ -46,7 +46,7 @@ export const Api = {
     return await makeRequest(
       `/add-items-order?order_id=${order_id}&action=${action}`,
       params,
-      "POST"
+      "POST",
     );
   },
   async categories(params) {
@@ -66,6 +66,9 @@ export const Api = {
   },
   async searchCustomers(params) {
     return await makeRequest("/search-customers", params);
+  },
+  async refundOrder(params) {
+    return await makeRequest("/refund-order", params, "POST");
   },
 };
 

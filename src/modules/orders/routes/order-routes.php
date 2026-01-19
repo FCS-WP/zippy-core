@@ -116,5 +116,11 @@ class Order_Route extends Core_Route
             'permission_callback' => [Core_Middleware::class, 'admin_only'],
             'args' => Order_Arguments::get_search_customers_args(),
         ]);
+        register_rest_route(ZIPPY_CORE_API_PREFIX, '/refund-order', [
+            'methods'  => 'POST',
+            'callback' => [Order_Controllers::class, 'refund_order'],
+            'permission_callback' => [Core_Middleware::class, 'admin_only'],
+            'args' => Order_Arguments::get_refund_order_args(),
+        ]);
     }
 }

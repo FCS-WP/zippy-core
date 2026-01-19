@@ -28,6 +28,7 @@ class Order_Services
             'orderby' => $order_by,
             'order'   => $order_val,
             'return'  => 'objects',
+            'type'    => 'shop_order',
         ];
 
         if (!empty($order_status)) {
