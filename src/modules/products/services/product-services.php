@@ -26,6 +26,7 @@ class Product_Services
         // Build data
         $data = [];
         foreach ($products as $product) {
+            $addons = self::get_product_addons($product);
             $data[] = [
                 'id'    => $product->get_id(),
                 'sku'   => $product->get_sku(),
@@ -36,7 +37,7 @@ class Product_Services
                 'link'  => admin_url('post.php?post=' . $product->get_id() . '&action=edit'),
                 'min_addons' => 0,
                 'min_order'  => 0,
-                'addons'     => [],
+                'addons'     => $addons,
                 'grouped_addons' => [],
                 'is_composite_product' => false,
             ];
@@ -51,6 +52,27 @@ class Product_Services
                 'per_page' => $per_page,
             ],
         ];
+    }
+
+    private static function get_product_addons($product)
+    {
+        $result = [];
+        $products_combo = get_field('products_combo', $product->get_id()) ?? [];
+
+        foreach ($products_combo as $combo) {
+            $prod = wc_get_product($combo['product_option']);
+            if ($prod) {
+                $result[] = [
+                    'id'    => $prod->get_id(),
+                    'sku'   => $prod->get_sku(),
+                    'name'  => $prod->get_name(),
+                    'stock' => $prod->get_stock_quantity(),
+                    'image' => wp_get_attachment_image_url($prod->get_image_id(), 'thumbnail'),
+                    'price' => $prod->get_price(),
+                ];
+            }
+        }
+        return $result;
     }
 
     private static function sort_and_paginate_products($args, $has_category, $page, $per_page)
@@ -143,6 +165,29 @@ class Product_Services
             'show_count'   => 1, // 1 for yes, 0 for no
             'hierarchical' => 1,
             'exclude' => $excluded
+        ];
+    }
+
+    public static function get_product_by_id($productID)
+    {
+        $product = wc_get_product($productID);
+        if (!$product) {
+            return [];
+        }
+
+        return [
+            'id'    => $product->get_id(),
+            'sku'   => $product->get_sku(),
+            'name'  => $product->get_name(),
+            'stock' => $product->get_stock_quantity(),
+            'img_url' => wp_get_attachment_image_url($product->get_image_id(), 'thumbnail'),
+            'type'  => $product->get_type(),
+            'link'  => admin_url('post.php?post=' . $product->get_id() . '&action=edit'),
+            'min_addons' => 0,
+            'min_order'  => 0,
+            'addons'     => self::get_product_addons($product),
+            'grouped_addons' => [],
+            'is_composite_product' => false,
         ];
     }
 }

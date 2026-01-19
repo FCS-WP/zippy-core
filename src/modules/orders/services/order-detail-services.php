@@ -210,6 +210,9 @@ class Order_Detail_Services
 
         // Update tax
         self::set_order_item_totals_with_wc_tax($item, $product_price, $quantity);
+
+        // Recalculate order totals
+        $order = wc_get_order($order_id);
         $order->calculate_totals();
         return [
             'order_id' => $order_id,
@@ -355,11 +358,18 @@ class Order_Detail_Services
     {
         $product_id = intval($productData['parent_product_id'] ?? 0);
         $quantity   = max(1, intval($productData['quantity'] ?? 1));
+        $addons     = $productData['addons'] ?? [];
 
         $product = wc_get_product($product_id);
         $product_price = $product->get_price();
         if (empty($product_price)) {
             return [];
+        }
+
+        $addons_total = self::handle_calculate_addon_products($addons, $order->get_id());
+
+        if ($addons_total > 0) {
+            $product_price += $addons_total;
         }
 
         $item_id = $order->add_product($product, $quantity);
@@ -370,12 +380,72 @@ class Order_Detail_Services
         $item = $order->get_item($item_id);
 
         Order_Detail_Services::set_order_item_totals_with_wc_tax($item, $product_price, $quantity);
+
+        $order = wc_get_order($order->get_id());
         $order->calculate_totals();
         return [
             'product_id' => $product_id,
             'quantity'   => $quantity,
             'item_id'    => $item_id,
         ];
+    }
+
+    private static function handle_calculate_addon_products($addons, $order_id)
+    {
+        $addons_total = 0;
+
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            return 0;
+        }
+
+        $item_ids = [];
+        foreach ($addons as $addon) {
+            $addon_product_id = intval($addon['item_id']);
+            $addon_quantity   = intval($addon['quantity']);
+
+            $addon_product = wc_get_product($addon_product_id);
+            if ($addon_product) {
+                $addon_price = $addon_product->get_price();
+                $addons_total += $addon_price * $addon_quantity;
+
+                //Add line item for addon
+                $item_id = $order->add_product($addon_product, $addon_quantity);
+                if (!is_wp_error($item_id)) {
+                    $item_ids[] = $item_id;
+                }
+            }
+        }
+
+        $order = wc_get_order($order_id);
+        foreach ($item_ids as $item_id) {
+            $item = $order->get_item($item_id);
+            if ($item) {
+                $item->set_total(0);
+                $item->set_subtotal(0);
+                $item->set_taxes(['total' => [], 'subtotal' => []]);
+                $item->save();
+            }
+        }
+
+        return $addons_total;
+    }
+
+    private static function reset_price_for_addon_products($addons, $order)
+    {
+        foreach ($addons as $addon) {
+            $addon_product_id = intval($addon['item_id']);
+
+            foreach ($order->get_items() as $item) {
+                $product = $item->get_product();
+                if ($product && $product->get_id() === $addon_product_id) {
+                    $item->set_total(0);
+                    $item->set_subtotal(0);
+                    $item->set_taxes(['total' => [], 'subtotal' => []]);
+                    $item->save();
+                }
+            }
+        }
     }
 
     public static function get_order_detail_by_id($order_id): array

@@ -45,9 +45,11 @@ const ProductDetails = ({
     setLoading(true);
     try {
       const { data } = await Api.product({ productID });
+
       let converted = [];
       if (data?.status === "success" && data.data?.addons) {
         converted = convertRows(data.data);
+
         setData(mergeAddedProducts(converted, addedProducts, productID));
         setGroupTotal(data.data.grouped_addons?.quantity_products_group || 0);
         setMinMaxOptions(data.data.min_max_options || null);
@@ -100,10 +102,9 @@ const ProductDetails = ({
       NAME: value.name,
       SKU: value.sku,
       IMAGE: value.image || "",
-      MIN: value.min,
-      MAX: value.max,
+      MIN: value.min ?? 0,
+      MAX: value.max ?? 999,
       QUANTITY: value.min ?? 0,
-      isGrouped: rows.grouped_addons.product_ids.includes(Number(value.id)),
     }));
 
   /**
