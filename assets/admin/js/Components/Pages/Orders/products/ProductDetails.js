@@ -9,6 +9,7 @@ import {
   FormControl,
   Select,
   MenuItem,
+  InputLabel,
 } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 import { Api } from "../../../../api/admin";
@@ -18,7 +19,6 @@ const ProductDetails = ({
   orderID,
   quantity,
   addonMinOrder,
-  packingInstructions,
   addedProducts,
   addAddonProduct,
   handleRemoveProduct,
@@ -35,6 +35,8 @@ const ProductDetails = ({
   const [variableSelectedId, setVariableSelectedId] = useState(null);
   const [minMaxOptions, setMinMaxOptions] = useState(null);
   const [selectedMinMaxOption, setSelectedMinMaxOption] = useState("");
+  const [giftWrapping, setGiftWrapping] = useState("no");
+  const [giftNote, setGiftNote] = useState("");
 
   /**
    * Fetch product addons
@@ -68,7 +70,7 @@ const ProductDetails = ({
   useEffect(() => {
     if (!productID || !addedProducts) {
       setData((prev) =>
-        prev.map((row) => ({ ...row, QUANTITY: row.MIN || 0 }))
+        prev.map((row) => ({ ...row, QUANTITY: row.MIN || 0 })),
       );
       return;
     }
@@ -78,7 +80,7 @@ const ProductDetails = ({
       setData((prev) => mergeAddedProducts(prev, addedProducts, productID));
     } else {
       setData((prev) =>
-        prev.map((row) => ({ ...row, QUANTITY: row.MIN || 0 }))
+        prev.map((row) => ({ ...row, QUANTITY: row.MIN || 0 })),
       );
     }
   }, [addedProducts, productID]);
@@ -89,7 +91,7 @@ const ProductDetails = ({
 
     return data.map((row) => {
       const match = productData.addons.find(
-        (addon) => String(addon.item_id) === String(row.ID)
+        (addon) => String(addon.item_id) === String(row.ID),
       );
       if (match) return { ...row, QUANTITY: Number(match.quantity) };
       return row;
@@ -149,7 +151,7 @@ const ProductDetails = ({
 
       if (groupTotal > 0 && groupSum > groupTotal) {
         toast.error(
-          `Group limit exceeded: ${groupSum}/${groupTotal}. Please adjust.`
+          `Group limit exceeded: ${groupSum}/${groupTotal}. Please adjust.`,
         );
         return prev;
       }
@@ -256,8 +258,8 @@ const ProductDetails = ({
       toast.error(
         `Quantity addons required for selected option: ${selectedMinMaxOption}. Currently selected: ${selected.reduce(
           (sum, r) => sum + r.quantity,
-          0
-        )}`
+          0,
+        )}`,
       );
       return;
     }
@@ -269,8 +271,8 @@ const ProductDetails = ({
       toast.error(
         `Minimum addons required: ${addonMinOrder}. Currently selected: ${selected.reduce(
           (sum, r) => sum + r.quantity,
-          0
-        )}`
+          0,
+        )}`,
       );
       return;
     }
@@ -280,13 +282,13 @@ const ProductDetails = ({
     if (groupTotal > 0) {
       const groupSum = selected
         .filter((r) =>
-          data.find((row) => row.ID === r.item_id && row.isGrouped)
+          data.find((row) => row.ID === r.item_id && row.isGrouped),
         )
         .reduce((s, r) => s + r.quantity, 0);
 
       if (groupSum < groupTotal) {
         toast.error(
-          `You must select exactly ${groupTotal} items in grouped add-ons. Currently: ${groupSum}`
+          `You must select exactly ${groupTotal} items in grouped add-ons. Currently: ${groupSum}`,
         );
         return;
       }
@@ -296,7 +298,7 @@ const ProductDetails = ({
   };
 
   const handleAddProducts = async (selected, quantity) => {
-    addAddonProduct(productID, quantity, packingInstructions, selected);
+    addAddonProduct(productID, quantity, selected, giftWrapping, giftNote);
     setDisabledRemove(false);
     setHasChanges(false);
   };
@@ -353,6 +355,55 @@ const ProductDetails = ({
             rows={rowsWithInputs}
             className="table-addons"
           />
+
+          {/* Gift Wrapping and Gift Note */}
+          <Box
+            sx={{ my: 2, p: 2, backgroundColor: "#f5f5f5", borderRadius: 1 }}
+          >
+            <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
+              Gift Options
+            </Typography>
+            <Box display="flex" flexDirection="column" gap={2}>
+              {/* Gift Wrapping Select */}
+              <Box>
+                <InputLabel
+                  sx={{ mb: 0.5, fontWeight: 500, fontSize: "0.9rem" }}
+                >
+                  Gift Wrapping
+                </InputLabel>
+                <Select
+                  value={giftWrapping}
+                  onChange={(e) => setGiftWrapping(e.target.value)}
+                  size="small"
+                  fullWidth
+                  sx={{ backgroundColor: "white" }}
+                >
+                  <MenuItem value="no">No</MenuItem>
+                  <MenuItem value="yes">Yes</MenuItem>
+                </Select>
+              </Box>
+
+              {/* Gift Note TextField */}
+              <Box>
+                <InputLabel
+                  sx={{ mb: 0.5, fontWeight: 500, fontSize: "0.9rem" }}
+                >
+                  Gift Note
+                </InputLabel>
+                <TextField
+                  value={giftNote}
+                  onChange={(e) => setGiftNote(e.target.value)}
+                  placeholder="Enter gift note..."
+                  size="small"
+                  fullWidth
+                  multiline
+                  rows={2}
+                  sx={{ backgroundColor: "white" }}
+                />
+              </Box>
+            </Box>
+          </Box>
+
           <Box display="flex" justifyContent="flex-end" my={2} gap={1}>
             {!!addedProducts?.[productID] && (
               <Button

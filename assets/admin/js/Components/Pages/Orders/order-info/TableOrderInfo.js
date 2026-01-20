@@ -25,6 +25,7 @@ const TableOrderInfo = ({ orderId, enableEdit }) => {
   const [editingItemId, setEditingItemId] = useState(null);
   const [tempQuantity, setTempQuantity] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [isPreOrder, setIsPreOrder] = useState(false);
 
   useEffect(() => {
     if (orderId) {
@@ -36,7 +37,10 @@ const TableOrderInfo = ({ orderId, enableEdit }) => {
     try {
       setLoading(true);
       const { data: res } = await Api.getOrderInfo({ order_id: orderId });
-      if (res.status === "success") setOrderInfo(res.data);
+      if (res.status === "success") {
+        setOrderInfo(res.data);
+        setIsPreOrder(res.data.is_pre_order || false);
+      }
     } catch (error) {
       console.error("Error fetching order info:", error);
     } finally {
@@ -86,7 +90,9 @@ const TableOrderInfo = ({ orderId, enableEdit }) => {
   const priceOrderInfo = orderInfo?.order_info || {};
 
   // Calculate totals per product
-  const subtotal = priceOrderInfo?.subtotal;
+  const subtotal = parseFloat(
+    (priceOrderInfo?.subtotal - priceOrderInfo?.tax_total).toFixed(2),
+  );
 
   const gst = priceOrderInfo?.tax_total;
 
@@ -209,7 +215,7 @@ const TableOrderInfo = ({ orderId, enableEdit }) => {
           <>
             <RefundButton orderID={orderId} onRefundSuccess={getOrderInfo} />
             <ApplyCouponButton onApply={handleApplyCoupon} />
-            <ButtonAddProducts orderID={orderId} />
+            <ButtonAddProducts orderID={orderId} isPreOrder={isPreOrder} />
           </>
         )}
 

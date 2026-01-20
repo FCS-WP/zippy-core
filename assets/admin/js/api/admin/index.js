@@ -70,6 +70,9 @@ export const Api = {
   async refundOrder(params) {
     return await makeRequest("/refund-order", params, "POST");
   },
+  async getPreOrderOptions(params) {
+    return await makeRequest("/get-pre-order-options", params);
+  },
 };
 
 export const SettingApi = {

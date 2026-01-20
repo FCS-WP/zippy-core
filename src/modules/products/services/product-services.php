@@ -14,6 +14,7 @@ class Product_Services
      */
     public static function get_products($infos)
     {
+        $is_pre_order = $infos['is_pre_order'] == 'true' ? true : false;
         $category = !empty($infos['category']);
         $args = [
             'status'   => 'publish',
@@ -26,6 +27,13 @@ class Product_Services
         // Build data
         $data = [];
         foreach ($products as $product) {
+            if ($is_pre_order) {
+                $product_pre_order = get_field('pre_order', $product->get_id());
+                if (empty($product_pre_order)) {
+                    continue;
+                }
+            }
+
             $addons = self::get_product_addons($product);
             $data[] = [
                 'id'    => $product->get_id(),

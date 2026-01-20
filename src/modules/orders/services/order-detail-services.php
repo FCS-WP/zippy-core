@@ -49,6 +49,8 @@ class Order_Detail_Services
             'total'      => $totalCalculated,
         ];
 
+        $result['is_pre_order'] = $order->get_meta(IS_PRE_ORDER_ORDER, true) == 'yes' ? true : false;
+
         return ['data' => $result];
     }
 
@@ -97,6 +99,9 @@ class Order_Detail_Services
                 'min_order'         => get_post_meta($product->get_id(), '_custom_minimum_order_qty', true) ?: 0,
                 'refunded_qty'      => $refunded_qty,
                 'is_refunded'       => $is_refunded,
+                'planter_name'      => $item->get_meta('Planter'),
+                'gift_wrapping'     => $item->get_meta('Gift Wrapping'),
+                'gift_note'         => $item->get_meta('Gift Note'),
             ];
 
             $subtotal += ($price_total + Zippy_Wc_Calculate_Helper::round_price_wc($tax_total));
@@ -236,8 +241,8 @@ class Order_Detail_Services
         self::set_order_item_totals_with_wc_tax($item, $product_price, $quantity);
 
         // Recalculate order totals
-        $order = wc_get_order($order_id);
-        $order->calculate_totals();
+        self::recalculate_order_totals($order_id);
+
         return [
             'order_id' => $order_id,
             'item_id' => $item_id,
@@ -333,8 +338,8 @@ class Order_Detail_Services
             return false;
         }
 
-        $order = wc_get_order($order_id);
-        $order->calculate_totals();
+        self::recalculate_order_totals($order_id);
+
         return true;
     }
 
@@ -348,13 +353,15 @@ class Order_Detail_Services
 
         $user_id = $order->get_user_id() ?? 0;
         $products = $infos['products'] ?? [];
+        $is_pre_order = $infos['pre_order'] ?? false;
+
         if (empty($products) || !is_array($products)) {
             return [];
         }
 
         $added_items = [];
         foreach ($products as $product) {
-            $added_item = self::add_single_product_to_order($order, $product, $user_id);
+            $added_item = self::add_single_product_to_order($order, $product, $user_id, $is_pre_order);
             if (!empty($added_item)) {
                 $added_items[] = $added_item;
             }
@@ -366,7 +373,7 @@ class Order_Detail_Services
         ];
     }
 
-    private static function add_single_product_to_order($order, $productData, $user_id)
+    private static function add_single_product_to_order($order, $productData, $user_id, $is_pre_order = false)
     {
         $product_id = intval($productData['parent_product_id'] ?? 0);
         $product    = wc_get_product($product_id);
@@ -375,14 +382,17 @@ class Order_Detail_Services
             return [];
         }
 
-        return self::add_simple_product_to_order($order, $productData, $user_id);
+        return self::add_simple_product_to_order($order, $productData, $user_id, $is_pre_order);
     }
 
-    private static function add_simple_product_to_order($order, $productData, $user_id)
+    private static function add_simple_product_to_order($order, $productData, $user_id, $is_pre_order = false)
     {
+        $order_id   = $order->get_id();
         $product_id = intval($productData['parent_product_id'] ?? 0);
         $quantity   = max(1, intval($productData['quantity'] ?? 1));
         $addons     = $productData['addons'] ?? [];
+        $gift_wrapping = $productData['gift_wrapping'] ?? 'no';
+        $gift_note = $productData['gift_note'] ?? '';
 
         $product = wc_get_product($product_id);
         $product_price = $product->get_price();
@@ -390,10 +400,11 @@ class Order_Detail_Services
             return [];
         }
 
-        $addons_total = self::handle_calculate_addon_products($addons, $order->get_id());
-
-        if ($addons_total > 0) {
-            $product_price += $addons_total;
+        $is_pre_order = $order->get_meta(IS_PRE_ORDER_ORDER, true) == 'yes' ? true : false;
+        if ($is_pre_order) {
+            $pre_order_settings = get_pre_order_settings($product_id);
+            $order->update_meta_data(PRE_ORDER_DATE, $pre_order_settings[PRE_ORDER_MESSAGE]);
+            $order->save();
         }
 
         $item_id = $order->add_product($product, $quantity);
@@ -401,12 +412,45 @@ class Order_Detail_Services
             return [];
         }
 
+        // Topping
+        [$topping, $topping_price] = self::get_topping_data($product_id, $order_id, $quantity);
+
+        // Add addons and get their names
+        $addons_total = self::handle_calculate_addon_products($addons, $order_id, $item_id, $quantity);
+        $product_price += $addons_total;
+
+        if ($gift_wrapping == 'yes') {
+            $gift_wrapping_price = get_gift_wrap_price();
+            $product_price += $gift_wrapping_price;
+        }
+
+        if ($topping_price) {
+            $product_price += ($topping_price * $quantity);
+        }
+
         $item = $order->get_item($item_id);
+
+        // Gift data
+        self::save_gift_data($item, $product_id, $gift_wrapping, $gift_note);
+
+        // Combo / Pre-order meta
+        self::save_combo_meta(
+            $item,
+            $is_pre_order,
+            $addons,
+            $topping,
+            $product_price,
+            $topping_price,
+            $quantity,
+            $gift_wrapping,
+            $gift_note,
+            $product_id
+        );
 
         Order_Detail_Services::set_order_item_totals_with_wc_tax($item, $product_price, $quantity);
 
-        $order = wc_get_order($order->get_id());
-        $order->calculate_totals();
+        self::recalculate_order_totals($order->get_id());
+
         return [
             'product_id' => $product_id,
             'quantity'   => $quantity,
@@ -414,7 +458,114 @@ class Order_Detail_Services
         ];
     }
 
-    private static function handle_calculate_addon_products($addons, $order_id)
+    private static function recalculate_order_totals($order_id)
+    {
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            return false;
+        }
+
+        $order->calculate_totals();
+        return true;
+    }
+
+    private static function save_combo_meta(
+        $item,
+        $is_pre_order,
+        $addons,
+        $topping_id,
+        $product_price,
+        $topping_price,
+        $quantity,
+        $gift_wrapping,
+        $gift_note,
+        $product_id
+    ) {
+        $is_allow_gift_wrapping = get_gift_wrapping_option($product_id);
+
+        if ($is_pre_order) {
+            $meta = [
+                'is_pre_order' => $is_pre_order,
+                'planter_id'   => $addons[0]['item_id'] ?? null,
+                'topping_id'   => $topping_id,
+                'combo_total'  => $product_price + ($topping_price * $quantity),
+            ];
+
+            if ($is_allow_gift_wrapping) {
+                $meta['gift_id'] = $gift_wrapping;
+                $meta['gift_note'] = $gift_note;
+            }
+
+            $item->update_meta_data('pre_order_data', $meta);
+        } else {
+            $meta = [
+                'planter_id'      => $addons[0]['item_id'] ?? null,
+                'topping_id'      => $topping_id,
+                'combo_total'     => $product_price + ($topping_price * $quantity),
+                'is_combo_parent' => true,
+            ];
+
+            if ($is_allow_gift_wrapping) {
+                $meta['gift_id'] = $gift_wrapping;
+                $meta['gift_note'] = $gift_note;
+            }
+
+            $item->update_meta_data('combo_sub_products', $meta);
+        }
+
+        $item->save();
+    }
+
+    private static function save_gift_data($item, $product_id, $gift_wrapping, $gift_note)
+    {
+        if ($gift_wrapping === 'yes') {
+            $item->update_meta_data('Gift Wrapping', 'yes');
+        }
+
+        if (!empty($gift_note)) {
+            $item->update_meta_data('Gift Note', sanitize_text_field($gift_note));
+        }
+
+        $item->save();
+    }
+
+
+    private static function get_topping_data($product_id, $order_id, $quantity = 1)
+    {
+        $topping_id = get_field('topping_product', $product_id);
+        $topping = $topping_id ? wc_get_product($topping_id) : null;
+
+        self::create_item_meta_for_topping($topping, $order_id, $quantity);
+
+        return [
+            $topping_id,
+            $topping ? (float) $topping->get_price() : 0,
+        ];
+    }
+
+    private static function create_item_meta_for_topping($topping, $order_id, $quantity = 1)
+    {
+        if (!$topping) {
+            return;
+        }
+
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            return;
+        }
+
+        // Add line item for topping
+        $item_id = $order->add_product($topping, $quantity);
+        if (is_wp_error($item_id)) {
+            return;
+        }
+
+        //Reset price for topping to 0
+        self::reset_price_for_addon_products([ ['item_id' => $topping->get_id()] ], $order);
+    }
+
+
+    private static function handle_calculate_addon_products($addons, $order_id, $parent_item_id, $quantity = 1)
     {
         $addons_total = 0;
 
@@ -423,33 +574,30 @@ class Order_Detail_Services
             return 0;
         }
 
-        $item_ids = [];
-        foreach ($addons as $addon) {
-            $addon_product_id = intval($addon['item_id']);
-            $addon_quantity   = intval($addon['quantity']);
-
-            $addon_product = wc_get_product($addon_product_id);
-            if ($addon_product) {
-                $addon_price = $addon_product->get_price();
-                $addons_total += $addon_price * $addon_quantity;
-
-                //Add line item for addon
-                $item_id = $order->add_product($addon_product, $addon_quantity);
-                if (!is_wp_error($item_id)) {
-                    $item_ids[] = $item_id;
-                }
-            }
+        $addon = $addons[0] ?? null;
+        if (!$addon) {
+            return 0;
         }
 
-        $order = wc_get_order($order_id);
-        foreach ($item_ids as $item_id) {
-            $item = $order->get_item($item_id);
-            if ($item) {
-                $item->set_total(0);
-                $item->set_subtotal(0);
-                $item->set_taxes(['total' => [], 'subtotal' => []]);
-                $item->save();
-            }
+        $planter_name = null;
+        $addon_product_id = intval($addon['item_id']);
+
+        $addon_product = wc_get_product($addon_product_id);
+        $planter_name = $addon_product?->get_name();
+        if ($addon_product) {
+            $addon_price = $addon_product->get_price();
+            $addons_total += $addon_price * $quantity;
+            //Add line item for addon
+            $order->add_product($addon_product, $quantity);
+        }
+
+        // Reset price for addon products to 0
+        self::reset_price_for_addon_products($addons, $order);
+
+        $item_parent = $order->get_item($parent_item_id);
+        if ($planter_name) {
+            $item_parent->update_meta_data('Planter', $planter_name);
+            $item_parent->save();
         }
 
         return $addons_total;
@@ -661,5 +809,21 @@ class Order_Detail_Services
         } catch (Exception $e) {
             return new WP_Error('refund_failed', $e->getMessage());
         }
+    }
+
+    public static function get_pre_order_options($order_id)
+    {
+        $order = wc_get_order($order_id);
+        if (empty($order)) {
+            return [];
+        }
+
+        $pre_order_option = $order->get_meta(IS_PRE_ORDER_ORDER, true);
+
+        if (empty($pre_order_option)) {
+            return ['is_pre_order' => null];
+        }
+
+        return ['is_pre_order' => $pre_order_option];
     }
 }

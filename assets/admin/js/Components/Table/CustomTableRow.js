@@ -11,11 +11,12 @@ import {
   Collapse,
   InputLabel,
   FormControl,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 import theme from "../../../theme/theme";
 import ProductDetails from "../Pages/Orders/products/ProductDetails";
-import PackingInstruction from "../Pages/Orders/products/PackingInstruction";
 
 const CustomTableRow = ({
   hideCheckbox = false,
@@ -37,13 +38,13 @@ const CustomTableRow = ({
   const minOrder = row.MinOrder ?? 0;
   const [disabled, setDisabled] = useState(true && minOrder <= 0);
   const [showCollapse, setShowCollapse] = useState(showCollapseProp);
-  const [showCollapseAddToOrder, setShowCollapseAddToOrder] =
-    useState(false);
+  const [showCollapseAddToOrder, setShowCollapseAddToOrder] = useState(false);
   const handleToggleCollapse = () => {
     setShowCollapse((prev) => !prev);
   };
   const [quantity, setQuantity] = useState(minOrder);
-  const [packingInstructions, setPackingInstructions] = useState("");
+  const [giftWrapping, setGiftWrapping] = useState("no");
+  const [giftNote, setGiftNote] = useState("");
   const [error, setError] = useState(false);
   const [disabledRemove, setDisabledRemove] = useState(true);
 
@@ -76,6 +77,9 @@ const CustomTableRow = ({
 
   const handleAddProduct = () => {
     if (onAddProduct) {
+      // Add gift wrapping and gift note to row
+      row.giftWrapping = giftWrapping;
+      row.giftNote = giftNote;
       onAddProduct(row);
       setDisabled(true);
       setDisabledRemove(false);
@@ -190,39 +194,68 @@ const CustomTableRow = ({
       colSpan={cols.length}
       style={{ paddingBottom: 0, paddingTop: 0 }}
     >
-      <Collapse
-        in={showCollapseAddToOrder}
-        timeout="auto"
-        unmountOnExit
-      >
-        <Stack
-          direction="row"
-          justifyContent="flex-end"
-          spacing={1}
-          mt={1}
-          mb={2}
-        >
-          {!!addedProducts?.[row.productID] && (
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={handleRemoveProduct}
-              disabled={disabledRemove}
-              sx={{ borderColor: "red", color: "red" }}
-            >
-              Remove
-            </Button>
-          )}
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={handleAddProduct}
-            disabled={disabled}
-          >
-            Add to Order
-          </Button>
-        </Stack>
+      <Collapse in={showCollapseAddToOrder} timeout="auto" unmountOnExit>
+        <Box sx={{ p: 2, backgroundColor: "#f5f5f5", borderRadius: 1 }}>
+          <Stack spacing={2}>
+            {/* Gift Wrapping Select */}
+            <Box>
+              <InputLabel sx={{ mb: 0.5, fontWeight: 500, fontSize: "0.9rem" }}>
+                Gift Wrapping
+              </InputLabel>
+              <Select
+                value={giftWrapping}
+                onChange={(e) => setGiftWrapping(e.target.value)}
+                size="small"
+                fullWidth
+                sx={{ backgroundColor: "white" }}
+              >
+                <MenuItem value="no">No</MenuItem>
+                <MenuItem value="yes">Yes</MenuItem>
+              </Select>
+            </Box>
+
+            {/* Gift Note TextField */}
+            <Box>
+              <InputLabel sx={{ mb: 0.5, fontWeight: 500, fontSize: "0.9rem" }}>
+                Gift Note
+              </InputLabel>
+              <TextField
+                value={giftNote}
+                onChange={(e) => setGiftNote(e.target.value)}
+                placeholder="Enter gift note..."
+                size="small"
+                fullWidth
+                multiline
+                rows={2}
+                sx={{ backgroundColor: "white" }}
+              />
+            </Box>
+
+            {/* Action Buttons */}
+            <Stack direction="row" justifyContent="flex-end" spacing={1}>
+              {!!addedProducts?.[row.productID] && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={handleRemoveProduct}
+                  disabled={disabledRemove}
+                  sx={{ borderColor: "red", color: "red" }}
+                >
+                  Remove
+                </Button>
+              )}
+              <Button
+                variant="contained"
+                color="primary"
+                size="small"
+                onClick={handleAddProduct}
+                disabled={disabled}
+              >
+                Add to Order
+              </Button>
+            </Stack>
+          </Stack>
+        </Box>
       </Collapse>
     </TableCell>
   );
@@ -233,17 +266,11 @@ const CustomTableRow = ({
       style={{ paddingBottom: 0, paddingTop: 0 }}
     >
       <Collapse in={showCollapse} timeout="auto" unmountOnExit>
-        <PackingInstruction
-          value={packingInstructions}
-          onChange={handleSubTableChange}
-        />
-
         <ProductDetails
           productID={row.productID}
           orderID={row.orderID}
           quantity={quantity}
           addonMinOrder={row.MinAddons}
-          packingInstructions={row.packingInstructions}
           addedProducts={addedProducts}
           addAddonProduct={addAddonProduct}
           handleRemoveProduct={handleRemoveProduct}
