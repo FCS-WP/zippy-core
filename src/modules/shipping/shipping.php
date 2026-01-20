@@ -67,7 +67,8 @@ class Core_Shipping extends Core_Module
             $taxes  = Zippy_Wc_Calculate_Helper::get_tax($cost);
             $rate->set_cost($costExclTax);
             $rate->set_taxes([1 => $taxes]);
-            return $rate;
         }
+
+        return $rates;
     }
 }
