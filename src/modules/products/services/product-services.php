@@ -22,18 +22,27 @@ class Product_Services
         $page = max(1, intval($infos['page']));
         $per_page = 50;
 
+        // Build meta query
+        $meta_query = ['relation' => 'AND'];
+
+        if ($is_pre_order) {
+            $meta_query[] = [
+                'key'     => 'pre_order',
+                'value'   => '1',
+                'compare' => '=',
+                'type'    => 'CHAR',
+            ];
+        }
+
+        if (count($meta_query) > 1) {
+            $args['meta_query'] = $meta_query;
+        }
+
         [$products, $total, $max_pages] = self::sort_and_paginate_products($args, $category, $page, $per_page);
 
         // Build data
         $data = [];
         foreach ($products as $product) {
-            if ($is_pre_order) {
-                $product_pre_order = get_field('pre_order', $product->get_id());
-                if (empty($product_pre_order)) {
-                    continue;
-                }
-            }
-
             $addons = self::get_product_addons($product);
             $data[] = [
                 'id'    => $product->get_id(),
@@ -85,31 +94,38 @@ class Product_Services
 
     private static function sort_and_paginate_products($args, $has_category, $page, $per_page)
     {
-        if ($has_category) {
-            $results = wc_get_products($args);
-            if (empty($results) || empty($results->products)) {
-                return [[], 0, 0];
-            }
+        $wp_args = [
+            'post_type'      => 'product',
+            'post_status'    => $args['status'] ?? 'publish',
+            'posts_per_page' => $per_page,
+            'paged'          => $page,
+            'fields'         => 'ids',
+        ];
 
-            $products  = $results->products;
-            $total     = $results->total;
-            $max_pages = $results->max_num_pages;
-        } else {
-            $args['limit']    = -1;
-            $args['paginate'] = false;
-
-            $all_products = wc_get_products($args);
-            if (empty($all_products)) {
-                return [[], 0, 0];
-            }
-
-            $total     = count($all_products);
-            $max_pages = ceil($total / $per_page);
-            $offset    = ($page - 1) * $per_page;
-            $products  = array_slice($all_products, $offset, $per_page);
+        if (isset($args['meta_query'])) {
+            $wp_args['meta_query'] = $args['meta_query'];
         }
 
-        return [$products, $total, $max_pages];
+        if ($has_category && !empty($args['category'])) {
+            $wp_args['tax_query'] = [
+                [
+                    'taxonomy' => 'product_cat',
+                    'field'    => 'slug',
+                    'terms'    => $args['category'],
+                ],
+            ];
+        }
+
+        $query = new \WP_Query($wp_args);
+
+        if (empty($query->posts)) {
+            return [[], 0, 0];
+        }
+
+        // Convert product IDs to WC_Product objects
+        $products = array_filter(array_map('wc_get_product', $query->posts));
+
+        return [$products, $query->found_posts, $query->max_num_pages];
     }
 
     /**
