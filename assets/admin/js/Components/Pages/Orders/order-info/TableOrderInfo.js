@@ -119,7 +119,15 @@ const TableOrderInfo = ({ orderId, enableEdit }) => {
 
   return (
     <Box sx={{ mt: 4 }}>
-      <TableContainer elevation={0}>
+      <TableContainer
+        elevation={0}
+        sx={{
+          overflowX: "auto",
+          "& .MuiTable-root": {
+            minWidth: { xs: 650, sm: 750 },
+          },
+        }}
+      >
         <Table>
           <TableHead>
             <TableRow>
@@ -210,7 +218,16 @@ const TableOrderInfo = ({ orderId, enableEdit }) => {
         total={total}
       />
 
-      <Box sx={{ p: 2, display: "flex", justifyContent: "flex-end", gap: 2 }}>
+      <Box
+        sx={{
+          p: 2,
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 2,
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "stretch", sm: "center" },
+        }}
+      >
         {enableEdit && (
           <>
             <RefundButton orderID={orderId} onRefundSuccess={getOrderInfo} />

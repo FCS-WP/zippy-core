@@ -55,10 +55,17 @@ const TablePaginationCustom = ({
       sx={{
         borderTop: "1px solid",
         borderColor: "divider",
+        flexDirection: { xs: "column", sm: "row" },
+        gap: { xs: 2, sm: 0 },
       }}
     >
       <Stack direction="row" spacing={1} alignItems="center">
-        <Typography variant="body2">Rows per page:</Typography>
+        <Typography
+          variant="body2"
+          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+        >
+          Rows per page:
+        </Typography>
         <Select
           value={rowsPerPage}
           onChange={onRowsPerPageChange}
@@ -73,8 +80,19 @@ const TablePaginationCustom = ({
         </Select>
       </Stack>
 
-      <Stack direction="row" spacing={2} alignItems="center">
-        <Typography variant="body2">
+      <Stack
+        direction="row"
+        spacing={2}
+        alignItems="center"
+        sx={{
+          flexDirection: { xs: "column", sm: "row" },
+          gap: { xs: 1, sm: 2 },
+        }}
+      >
+        <Typography
+          variant="body2"
+          sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+        >
           {startCounter} - {endCounter} of {count}
         </Typography>
 
@@ -84,8 +102,9 @@ const TablePaginationCustom = ({
             disabled={page === 0}
             size="small"
             aria-label="first page"
+            sx={{ padding: { xs: "4px", sm: "8px" } }}
           >
-            <FirstPage />
+            <FirstPage sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />
           </IconButton>
 
           <IconButton
@@ -93,8 +112,9 @@ const TablePaginationCustom = ({
             disabled={page === 0}
             size="small"
             aria-label="previous page"
+            sx={{ padding: { xs: "4px", sm: "8px" } }}
           >
-            <NavigateBefore />
+            <NavigateBefore sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />
           </IconButton>
 
           <IconButton
@@ -102,8 +122,9 @@ const TablePaginationCustom = ({
             disabled={page >= totalPages - 1}
             size="small"
             aria-label="next page"
+            sx={{ padding: { xs: "4px", sm: "8px" } }}
           >
-            <NavigateNext />
+            <NavigateNext sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />
           </IconButton>
 
           <IconButton
@@ -111,8 +132,9 @@ const TablePaginationCustom = ({
             disabled={page >= totalPages - 1}
             size="small"
             aria-label="last page"
+            sx={{ padding: { xs: "4px", sm: "8px" } }}
           >
-            <LastPage />
+            <LastPage sx={{ fontSize: { xs: "1.2rem", sm: "1.5rem" } }} />
           </IconButton>
         </Stack>
       </Stack>

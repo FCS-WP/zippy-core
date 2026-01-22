@@ -195,7 +195,7 @@ const CustomTableRow = ({
       style={{ paddingBottom: 0, paddingTop: 0 }}
     >
       <Collapse in={showCollapseAddToOrder} timeout="auto" unmountOnExit>
-        <Box sx={{ p: 2, backgroundColor: "#f5f5f5", borderRadius: 1 }}>
+        <Box sx={{ p: 2, borderRadius: 1 }}>
           <Stack spacing={2}>
             {/* Gift Wrapping Select */}
             <Box>

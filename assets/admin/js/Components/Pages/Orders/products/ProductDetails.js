@@ -309,7 +309,7 @@ const ProductDetails = ({
   };
 
   return (
-    <Box>
+    <Box sx={{ paddingTop: 2, paddingBottom: 2 }}>
       <ToastContainer
         position="bottom-center"
         theme="colored"
@@ -357,9 +357,7 @@ const ProductDetails = ({
           />
 
           {/* Gift Wrapping and Gift Note */}
-          <Box
-            sx={{ my: 2, p: 2, backgroundColor: "#f5f5f5", borderRadius: 1 }}
-          >
+          <Box sx={{ my: 2, p: 2, borderRadius: 1 }}>
             <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 600 }}>
               Gift Options
             </Typography>
