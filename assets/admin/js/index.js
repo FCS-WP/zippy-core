@@ -9,6 +9,7 @@ import { OrderProvider } from "./context/OrderContext";
 import Orders from "./pages/orders/Orders";
 import { SettingsProvider } from "../providers/SettingsProvider";
 import CoreSettingOrders from "./pages/settings/CoreSettingOrders";
+import PreOrderOptions from "./Components/Pages/Orders/PreOrderOptions";
 
 // Zippy Dashboard
 document.addEventListener("DOMContentLoaded", function () {
@@ -42,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <Orders />
           <ToastContainer />
         </OrderProvider>
-      </>
+      </>,
     );
   }
 });
@@ -58,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
       <>
         <TableOrderInfo orderId={orderId} enableEdit={enableEdit} />
         <ToastContainer />
-      </>
+      </>,
     );
   }
 });
@@ -76,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <ModuleSettings />
           <ToastContainer />
         </SettingsProvider>
-      </>
+      </>,
     );
   }
 });
@@ -87,12 +88,29 @@ document.addEventListener("DOMContentLoaded", function () {
   if (orderPage) {
     const root = ReactDOM.createRoot(orderPage);
     root.render(
-     <>
+      <>
         <SettingsProvider>
           <CoreSettingOrders />
           <ToastContainer />
         </SettingsProvider>
-      </>
+      </>,
+    );
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const zippyOrderDetailPreOrderOptions = document.getElementById(
+    "zippy-pre-order-options",
+  );
+
+  if (zippyOrderDetailPreOrderOptions) {
+    const root = ReactDOM.createRoot(zippyOrderDetailPreOrderOptions);
+    const orderID =
+      zippyOrderDetailPreOrderOptions.getAttribute("data-order-id");
+    root.render(
+      <>
+        <PreOrderOptions orderID={orderID} />
+      </>,
     );
   }
 });
