@@ -176,21 +176,25 @@ class Order_Services
      */
     public static function export_orders(array $paramInfos)
     {
-        $date_from = sanitize_text_field($paramInfos['date_from'] ?? '');
-        $date_to   = sanitize_text_field($paramInfos['date_to'] ?? '');
+        $filter = $paramInfos['filter'] ?? [];
         $format    = sanitize_text_field($paramInfos['format'] ?? 'csv');
+        $limit    = intval($paramInfos['limit']);
 
         $args = [
-            'limit'   => -1,
+            'limit'   => $limit,
             'return'  => 'objects',
         ];
 
-        if ($date_from && $date_to) {
-            $args['date_created'] = $date_from . '...' . $date_to;
-        } elseif ($date_from) {
-            $args['date_created'] = '>' . $date_from . ' 00:00:00';
-        } elseif ($date_to) {
-            $args['date_created'] = '<' . $date_to . ' 23:59:59';
+        if (!empty($filter['date_from']) && !empty($filter['date_to'])) {
+            $args['date_created'] = $filter['date_from'] . '...' . $filter['date_to'];
+        } elseif (!empty($filter['date_from'])) {
+            $args['date_created'] = '>' . $filter['date_from'] . ' 00:00:00';
+        } elseif (!empty($filter['date_to'])) {
+            $args['date_created'] = '<' . $filter['date_to'] . ' 23:59:59';
+        }
+
+        if (!empty($filter['order_status'])) {
+            $args['status'] = $filter['order_status'];
         }
 
         $orders = wc_get_orders($args);

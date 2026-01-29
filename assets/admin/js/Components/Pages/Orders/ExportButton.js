@@ -7,7 +7,7 @@ import { downloadBase64File } from "../../../utils/FileHelper";
 import { toast } from "react-toastify";
 
 const ExportButton = () => {
-  const { fromDate, toDate } = useOrderProvider();
+  const { filteredOrders, rowsPerPage } = useOrderProvider();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -22,8 +22,17 @@ const ExportButton = () => {
 
   const handleExport = async (type) => {
     handleClose();
-    const params = { date_from: fromDate, date_to: toDate };
-    const { data } = await Api.exportOrders({ format: type, ...params });
+
+    let filter = {};
+    if (filteredOrders) {
+      filter = filteredOrders;
+    }
+  
+    const { data } = await Api.exportOrders({
+      format: type,
+      filter: filter,
+      limit: rowsPerPage,
+    });
 
     if (data?.status === "success") {
       const { file_base64, file_name, file_type } = data;

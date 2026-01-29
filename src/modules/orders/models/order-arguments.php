@@ -16,7 +16,7 @@ class Order_Arguments
             'per_page' => [
                 'default'           => 10,
                 'sanitize_callback' => 'absint',
-                'validate_callback' => fn($value) => $value > 0 && $value <= 100,
+                'validate_callback' => fn($value) => $value > 0 && $value <= 200,
             ],
             'orderby' => [
                 'sanitize_callback' => 'sanitize_text_field',
@@ -146,17 +146,17 @@ class Order_Arguments
     public static function get_export_orders_args()
     {
         return [
-            'date_from' => [
+            'filter' => [
                 'required' => false,
-                'type' => 'string',
-            ],
-            'date_to' => [
-                'required' => false,
-                'type' => 'string',
+                'type' => 'object',
             ],
             'format' => [
                 'required' => false,
                 'type' => 'string',
+            ],
+            'limit' => [
+                'required' => true,
+                'type' => 'integer',
             ],
         ];
     }
