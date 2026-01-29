@@ -63,7 +63,7 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
     setSelectedOrders((prev) =>
       prev.includes(String(orderId))
         ? prev.filter((x) => x !== String(orderId))
-        : [...prev, String(orderId)]
+        : [...prev, String(orderId)],
     );
   };
 
@@ -244,7 +244,7 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
         onPageChange={handleChangePage}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={handleChangeRowsPerPage}
-        rowsPerPageOptions={[5, 10, 20]}
+        rowsPerPageOptions={[5, 10, 20, 50, 100, 200]}
       />
     </Paper>
   );
