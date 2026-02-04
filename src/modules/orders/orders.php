@@ -147,7 +147,8 @@ class Core_Orders extends Core_Module
 
     function add_scripts_to_hide_menu_items()
     {
-        wp_enqueue_script('ordee-admin-scripts', ZIPPY_CORE_URL . '/assets/admin/js/custom-order-scripts.js', [], '1.0', true);
+        $version = time();
+        wp_enqueue_script('ordee-admin-scripts', ZIPPY_CORE_URL . '/assets/admin/js/custom-order-scripts.js', [], $version, true);
     }
 
     /**
