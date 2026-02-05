@@ -412,7 +412,7 @@ class Order_Services
 
         // Set recipient based on email type
         $to = in_array($email_type, ['new_order', 'cancelled_order', 'failed_order'])
-            ? 'hau.nguyen@floatingcube.com'
+            ? 'dev@zippy.sg'
             : $order->get_billing_email();
 
         // Wrap email with WooCommerce header/footer
