@@ -9,6 +9,8 @@ use WC_Tax;
 
 class Core_Shipping extends Core_Module
 {
+    protected $module_key = 'shipping';
+
     public function __construct()
     {
         if (!function_exists('is_plugin_active')) {

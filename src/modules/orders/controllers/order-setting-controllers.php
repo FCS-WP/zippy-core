@@ -1,10 +1,10 @@
 <?php
 
-namespace Zippy_Core\Settings\Controllers;
+namespace Zippy_Core\Orders\Controllers;
 
 use WP_REST_Request;
 use Zippy_Core\Core_Settings;
-use Zippy_Core\Settings\Services\Order_Setting_Services;
+use Zippy_Core\Orders\Services\Order_Setting_Services;
 use Zippy_Core\Settings\Services\Setting_Services;
 use Zippy_Core\Utils\Zippy_Response_Handler;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Zippy_Core\Settings\Services;
+namespace Zippy_Core\Orders\Services;
 
 use Zippy_Core\Core_Settings;
 
