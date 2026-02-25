@@ -43,8 +43,8 @@ class Core_Orders extends Core_Module
          * 
          */
 
-        // add_action('admin_menu', [$this, 'add_custom_orders_page']);
-        // add_action('admin_menu', [$this, 'hide_default_orders'], 999);
+        add_action('admin_menu', [$this, 'add_custom_orders_page']);
+        add_action('admin_menu', [$this, 'hide_default_orders'], 999);
 
         if ($this->is_custom_order_items_active()) {
             add_shortcode('admin_order_table', array($this, 'generate_admin_order_table_div'));
