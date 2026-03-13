@@ -5,6 +5,7 @@ namespace Zippy_Core;
 use Zippy_Core\Core_Module;
 use Zippy_Core\Orders\Controllers\Order_Controllers;
 use Zippy_Core\Orders\Routes\Order_Route;
+use Zippy_Core\Orders\Services\Order_Setting_Services;
 use Zippy_Core\Utils\Zippy_String_Helpers;
 
 class Core_Orders extends Core_Module
@@ -35,6 +36,8 @@ class Core_Orders extends Core_Module
     {
         Order_Route::get_instance();
 
+        $this->init_required_options();
+
         /**
          * Add cutomize orders pages
          * 
@@ -49,6 +52,12 @@ class Core_Orders extends Core_Module
             add_action('admin_head', [$this, 'custom_admin_order_styles']);
             add_action('woocommerce_admin_order_data_after_shipping_address', [$this, 'custom_display_order_meta'], 10, 1);
         }
+    }
+
+    public function init_required_options()
+    {
+        Order_Setting_Services::init_invoices_option();
+        Order_Setting_Services::init_order_detail_option();
     }
 
     protected function is_custom_order_items_active()
