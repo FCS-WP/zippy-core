@@ -23,12 +23,13 @@ import { useOrderProvider } from "../../../context/OrderContext";
 import DateCreatedCell from "./DateCreatedCell";
 import ExportButton from "./ExportButton";
 import SummaryOrders from "./SummaryOrders";
+import OrderSearch from "./OrderSearch";
 
 const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [paginatedOrders, setPaginatedOrders] = useState([]);
 
-  const { totalOrders, rowsPerPage, setRowsPerPage, page, setPage } =
+  const { totalOrders, rowsPerPage, setRowsPerPage, page, setPage, fetchSearchOrders } =
     useOrderProvider();
 
   useEffect(() => {
@@ -79,6 +80,10 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
       setSelectedOrders((prev) => [...new Set([...prev, ...allIds])]);
     }
   };
+
+  const handleSearchOrders = (value) => {
+    fetchSearchOrders(value)
+  }
 
   return (
     <Paper sx={{ p: 2 }}>
@@ -145,6 +150,7 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
         />
         <FilterOrder />
         <ExportButton />
+        <OrderSearch onSearch={handleSearchOrders} />
       </Box>
 
       <TableContainer sx={{ my: "20px" }}>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Autocomplete, Box, CircularProgress } from "@mui/material";
+import { useOrderProvider } from "../../context/OrderContext";
 
 /**
  * Generic search-select input
@@ -19,8 +20,10 @@ export default function SearchSelect({
   height = 32,
   minCharacters = 3,
 }) {
+  const {searchQuery} = useOrderProvider();
+  
   const [options, setOptions] = useState([]);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(searchQuery);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

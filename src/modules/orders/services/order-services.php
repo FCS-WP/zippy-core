@@ -11,7 +11,7 @@ use Automattic\WooCommerce\Admin\Overrides\OrderRefund;
 
 class Order_Services
 {
-    public static function handle_orders($infos)
+    public static function handle_orders_v1($infos)
     {
         $page         = $infos['page'] ?? null;
         $per_page     = $infos['per_page'] ?? null;
@@ -489,6 +489,204 @@ class Order_Services
 
         return [
             'results' => $results,
+        ];
+    }
+
+    public static function handle_orders($infos)
+    {
+        $page         = $infos['page'] ?? null;
+        $per_page     = $infos['per_page'] ?? null;
+        $order_by     = $infos['order_by'] ?? 'date';
+        $order_val    = $infos['order_val'] ?? 'DESC';
+        $order_status = $infos['order_status'] ?? null;
+        $date_from    = $infos['date_from'] ?? null;
+        $date_to      = $infos['date_to'] ?? null;
+        $customer_id  = $infos['customer_id'] ?? null;
+        $search       = isset($infos['search']) ? trim($infos['search']) : null;
+
+        $base_args = [
+            'orderby' => $order_by,
+            'order'   => $order_val,
+            'type'    => 'shop_order',
+            'return'  => 'objects',
+        ];
+
+        if (!empty($order_status)) {
+            $base_args['status'] = array_map('trim', explode(',', $order_status));
+        }
+
+        if ($date_from && $date_to) {
+            $base_args['date_created'] = "{$date_from}...{$date_to}";
+        } elseif ($date_from) {
+            $base_args['date_created'] = ">{$date_from} 00:00:00";
+        } elseif ($date_to) {
+            $base_args['date_created'] = "<{$date_to} 23:59:59";
+        }
+
+        if (!empty($customer_id)) {
+            $base_args['customer_id'] = $customer_id;
+        }
+
+        if (!empty($search)) {
+            // Numeric = direct order ID lookup, no need to scan everything
+            if (is_numeric($search)) {
+                $base_args['post__in'] = [absint($search)];
+            } else {
+                // Resolve matched WP user IDs from search
+                $matched_customer_ids = self::find_customer_ids_by_search($search);
+
+                if (!empty($matched_customer_ids)) {
+                    if (!empty($customer_id)) {
+                        // Intersect explicit customer_id with search results
+                        if (!in_array((int) $customer_id, $matched_customer_ids, true)) {
+                            return self::empty_result($page, $per_page);
+                        }
+                    } else {
+                        $base_args['customer_id'] = $matched_customer_ids;
+                    }
+                }
+
+                // Always fetch all (no limit) and filter in PHP using decrypted billing data
+                // This is the only reliable approach when order meta is encrypted
+                $base_args['limit'] = -1;
+                unset($base_args['page']);
+            }
+        }
+
+        // -------------------------------------------------------------------------
+        // Fetch orders
+        // -------------------------------------------------------------------------
+        $use_php_search = !empty($search) && !is_numeric($search);
+
+        if ($use_php_search) {
+            // Fetch all matched orders, filter by billing fields in PHP
+            $all_orders = wc_get_orders($base_args);
+            $filtered   = [];
+
+            foreach ($all_orders as $order) {
+                if ($order instanceof OrderRefund) {
+                    continue;
+                }
+
+                if (self::order_matches_search($order, $search)) {
+                    $filtered[] = $order;
+                }
+            }
+
+            $total_orders = count($filtered);
+            $total_pages  = $per_page > 0 ? (int) ceil($total_orders / $per_page) : 1;
+
+            // Manual pagination on filtered results
+            $offset = $per_page > 0 ? ($page - 1) * $per_page : 0;
+            $paged  = array_slice($filtered, $offset, $per_page ?: null);
+
+            return [
+                'page'         => $page,
+                'per_page'     => $per_page,
+                'total_pages'  => $total_pages,
+                'total_orders' => $total_orders,
+                'orders'       => array_map([self::class, 'parse_order_data'], $paged),
+            ];
+        }
+
+        // Normal paginated path (no search or numeric order ID search)
+        $orders = wc_get_orders(array_merge($base_args, [
+            'limit' => $per_page,
+            'page'  => $page,
+        ]));
+
+        $data = [];
+        foreach ($orders as $order) {
+            if (!($order instanceof OrderRefund)) {
+                $data[] = self::parse_order_data($order);
+            }
+        }
+
+        $total_orders = count(wc_get_orders(array_merge($base_args, [
+            'limit'  => -1,
+            'return' => 'ids',
+        ])));
+
+        return [
+            'page'         => $page,
+            'per_page'     => $per_page,
+            'total_pages'  => $per_page > 0 ? (int) ceil($total_orders / $per_page) : 1,
+            'total_orders' => $total_orders,
+            'orders'       => $data,
+        ];
+    }
+
+    /**
+     * Check if an order matches the search string against decrypted billing data.
+     * WooCommerce decrypts values automatically via get_address() / getters.
+     */
+    private static function order_matches_search($order, string $search): bool
+    {
+        $search = strtolower($search);
+
+        $billing = $order->get_address('billing');
+
+        $haystack = strtolower(implode(' ', array_filter([
+            $billing['first_name'] ?? '',
+            $billing['last_name']  ?? '',
+            $billing['email']      ?? '',
+            $billing['phone']      ?? '',
+            $billing['company']    ?? '',
+        ])));
+
+        return strpos($haystack, $search) !== false;
+    }
+
+    /**
+     * Find WP user IDs matching a search string (registered users only).
+     * Does NOT touch order meta — used to pre-filter wc_get_orders by customer_id.
+     */
+    private static function find_customer_ids_by_search(string $search): array
+    {
+        $ids = [];
+
+        foreach (['email', 'login'] as $field) {
+            $user = get_user_by($field, $search);
+            if ($user) {
+                $ids[] = (int) $user->ID;
+            }
+        }
+
+        $user_query = new \WP_User_Query([
+            'search'         => '*' . esc_attr($search) . '*',
+            'search_columns' => ['user_login', 'user_email', 'display_name'],
+            'fields'         => 'ID',
+            'number'         => 50,
+            'meta_query'     => [
+                'relation' => 'OR',
+                [
+                    'key'     => 'first_name',
+                    'value'   => $search,
+                    'compare' => 'LIKE',
+                ],
+                [
+                    'key'     => 'last_name',
+                    'value'   => $search,
+                    'compare' => 'LIKE',
+                ],
+            ],
+        ]);
+
+        foreach ($user_query->get_results() as $uid) {
+            $ids[] = (int) $uid;
+        }
+
+        return array_values(array_unique($ids));
+    }
+
+    private static function empty_result($page, $per_page): array
+    {
+        return [
+            'page'         => $page,
+            'per_page'     => $per_page,
+            'total_pages'  => 0,
+            'total_orders' => 0,
+            'orders'       => [],
         ];
     }
 }
