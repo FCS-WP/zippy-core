@@ -97,10 +97,10 @@ const FilterOrder = () => {
       </FormControl>
 
       {/* Filter by customer email */}
-      <CustomerFilterOrder
+      {/* <CustomerFilterOrder
         customerSearchSelected={customerSearchSelected}
         setCustomerSearchSelected={setCustomerSearchSelected}
-      />
+      /> */}
 
       {/* Filter button */}
       <Button
