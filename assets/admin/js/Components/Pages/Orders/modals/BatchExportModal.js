@@ -15,7 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { Api } from '../../../../api/admin';
 
-const BatchExportModal = ({ open, onClose, filters, format = 'csv' }) => {
+const BatchExportModal = ({ open, onClose, filters }) => {
     const [status, setStatus] = useState('idle'); // idle, starting, processing, completed, error
     const [progress, setProgress] = useState(0);
     const [processedCount, setProcessedCount] = useState(0);
@@ -47,7 +47,7 @@ const BatchExportModal = ({ open, onClose, filters, format = 'csv' }) => {
 
         try {
             // 1. Get total and init
-            const startRes = await Api.exportStart({ filter: filters, format: format });
+            const startRes = await Api.exportStart({ filter: filters });
             if (startRes.error) throw new Error(startRes.error.message);
             if (startRes.data?.status === 'error') throw new Error(startRes.data.message);
 
@@ -70,8 +70,7 @@ const BatchExportModal = ({ open, onClose, filters, format = 'csv' }) => {
                     export_id,
                     offset: currentOffset,
                     limit: chunk_size,
-                    filter: filters,
-                    format: format
+                    filter: filters
                 });
 
                 if (chunkRes.error) throw new Error(chunkRes.error.message);
@@ -114,7 +113,7 @@ const BatchExportModal = ({ open, onClose, filters, format = 'csv' }) => {
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
             <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                Order Export Progress ({format.toUpperCase()})
+                Order Export Progress (CSV)
                 <IconButton onClick={handleClose}>
                     <CloseIcon />
                 </IconButton>
@@ -128,7 +127,7 @@ const BatchExportModal = ({ open, onClose, filters, format = 'csv' }) => {
                 {status === 'processing' && (
                     <Box sx={{ width: '100%', mt: 2 }}>
                         <Typography variant="body2" color="text.secondary" gutterBottom>
-                            Processing orders ({format.toUpperCase()}): {processedCount} / {totalCount}
+                            Processing orders (CSV): {processedCount} / {totalCount}
                         </Typography>
                         <LinearProgress variant="determinate" value={progress} sx={{ height: 10, borderRadius: 5 }} />
                         <Typography variant="h6" sx={{ mt: 1, textAlign: 'center' }}>
@@ -142,7 +141,7 @@ const BatchExportModal = ({ open, onClose, filters, format = 'csv' }) => {
 
                 {status === 'starting' && (
                     <Box sx={{ textAlign: 'center', p: 3 }}>
-                        <Typography>Initializing {format.toUpperCase()} export session...</Typography>
+                        <Typography>Initializing CSV export session...</Typography>
                         <LinearProgress sx={{ mt: 2 }} />
                     </Box>
                 )}
@@ -150,7 +149,7 @@ const BatchExportModal = ({ open, onClose, filters, format = 'csv' }) => {
                 {status === 'completed' && (
                     <Box sx={{ textAlign: 'center', p: 3 }}>
                         <Typography variant="h6" color="success.main" gutterBottom>
-                            {format.toUpperCase()} Export Completed Successfully!
+                            CSV Export Completed Successfully!
                         </Typography>
                         <Typography variant="body1" sx={{ mb: 3 }}>
                             Your file with {totalCount} orders is ready.
@@ -163,7 +162,7 @@ const BatchExportModal = ({ open, onClose, filters, format = 'csv' }) => {
                             target="_blank"
                             size="large"
                         >
-                            Download {format.toUpperCase()} File
+                            Download CSV File
                         </Button>
                     </Box>
                 )}

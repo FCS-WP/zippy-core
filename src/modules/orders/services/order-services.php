@@ -179,6 +179,7 @@ class Order_Services
         $date_from = sanitize_text_field($paramInfos['date_from'] ?? '');
         $date_to   = sanitize_text_field($paramInfos['date_to'] ?? '');
         $format    = sanitize_text_field($paramInfos['format'] ?? 'csv');
+        $search    = isset($paramInfos['search']) ? trim($paramInfos['search']) : '';
 
         $args = [
             'limit'   => -1,
@@ -193,10 +194,27 @@ class Order_Services
             $args['date_created'] = '<' . $date_to . ' 23:59:59';
         }
 
+        if (!empty($search)) {
+            if (is_numeric($search)) {
+                $args['post__in'] = [absint($search)];
+            }
+        }
+
         $orders = wc_get_orders($args);
 
+        if (!empty($search) && !is_numeric($search)) {
+            $filtered = [];
+            foreach ($orders as $order) {
+                if ($order instanceof OrderRefund) continue;
+                if (self::order_matches_search($order, $search)) {
+                    $filtered[] = $order;
+                }
+            }
+            $orders = $filtered;
+        }
+
         if (empty($orders)) {
-            return new \WP_Error('no_orders', 'No orders found for the selected date range.');
+            return new \WP_Error('no_orders', 'No orders found for the selected range/search.');
         }
 
         $order_rows = [];

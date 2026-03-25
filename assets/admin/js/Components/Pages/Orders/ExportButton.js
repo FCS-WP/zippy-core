@@ -8,11 +8,11 @@ import { toast } from "react-toastify";
 import BatchExportModal from "./modals/BatchExportModal";
 
 const ExportButton = () => {
-  const { filteredOrders, rowsPerPage } = useOrderProvider();
+  const { filteredOrders, rowsPerPage, searchQuery } = useOrderProvider();
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [openBatchModal, setOpenBatchModal] = useState(false);
-  const [batchFormat, setBatchFormat] = useState('csv');
+  const [batchFormat, setBatchFormat] = useState("csv");
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
@@ -26,7 +26,10 @@ const ExportButton = () => {
   const handleExport = async (type) => {
     handleClose();
 
-    let filter = filteredOrders || {};
+    let filter = {
+      ...(filteredOrders || {}),
+      search: searchQuery || "",
+    };
 
     try {
       const res = await Api.exportOrders({
@@ -45,7 +48,8 @@ const ExportButton = () => {
         downloadBase64File(file_base64, file_name, file_type);
         toast.success("File downloaded successfully!");
       } else {
-        const errorMessage = res.error?.message || res.data?.message || "Failed to export orders.";
+        const errorMessage =
+          res.error?.message || res.data?.message || "Failed to export orders.";
         toast.error(errorMessage);
       }
     } catch (error) {
@@ -78,16 +82,6 @@ const ExportButton = () => {
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
       >
-        <MenuItem onClick={() => handleExport("pdf")}>
-          Export as PDF (Current Page)
-        </MenuItem>
-        <MenuItem onClick={() => handleExport("csv")}>
-          Export as CSV (Current Page)
-        </MenuItem>
-        <Divider />
-        <MenuItem onClick={() => handleOpenBatchExport("pdf")}>
-          <DownloadIcon sx={{ mr: 1, fontSize: 18 }} /> Export All Orders (PDF)
-        </MenuItem>
         <MenuItem onClick={() => handleOpenBatchExport("csv")}>
           <DownloadIcon sx={{ mr: 1, fontSize: 18 }} /> Export All Orders (CSV)
         </MenuItem>
@@ -97,7 +91,10 @@ const ExportButton = () => {
       <BatchExportModal
         open={openBatchModal}
         format={batchFormat}
-        filters={filteredOrders || {}}
+        filters={{
+          ...(filteredOrders || {}),
+          search: searchQuery || "",
+        }}
         onClose={() => setOpenBatchModal(false)}
       />
     </>
