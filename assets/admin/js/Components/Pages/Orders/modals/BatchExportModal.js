@@ -15,7 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import { Api } from '../../../../api/admin';
 
-const BatchExportModal = ({ open, onClose, filters }) => {
+const BatchExportModal = ({ open, onClose, filters, format = 'csv' }) => {
     const [status, setStatus] = useState('idle'); // idle, starting, processing, completed, error
     const [progress, setProgress] = useState(0);
     const [processedCount, setProcessedCount] = useState(0);
@@ -47,7 +47,7 @@ const BatchExportModal = ({ open, onClose, filters }) => {
 
         try {
             // 1. Get total and init
-            const startRes = await Api.exportStart({ filter: filters });
+            const startRes = await Api.exportStart({ filter: filters, format: format });
             if (startRes.error) throw new Error(startRes.error.message);
             if (startRes.data?.status === 'error') throw new Error(startRes.data.message);
 
@@ -70,7 +70,8 @@ const BatchExportModal = ({ open, onClose, filters }) => {
                     export_id,
                     offset: currentOffset,
                     limit: chunk_size,
-                    filter: filters
+                    filter: filters,
+                    format: format
                 });
 
                 if (chunkRes.error) throw new Error(chunkRes.error.message);
@@ -113,7 +114,7 @@ const BatchExportModal = ({ open, onClose, filters }) => {
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
             <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                Order Export Progress
+                Order Export Progress ({format.toUpperCase()})
                 <IconButton onClick={handleClose}>
                     <CloseIcon />
                 </IconButton>
@@ -127,7 +128,7 @@ const BatchExportModal = ({ open, onClose, filters }) => {
                 {status === 'processing' && (
                     <Box sx={{ width: '100%', mt: 2 }}>
                         <Typography variant="body2" color="text.secondary" gutterBottom>
-                            Processing orders: {processedCount} / {totalCount}
+                            Processing orders ({format.toUpperCase()}): {processedCount} / {totalCount}
                         </Typography>
                         <LinearProgress variant="determinate" value={progress} sx={{ height: 10, borderRadius: 5 }} />
                         <Typography variant="h6" sx={{ mt: 1, textAlign: 'center' }}>
@@ -141,7 +142,7 @@ const BatchExportModal = ({ open, onClose, filters }) => {
 
                 {status === 'starting' && (
                     <Box sx={{ textAlign: 'center', p: 3 }}>
-                        <Typography>Initializing export session...</Typography>
+                        <Typography>Initializing {format.toUpperCase()} export session...</Typography>
                         <LinearProgress sx={{ mt: 2 }} />
                     </Box>
                 )}
@@ -149,7 +150,7 @@ const BatchExportModal = ({ open, onClose, filters }) => {
                 {status === 'completed' && (
                     <Box sx={{ textAlign: 'center', p: 3 }}>
                         <Typography variant="h6" color="success.main" gutterBottom>
-                            Export Completed Successfully!
+                            {format.toUpperCase()} Export Completed Successfully!
                         </Typography>
                         <Typography variant="body1" sx={{ mb: 3 }}>
                             Your file with {totalCount} orders is ready.
@@ -162,7 +163,7 @@ const BatchExportModal = ({ open, onClose, filters }) => {
                             target="_blank"
                             size="large"
                         >
-                            Download CSV File
+                            Download {format.toUpperCase()} File
                         </Button>
                     </Box>
                 )}

@@ -12,6 +12,7 @@ const ExportButton = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [openBatchModal, setOpenBatchModal] = useState(false);
+  const [batchFormat, setBatchFormat] = useState('csv');
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
@@ -34,7 +35,7 @@ const ExportButton = () => {
         limit: rowsPerPage,
       });
 
-      if (res.status === "success" && res.data) {
+      if (res.data?.status === "success") {
         const { file_base64, file_name, file_type } = res.data;
         if (!file_base64) {
           toast.warning("The file is empty. Nothing to download.");
@@ -44,15 +45,17 @@ const ExportButton = () => {
         downloadBase64File(file_base64, file_name, file_type);
         toast.success("File downloaded successfully!");
       } else {
-        toast.error(res.message || "Failed to export orders.");
+        const errorMessage = res.error?.message || res.data?.message || "Failed to export orders.";
+        toast.error(errorMessage);
       }
     } catch (error) {
       toast.error("An error occurred during export.");
     }
   };
 
-  const handleOpenBatchExport = () => {
+  const handleOpenBatchExport = (format) => {
     handleClose();
+    setBatchFormat(format);
     setOpenBatchModal(true);
   };
 
@@ -82,14 +85,18 @@ const ExportButton = () => {
           Export as CSV (Current Page)
         </MenuItem>
         <Divider />
-        <MenuItem onClick={handleOpenBatchExport}>
-          <DownloadIcon sx={{ mr: 1, fontSize: 18 }} /> Export All Orders
+        <MenuItem onClick={() => handleOpenBatchExport("pdf")}>
+          <DownloadIcon sx={{ mr: 1, fontSize: 18 }} /> Export All Orders (PDF)
+        </MenuItem>
+        <MenuItem onClick={() => handleOpenBatchExport("csv")}>
+          <DownloadIcon sx={{ mr: 1, fontSize: 18 }} /> Export All Orders (CSV)
         </MenuItem>
       </Menu>
 
       {/* New Batch Export Modal */}
       <BatchExportModal
         open={openBatchModal}
+        format={batchFormat}
         filters={filteredOrders || {}}
         onClose={() => setOpenBatchModal(false)}
       />
