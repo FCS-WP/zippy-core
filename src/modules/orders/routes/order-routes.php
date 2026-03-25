@@ -122,5 +122,26 @@ class Order_Route extends Core_Route
             'permission_callback' => [Core_Middleware::class, 'admin_only'],
             'args' => Order_Arguments::get_refund_order_args(),
         ]);
+
+        register_rest_route(ZIPPY_CORE_API_PREFIX, '/export-start', [
+            'methods'  => 'POST',
+            'callback' => [Order_Controllers::class, 'export_start'],
+            'permission_callback' => [Core_Middleware::class, 'admin_only'],
+            'args' => Order_Arguments::get_export_start_args(),
+        ]);
+
+        register_rest_route(ZIPPY_CORE_API_PREFIX, '/export-process-chunk', [
+            'methods'  => 'POST',
+            'callback' => [Order_Controllers::class, 'export_process_chunk'],
+            'permission_callback' => [Core_Middleware::class, 'admin_only'],
+            'args' => Order_Arguments::get_export_process_chunk_args(),
+        ]);
+
+        register_rest_route(ZIPPY_CORE_API_PREFIX, '/export-finalize', [
+            'methods'  => 'POST',
+            'callback' => [Order_Controllers::class, 'export_finalize'],
+            'permission_callback' => [Core_Middleware::class, 'admin_only'],
+            'args' => Order_Arguments::get_export_finalize_args(),
+        ]);
     }
 }

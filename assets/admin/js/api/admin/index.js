@@ -55,6 +55,9 @@ export const Api = {
   async product(params) {
     return await makeRequest("/product", params, "GET");
   },
+  async getOrderDetails(params) {
+    return await makeRequest("/order-details", params);
+  },
   async exportOrders(params) {
     return await makeRequest("/export-orders", params, "POST");
   },
@@ -69,6 +72,17 @@ export const Api = {
   },
   async refundOrder(params) {
     return await makeRequest("/refund-order", params, "POST");
+  },
+
+  // --- Client-side Batching Export APIs ---
+  async exportStart(params) {
+    return await makeRequest("/export-start", params, "POST");
+  },
+  async exportProcessChunk(params) {
+    return await makeRequest("/export-process-chunk", params, "POST");
+  },
+  async exportFinalize(params) {
+    return await makeRequest("/export-finalize", params, "POST");
   },
 };
 

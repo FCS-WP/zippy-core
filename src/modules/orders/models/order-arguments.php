@@ -243,4 +243,46 @@ class Order_Arguments
             ],
         ];
     }
+
+    public static function get_export_start_args()
+    {
+        return [
+            'filter' => [
+                'required' => false,
+                'type' => 'object',
+            ],
+        ];
+    }
+
+    public static function get_export_process_chunk_args()
+    {
+        return [
+            'export_id' => [
+                'required' => true,
+                'type' => 'string',
+            ],
+            'offset' => [
+                'required' => true,
+                'type' => 'integer',
+            ],
+            'limit' => [
+                'required' => true,
+                'type' => 'integer',
+            ],
+            'filter' => [
+                'required' => false,
+                'type' => 'object',
+            ],
+        ];
+    }
+
+    public static function get_export_finalize_args()
+    {
+        return [
+            'export_id' => [
+                'required' => true,
+                'type' => 'string',
+            ],
+        ];
+    }
 }
