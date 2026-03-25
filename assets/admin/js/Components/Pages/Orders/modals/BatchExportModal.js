@@ -161,6 +161,16 @@ const BatchExportModal = ({ open, onClose, filters }) => {
                             href={fileUrl}
                             target="_blank"
                             size="large"
+                            sx={{
+                                color: '#fff !important',
+                                '& .MuiButton-startIcon': {
+                                    color: '#fff !important'
+                                },
+                                '&:hover': {
+                                    backgroundColor: 'success.dark',
+                                    color: '#fff !important'
+                                }
+                            }}
                         >
                             Download CSV File
                         </Button>
