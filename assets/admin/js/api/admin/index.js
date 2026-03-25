@@ -74,7 +74,7 @@ export const Api = {
     return await makeRequest("/refund-order", params, "POST");
   },
 
-  // --- Client-side Batching Export APIs ---
+  //Export all orders
   async exportStart(params) {
     return await makeRequest("/export-start", params, "POST");
   },
