@@ -9,10 +9,10 @@ export const orderStatus = {
 };
 
 export const statusColors = {
-  [orderStatus.PROCESSING]: { label: "Processing", customColor: "#03dd20ff" },
+  [orderStatus.PROCESSING]: { label: "Processing", customColor: "#2e7d32" },
   [orderStatus.COMPLETED]: { label: "Completed", customColor: "#1976d2" },
-  [orderStatus.PENDING]: { label: "Pending Payment", customColor: "#ff0000ff" },
-  [orderStatus.CANCELLED]: { label: "Cancelled", customColor: "#f6739cff" },
+  [orderStatus.PENDING]: { label: "Pending Payment", customColor: "#d32f2f" },
+  [orderStatus.CANCELLED]: { label: "Cancelled", customColor: "#000000de" },
   [orderStatus.REFUNDED]: { label: "Refunded", customColor: "#ff9d00ff" },
   [orderStatus.ON_HOLD]: { label: "On Hold", customColor: "#dab821ff" },
 };

@@ -88,7 +88,7 @@ class Order_Services
     public static function parse_order_data($order)
     {
         $billing  = $order->get_address('billing');
-        $shipping = $order->get_address('shipping');
+        $shipping = !array_filter($order->get_address('shipping')) ? $billing : $order->get_address('shipping');
 
         $data = [
             'id'           => $order->get_id(),
@@ -134,6 +134,7 @@ class Order_Services
                     'total'      => $item->get_total(),
                 ];
             }, $order->get_items()),
+            'source'      => $order->get_meta('_wc_order_attribution_utm_source') ?: 'website',
         ];
 
         return $data;
@@ -176,31 +177,45 @@ class Order_Services
      */
     public static function export_orders(array $paramInfos)
     {
-        $filter = $paramInfos['filter'] ?? [];
+        $date_from = sanitize_text_field($paramInfos['date_from'] ?? '');
+        $date_to   = sanitize_text_field($paramInfos['date_to'] ?? '');
         $format    = sanitize_text_field($paramInfos['format'] ?? 'csv');
-        $limit    = intval($paramInfos['limit']);
+        $search    = isset($paramInfos['search']) ? trim($paramInfos['search']) : '';
 
         $args = [
-            'limit'   => $limit,
+            'limit'   => -1,
             'return'  => 'objects',
         ];
 
-        if (!empty($filter['date_from']) && !empty($filter['date_to'])) {
-            $args['date_created'] = $filter['date_from'] . '...' . $filter['date_to'];
-        } elseif (!empty($filter['date_from'])) {
-            $args['date_created'] = '>' . $filter['date_from'] . ' 00:00:00';
-        } elseif (!empty($filter['date_to'])) {
-            $args['date_created'] = '<' . $filter['date_to'] . ' 23:59:59';
+        if ($date_from && $date_to) {
+            $args['date_created'] = $date_from . '...' . $date_to;
+        } elseif ($date_from) {
+            $args['date_created'] = '>' . $date_from . ' 00:00:00';
+        } elseif ($date_to) {
+            $args['date_created'] = '<' . $date_to . ' 23:59:59';
         }
 
-        if (!empty($filter['order_status'])) {
-            $args['status'] = $filter['order_status'];
+        if (!empty($search)) {
+            if (is_numeric($search)) {
+                $args['post__in'] = [absint($search)];
+            }
         }
 
         $orders = wc_get_orders($args);
 
+        if (!empty($search) && !is_numeric($search)) {
+            $filtered = [];
+            foreach ($orders as $order) {
+                if ($order instanceof OrderRefund) continue;
+                if (self::order_matches_search($order, $search)) {
+                    $filtered[] = $order;
+                }
+            }
+            $orders = $filtered;
+        }
+
         if (empty($orders)) {
-            return new \WP_Error('no_orders', 'No orders found for the selected date range.');
+            return new \WP_Error('no_orders', 'No orders found for the selected range/search.');
         }
 
         $order_rows = [];
@@ -208,17 +223,31 @@ class Order_Services
             if ($order instanceof OrderRefund) {
                 continue;
             }
+            $country = $order->get_billing_country();
+            $state   = $order->get_billing_state();
+
+            $states = WC()->countries->get_states($country);
+            $state_name = $states[$state] ?? $state;
 
             $order_rows[] = [
                 'order_id'       => $order->get_id(),
                 'phone'          => $order->get_billing_phone(),
-                'firstname'      => $order->get_billing_first_name(),
-                'lastname'       => $order->get_billing_last_name(),
-                'user'           => $order->get_user_id() ? get_userdata($order->get_user_id())->user_login : 'Guest',
+                'name'      => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(),
+                'email'       => $order->get_billing_email(),
+                'company'           => $order->get_billing_company(),
+                'street'        => trim(
+                    $order->get_billing_address_1() . ' ' . $order->get_billing_address_2()
+                ),
+                'city'          => $order->get_billing_city(),
+                'postcode'     => $order->get_billing_postcode(),
+                'state'           => $state_name,
+                'items'         => self::get_items_data($order),
                 'status'         => wc_get_order_status_name($order->get_status()),
-                'total'          => strip_tags(wc_price($order->get_total())),
+                'total' => html_entity_decode(wp_strip_all_tags(wc_price($order->get_total()))),
                 'payment_method' => $order->get_payment_method_title(),
+                'order_note' => $order->get_customer_note(),
                 'date_created'   => $order->get_date_created()->date_i18n('Y-m-d H:i:s'),
+                'source'      => $order->get_meta('_wc_order_attribution_utm_source') ?: 'website',
             ];
         }
 
@@ -242,6 +271,7 @@ class Order_Services
         ];
     }
 
+
     /**
      * Create CSV – return content string
      */
@@ -251,28 +281,40 @@ class Order_Services
         fwrite($handle, "\xEF\xBB\xBF"); // UTF-8 BOM
 
         fputcsv($handle, [
-            'Order ID',
+            'Name',
             'Phone',
-            'First Name',
-            'Last Name',
-            'User',
+            'Email',
+            'Company',
+            'Street',
+            'City',
+            'Postcode',
+            'State',
+            'Order ID',
+            "Products",
+            "Notes",
             'Status',
             'Total',
-            'Payment Method',
             'Date Created',
+            'Source',
         ]);
 
         foreach ($rows as $r) {
             fputcsv($handle, [
-                $r['order_id'],
+                $r['name'],
                 $r['phone'],
-                $r['firstname'],
-                $r['lastname'],
-                $r['user'],
+                $r['email'],
+                $r['company'] ?? '',
+                $r['street'],
+                $r['city'],
+                $r['postcode'],
+                $r['state'] ?? '',
+                $r['order_id'],
+                $r['items'],
+                $r['order_note'],
                 $r['status'],
                 $r['total'],
-                $r['payment_method'],
                 $r['date_created'],
+                $r['source'],
             ]);
         }
 
@@ -281,6 +323,25 @@ class Order_Services
         fclose($handle);
         return $content;
     }
+
+    private static function get_items_data($order)
+    {
+        $items = [];
+
+        foreach ($order->get_items() as $item) {
+            if ($item instanceof WC_Order_Item_Product) {
+                $items[] = sprintf(
+                    '%s (x%d) - %s',
+                    $item->get_name(),
+                    $item->get_quantity(),
+                    html_entity_decode(wp_strip_all_tags(wc_price($item->get_total())))
+                );
+            }
+        }
+
+        return implode("\n", $items);
+    }
+
 
     /**
      * Create PDF – return content string
@@ -306,13 +367,15 @@ class Order_Services
                 <tr>
                     <th>Order ID</th>
                     <th>Phone</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>User</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Company</th>
+                    <th>State</th>
                     <th>Status</th>
                     <th>Total</th>
-                    <th>Payment Method</th>
                     <th>Date Created</th>
+                    <th>Source</th>
+                    
                 </tr>
             </thead>
             <tbody>';
@@ -321,13 +384,14 @@ class Order_Services
             $html .= '<tr>
                 <td>' . esc_html($r['order_id']) . '</td>
                 <td>' . esc_html($r['phone']) . '</td>
-                <td>' . esc_html($r['firstname']) . '</td>
-                <td>' . esc_html($r['lastname']) . '</td>
-                <td>' . esc_html($r['user']) . '</td>
+                <td>' . esc_html($r['name']) . '</td>
+                <td>' . esc_html($r['email']) . '</td>
+                <td>' . esc_html($r['company']) . '</td>
+                <td>' . esc_html($r['state']) . '</td>
                 <td>' . esc_html($r['status']) . '</td>
                 <td>' . esc_html($r['total']) . '</td>
-                <td>' . esc_html($r['payment_method']) . '</td>
                 <td>' . esc_html($r['date_created']) . '</td>
+                <td>' . esc_html($r['source']) . '</td>
             </tr>';
         }
 
@@ -338,6 +402,7 @@ class Order_Services
 
         return $dompdf->output();
     }
+
 
     public static function move_orders_to_trash(array $order_ids)
     {
