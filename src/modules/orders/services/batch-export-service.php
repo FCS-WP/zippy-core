@@ -4,6 +4,10 @@ namespace Zippy_Core\Src\Modules\Orders\Services;
 
 defined('ABSPATH') or die();
 
+use Automattic\WooCommerce\Admin\Overrides\OrderRefund;
+use WC_Order_Item_Product;
+
+
 class Batch_Export_Service
 {
     /**
@@ -101,36 +105,77 @@ class Batch_Export_Service
             if ($format === 'csv') {
                 fwrite($f_handle, "\xEF\xBB\xBF"); // UTF-8 BOM
                 fputcsv($f_handle, [
-                    'Order ID', 'Phone', 'First Name', 'Last Name', 'User', 'Status', 'Total', 'Payment Method', 'Date Created'
+                    'Name',
+                    'Phone',
+                    'Email',
+                    'Company',
+                    'Street',
+                    'City',
+                    'Postcode',
+                    'State',
+                    'Order ID',
+                    "Products",
+                    "Notes",
+                    'Status',
+                    'Total',
+                    'Date Created',
+                    'Source',
                 ]);
             }
         }
 
         foreach ($orders as $order) {
-            $row = [
-                $order->get_id(),
-                $order->get_billing_phone(),
-                $order->get_billing_first_name(),
-                $order->get_billing_last_name(),
-                $order->get_user_id() ? get_userdata($order->get_user_id())->user_login : 'Guest',
-                wc_get_order_status_name($order->get_status()),
-                strip_tags(wc_price($order->get_total())),
-                $order->get_payment_method_title(),
-                $order->get_date_created() ? $order->get_date_created()->date_i18n('Y-m-d H:i:s') : '',
-            ];
-            
+            if ($order instanceof OrderRefund) {
+                continue;
+            }
+
+            $country = $order->get_billing_country();
+            $state   = $order->get_billing_state();
+            $states  = WC()->countries->get_states($country);
+            $state_name = $states[$state] ?? $state;
+
+            $items_data = self::get_items_data($order);
+            $total_formatted = html_entity_decode(wp_strip_all_tags(wc_price($order->get_total())));
+            $date_created = $order->get_date_created() ? $order->get_date_created()->date_i18n('Y-m-d H:i:s') : '';
+            $source = $order->get_meta('_wc_order_attribution_utm_source') ?: 'website';
+
             if ($format === 'csv') {
+                $row = [
+                    $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(),
+                    $order->get_billing_phone(),
+                    $order->get_billing_email(),
+                    $order->get_billing_company(),
+                    trim($order->get_billing_address_1() . ' ' . $order->get_billing_address_2()),
+                    $order->get_billing_city(),
+                    $order->get_billing_postcode(),
+                    $state_name,
+                    $order->get_id(),
+                    $items_data,
+                    $order->get_customer_note(),
+                    wc_get_order_status_name($order->get_status()),
+                    $total_formatted,
+                    $date_created,
+                    $source,
+                ];
                 fputcsv($f_handle, $row);
             } else {
-                // PDF mode: append HTML rows to a temp HTML file
-                $html_row = '<tr>';
-                foreach ($row as $cell) {
-                    $html_row .= '<td>' . esc_html($cell) . '</td>';
-                }
-                $html_row .= '</tr>' . PHP_EOL;
+                // PDF mode: 10 columns as per snippet (space constraints)
+                $html_row = '<tr>
+                    <td>' . esc_html($order->get_id()) . '</td>
+                    <td>' . esc_html($order->get_billing_phone()) . '</td>
+                    <td>' . esc_html($order->get_billing_first_name() . ' ' . $order->get_billing_last_name()) . '</td>
+                    <td>' . esc_html($order->get_billing_email()) . '</td>
+                    <td>' . esc_html($order->get_billing_company()) . '</td>
+                    <td>' . esc_html($state_name) . '</td>
+                    <td>' . esc_html(wc_get_order_status_name($order->get_status())) . '</td>
+                    <td>' . esc_html($total_formatted) . '</td>
+                    <td>' . esc_html($date_created) . '</td>
+                    <td>' . esc_html($source) . '</td>
+                </tr>' . PHP_EOL;
                 fwrite($f_handle, $html_row);
             }
         }
+
 
         fclose($f_handle);
 
@@ -187,19 +232,39 @@ class Batch_Export_Service
         <table>
             <thead>
                 <tr>
-                    <th style="width: 8%">ID</th>
+                    <th style="width: 8%">Order ID</th>
                     <th style="width: 12%">Phone</th>
-                    <th style="width: 10%">First</th>
-                    <th style="width: 10%">Last</th>
-                    <th style="width: 10%">User</th>
+                    <th style="width: 12%">Name</th>
+                    <th style="width: 12%">Email</th>
+                    <th style="width: 10%">Company</th>
+                    <th style="width: 10%">State</th>
                     <th style="width: 10%">Status</th>
-                    <th style="width: 10%">Total</th>
-                    <th style="width: 12%">Payment</th>
-                    <th style="width: 18%">Date</th>
+                    <th style="width: 8%">Total</th>
+                    <th style="width: 10%">Date Created</th>
+                    <th style="width: 8%">Source</th>
                 </tr>
             </thead>
             <tbody>' . $rows_html . '</tbody></table>';
     }
+
+    private static function get_items_data($order)
+    {
+        $items = [];
+
+        foreach ($order->get_items() as $item) {
+            if ($item instanceof WC_Order_Item_Product) {
+                $items[] = sprintf(
+                    "%s (x%d) - %s",
+                    $item->get_name(),
+                    $item->get_quantity(),
+                    html_entity_decode(wp_strip_all_tags(wc_price($item->get_total())))
+                );
+            }
+        }
+
+        return implode("\n", $items);
+    }
+
 
     private static function generate_pdf_content($html)
     {
