@@ -29,8 +29,14 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [paginatedOrders, setPaginatedOrders] = useState([]);
 
-  const { totalOrders, rowsPerPage, setRowsPerPage, page, setPage, fetchSearchOrders } =
-    useOrderProvider();
+  const {
+    totalOrders,
+    rowsPerPage,
+    setRowsPerPage,
+    page,
+    setPage,
+    fetchSearchOrders,
+  } = useOrderProvider();
 
   useEffect(() => {
     const sorted = [...orders].sort((a, b) => {
@@ -82,8 +88,8 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
   };
 
   const handleSearchOrders = (value) => {
-    fetchSearchOrders(value)
-  }
+    fetchSearchOrders(value);
+  };
 
   return (
     <Paper sx={{ p: 2 }}>
@@ -178,6 +184,7 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
                 { id: "payment_method", label: "Payment Method" },
                 { id: "shipping_info", label: "Shipping Info" },
                 { id: "date_created", label: "Date Created" },
+                { id: "source", label: "Source" },
               ].map((col) => (
                 <TableCell
                   key={col.id}
@@ -245,7 +252,7 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
                     </>
                   ) : (
                     <>
-                      {parseInt(order.total).toLocaleString()} {order.currency}
+                      {order.total.toLocaleString()} {order.currency}
                     </>
                   )}
                 </TableCell>
@@ -257,6 +264,8 @@ const OrdersTable = ({ orders, orderBy, orderDirection, handleSort }) => {
                 <TableCell>
                   <DateCreatedCell dateString={order.date_created} />
                 </TableCell>
+
+                <TableCell>{order.source || "website"}</TableCell>
               </TableRow>
             ))}
           </TableBody>

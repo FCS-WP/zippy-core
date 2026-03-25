@@ -88,7 +88,7 @@ class Order_Services
     public static function parse_order_data($order)
     {
         $billing  = $order->get_address('billing');
-        $shipping = $order->get_address('shipping');
+        $shipping = !array_filter($order->get_address('shipping')) ? $billing : $order->get_address('shipping');
 
         $data = [
             'id'           => $order->get_id(),
