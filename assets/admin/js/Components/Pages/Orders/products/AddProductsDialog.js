@@ -20,7 +20,7 @@ import { Api } from "../../../../api/admin";
 import TablePaginationCustom from "../../../Table/TablePaginationCustom";
 
 const productListOrder = ["IMAGE", "ID", "NAME", "INVENTORY", "ACTIONS"];
-const AddProductsDialog = ({ onClose, open, orderID }) => {
+const AddProductsDialog = ({ onClose, open, orderID, isPreOrder }) => {
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
     page: 0,
@@ -35,6 +35,7 @@ const AddProductsDialog = ({ onClose, open, orderID }) => {
     category: "",
     userID: userSettings.uid,
     search: "",
+    is_pre_order: isPreOrder,
   });
 
   const [simpleProduct, setSimpleProduct] = useState({});
@@ -46,8 +47,6 @@ const AddProductsDialog = ({ onClose, open, orderID }) => {
     setLoading(true);
     try {
       const { data } = await Api.products(params);
-      console.log(data);
-
       if (data?.status === "success" && Array.isArray(data?.data)) {
         setData(convertRows(data.data));
         setPagination((prev) => ({
@@ -73,7 +72,7 @@ const AddProductsDialog = ({ onClose, open, orderID }) => {
       const { data } = await Api.addProductsToOrder(
         orderID,
         "admin_edit_order",
-        payload
+        payload,
       );
       if (data?.status === "success") {
         toast.success("Products added to order successfully");
@@ -98,6 +97,8 @@ const AddProductsDialog = ({ onClose, open, orderID }) => {
     const info = {
       parent_product_id: row.productID,
       quantity: row.quantity,
+      gift_wrapping: row.giftWrapping || "no",
+      gift_note: row.giftNote || "",
     };
 
     setAddedProducts((prev) => ({
@@ -107,12 +108,13 @@ const AddProductsDialog = ({ onClose, open, orderID }) => {
   }, []);
 
   const addAddonProduct = useCallback(
-    (productId, quantity, packingInstructions, addon) => {
+    (productId, quantity, addon, giftWrapping, giftNote) => {
       const info = {
         parent_product_id: productId,
         quantity: quantity,
-        packing_instructions: packingInstructions || "",
         addons: addon,
+        gift_wrapping: giftWrapping || "no",
+        gift_note: giftNote || "",
       };
 
       setAddedProducts((prev) => ({
@@ -120,7 +122,7 @@ const AddProductsDialog = ({ onClose, open, orderID }) => {
         [productId]: info,
       }));
     },
-    []
+    [],
   );
 
   const submitProducts = useCallback(async () => {
@@ -133,10 +135,11 @@ const AddProductsDialog = ({ onClose, open, orderID }) => {
       order_id: orderID,
       products: Object.values(addedProducts),
       action: "admin_edit_order",
+      pre_order: isPreOrder,
     };
 
     await callAddProductsToOrder(payload);
-  }, [orderID, addedProducts]);
+  }, [orderID, addedProducts, isPreOrder]);
 
   const convertRows = (rows) =>
     rows.map((item) => ({
@@ -152,7 +155,6 @@ const AddProductsDialog = ({ onClose, open, orderID }) => {
       MinAddons: item.min_addons,
       MinOrder: item.min_order,
       ADDONS: item.addons || {},
-      packingInstructions: "",
       quantity: item.min_order,
       type: item.type,
     }));
@@ -212,7 +214,7 @@ const AddProductsDialog = ({ onClose, open, orderID }) => {
           "No Image"
         ),
       })),
-    [data]
+    [data],
   );
 
   const handleSubTableChange = (row) => {
@@ -265,7 +267,6 @@ const AddProductsDialog = ({ onClose, open, orderID }) => {
       <DialogContent>
         <Box display="flex" flexDirection="column" gap={2}>
           <ProductFilterbyCategories onFilter={handleFilter} />
-
           {loading ? (
             <Box display="flex" justifyContent="center" py={3}>
               <CircularProgress />

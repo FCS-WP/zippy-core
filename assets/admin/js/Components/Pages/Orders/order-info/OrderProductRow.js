@@ -27,9 +27,7 @@ const OrderProductRow = ({
     return (Math.round(num * 10) / 10).toFixed(2);
   };
 
-  const unitPriceInclTax = roundUp2dp(
-    parseFloat(item.price_per_item) + parseFloat(item.tax_per_item),
-  );
+  const unitPriceInclTax = parseFloat(item.price_per_item);
 
   const saveQuantity = async () => {
     try {
@@ -104,6 +102,39 @@ const OrderProductRow = ({
             SKU: {item.sku || "N/A"}
           </Typography>
         </Box>
+        {item.planter_name && (
+          <Box sx={{ mt: 0.5 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: "0.65rem" }}
+            >
+              Planter: {item.planter_name}
+            </Typography>
+          </Box>
+        )}
+        {item.gift_wrapping === "yes" && (
+          <Box sx={{ mt: 0.5 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: "0.65rem" }}
+            >
+              Gift Wrapping: Yes
+            </Typography>
+          </Box>
+        )}
+        {item.gift_note && (
+          <Box sx={{ mt: 0.5 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ fontSize: "0.65rem" }}
+            >
+              Gift Note: {item.gift_note}
+            </Typography>
+          </Box>
+        )}
         {item.is_refunded && item.refunded_qty > 0 && (
           <Box sx={{ mt: 0.5 }}>
             <Typography
@@ -111,54 +142,6 @@ const OrderProductRow = ({
               sx={{ fontSize: "0.75rem", color: "#ff5252", fontWeight: "500" }}
             >
               Refunded Quantity: {item.refunded_qty}
-            </Typography>
-          </Box>
-        )}
-        {item.addons?.length > 0 && (
-          <Box sx={{ ml: 1, mt: 0.5 }}>
-            <Typography
-              variant="body2"
-              fontWeight="bold"
-              sx={{ fontSize: "0.8rem" }}
-            >
-              Combo Products:
-            </Typography>
-            {item.addons.map((addon, i) => (
-              <Typography
-                key={i}
-                component="a"
-                href={`/wp-admin/post.php?post=${addon.addon_id}&action=edit`}
-                target="_blank"
-                variant="body2"
-                color="text.secondary"
-                sx={{
-                  fontSize: "0.75rem",
-                  ml: 2,
-                  display: "block",
-                  textDecoration: "none",
-                  "&:hover": { textDecoration: "underline" },
-                }}
-              >
-                {addon.name} × {addon.quantity}
-              </Typography>
-            ))}
-          </Box>
-        )}
-        {item.packing_instructions && (
-          <Box sx={{ mt: 0.5 }}>
-            <Typography
-              variant="body2"
-              fontWeight="bold"
-              sx={{ fontSize: "0.8rem" }}
-            >
-              Packing Instructions:{" "}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ fontSize: "0.75rem", whiteSpace: "pre-wrap" }}
-            >
-              {item.packing_instructions}
             </Typography>
           </Box>
         )}

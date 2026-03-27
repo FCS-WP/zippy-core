@@ -37,5 +37,16 @@ class Product_Route extends Core_Route
                 ],
             ],
         ));
+        register_rest_route(ZIPPY_CORE_API_PREFIX, '/product', array(
+            'methods' => 'GET',
+            'callback' => [Product_Controllers::class, 'get_product_by_id'],
+            'permission_callback' => [Core_Middleware::class, 'admin_only'],
+            'args' => [
+                'productID' => [
+                    'required' => true,
+                    'sanitize_callback' => 'absint',
+                ],
+            ],
+        ));
     }
 }

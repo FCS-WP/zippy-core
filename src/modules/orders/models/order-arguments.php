@@ -243,4 +243,14 @@ class Order_Arguments
             ],
         ];
     }
+
+    public static function get_pre_order_options_args()
+    {
+        return [
+            'order_id' => [
+                'required' => true,
+                'type' => 'integer',
+            ],
+        ];
+    }
 }

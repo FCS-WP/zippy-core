@@ -40,4 +40,19 @@ class Product_Controllers
             return Zippy_Response_Handler::error('Empty categories', 500);
         }
     }
+
+    public static function get_product_by_id(WP_REST_Request $request)
+    {
+        try {
+            $paramsInfo = Zippy_Request_Helper::get_params($request);
+            $productID = $paramsInfo['productID'];
+            $data = Product_Services::get_product_by_id($productID);
+
+            return empty($data)
+                ? Zippy_Response_Handler::error("No product found.")
+                : Zippy_Response_Handler::success(['data' => $data], "Product retrieved successfully.");
+        } catch (\Exception $e) {
+            return Zippy_Response_Handler::error('Error retrieving product', 500);
+        }
+    }
 }

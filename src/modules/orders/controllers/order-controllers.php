@@ -240,4 +240,25 @@ class Order_Controllers
             return Zippy_Response_Handler::error('An error occurred while processing the refund.');
         }
     }
+
+    public static function get_pre_order_options(WP_REST_Request $request)
+    {
+        try {
+            $order_id = $request->get_param('order_id');
+
+            if (empty($order_id)) {
+                return Zippy_Response_Handler::error('Order ID is required.');
+            }
+
+            $data = Order_Detail_Services::get_pre_order_options($order_id);
+
+            if (empty($data)) {
+                return Zippy_Response_Handler::error('No pre-order options found for this order.');
+            }
+
+            return Zippy_Response_Handler::success($data, 'Get pre-order options successfully!');
+        } catch (\Exception $e) {
+            return Zippy_Response_Handler::error($e->getMessage());
+        }
+    }
 }

@@ -14,6 +14,7 @@ class Product_Services
      */
     public static function get_products($infos)
     {
+        $is_pre_order = $infos['is_pre_order'] == 'true' ? true : false;
         $category = !empty($infos['category']);
         $args = [
             'status'   => 'publish',
@@ -21,11 +22,28 @@ class Product_Services
         $page = max(1, intval($infos['page']));
         $per_page = 50;
 
+        // Build meta query
+        $meta_query = ['relation' => 'AND'];
+
+        if ($is_pre_order) {
+            $meta_query[] = [
+                'key'     => 'pre_order',
+                'value'   => '1',
+                'compare' => '=',
+                'type'    => 'CHAR',
+            ];
+        }
+
+        if (count($meta_query) > 1) {
+            $args['meta_query'] = $meta_query;
+        }
+
         [$products, $total, $max_pages] = self::sort_and_paginate_products($args, $category, $page, $per_page);
 
         // Build data
         $data = [];
         foreach ($products as $product) {
+            $addons = self::get_product_addons($product);
             $data[] = [
                 'id'    => $product->get_id(),
                 'sku'   => $product->get_sku(),
@@ -36,7 +54,7 @@ class Product_Services
                 'link'  => admin_url('post.php?post=' . $product->get_id() . '&action=edit'),
                 'min_addons' => 0,
                 'min_order'  => 0,
-                'addons'     => [],
+                'addons'     => $addons,
                 'grouped_addons' => [],
                 'is_composite_product' => false,
             ];
@@ -53,33 +71,61 @@ class Product_Services
         ];
     }
 
+    private static function get_product_addons($product)
+    {
+        $result = [];
+        $products_combo = get_field('products_combo', $product->get_id()) ?? [];
+
+        foreach ($products_combo as $combo) {
+            $prod = wc_get_product($combo['product_option']);
+            if ($prod) {
+                $result[] = [
+                    'id'    => $prod->get_id(),
+                    'sku'   => $prod->get_sku(),
+                    'name'  => $prod->get_name(),
+                    'stock' => $prod->get_stock_quantity(),
+                    'image' => wp_get_attachment_image_url($prod->get_image_id(), 'thumbnail'),
+                    'price' => $prod->get_price(),
+                ];
+            }
+        }
+        return $result;
+    }
+
     private static function sort_and_paginate_products($args, $has_category, $page, $per_page)
     {
-        if ($has_category) {
-            $results = wc_get_products($args);
-            if (empty($results) || empty($results->products)) {
-                return [[], 0, 0];
-            }
+        $wp_args = [
+            'post_type'      => 'product',
+            'post_status'    => $args['status'] ?? 'publish',
+            'posts_per_page' => $per_page,
+            'paged'          => $page,
+            'fields'         => 'ids',
+        ];
 
-            $products  = $results->products;
-            $total     = $results->total;
-            $max_pages = $results->max_num_pages;
-        } else {
-            $args['limit']    = -1;
-            $args['paginate'] = false;
-
-            $all_products = wc_get_products($args);
-            if (empty($all_products)) {
-                return [[], 0, 0];
-            }
-
-            $total     = count($all_products);
-            $max_pages = ceil($total / $per_page);
-            $offset    = ($page - 1) * $per_page;
-            $products  = array_slice($all_products, $offset, $per_page);
+        if (isset($args['meta_query'])) {
+            $wp_args['meta_query'] = $args['meta_query'];
         }
 
-        return [$products, $total, $max_pages];
+        if ($has_category && !empty($args['category'])) {
+            $wp_args['tax_query'] = [
+                [
+                    'taxonomy' => 'product_cat',
+                    'field'    => 'slug',
+                    'terms'    => $args['category'],
+                ],
+            ];
+        }
+
+        $query = new \WP_Query($wp_args);
+
+        if (empty($query->posts)) {
+            return [[], 0, 0];
+        }
+
+        // Convert product IDs to WC_Product objects
+        $products = array_filter(array_map('wc_get_product', $query->posts));
+
+        return [$products, $query->found_posts, $query->max_num_pages];
     }
 
     /**
@@ -143,6 +189,29 @@ class Product_Services
             'show_count'   => 1, // 1 for yes, 0 for no
             'hierarchical' => 1,
             'exclude' => $excluded
+        ];
+    }
+
+    public static function get_product_by_id($productID)
+    {
+        $product = wc_get_product($productID);
+        if (!$product) {
+            return [];
+        }
+
+        return [
+            'id'    => $product->get_id(),
+            'sku'   => $product->get_sku(),
+            'name'  => $product->get_name(),
+            'stock' => $product->get_stock_quantity(),
+            'img_url' => wp_get_attachment_image_url($product->get_image_id(), 'thumbnail'),
+            'type'  => $product->get_type(),
+            'link'  => admin_url('post.php?post=' . $product->get_id() . '&action=edit'),
+            'min_addons' => 0,
+            'min_order'  => 0,
+            'addons'     => self::get_product_addons($product),
+            'grouped_addons' => [],
+            'is_composite_product' => false,
         ];
     }
 }

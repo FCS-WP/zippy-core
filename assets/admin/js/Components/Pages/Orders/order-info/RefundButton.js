@@ -98,7 +98,7 @@ export default function RefundButton({ orderID, onRefundSuccess }) {
           </Button>
           <Button
             onClick={handleRefund}
-            color="secondary"
+            color="primary"
             variant="contained"
             disabled={loading}
           >

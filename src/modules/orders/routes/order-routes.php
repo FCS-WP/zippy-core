@@ -122,5 +122,11 @@ class Order_Route extends Core_Route
             'permission_callback' => [Core_Middleware::class, 'admin_only'],
             'args' => Order_Arguments::get_refund_order_args(),
         ]);
+        register_rest_route(ZIPPY_CORE_API_PREFIX, '/get-pre-order-options', [
+            'methods'  => 'GET',
+            'callback' => [Order_Controllers::class, 'get_pre_order_options'],
+            'permission_callback' => [Core_Middleware::class, 'admin_only'],
+            'args' => Order_Arguments::get_pre_order_options_args(),
+        ]);
     }
 }
