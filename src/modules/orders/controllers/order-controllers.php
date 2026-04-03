@@ -10,6 +10,7 @@ use Zippy_Core\Utils\Zippy_Request_Helper;
 use Zippy_Core\Utils\Zippy_Response_Handler;
 use Zippy_Core\Utils\Zippy_Wc_Calculate_Helper;
 use WC_Coupon;
+use Zippy_Core\Src\Modules\Orders\Services\Batch_Export_Service;
 use Zippy_Core\Orders\Services\Order_Detail_Services;
 
 class Order_Controllers
@@ -238,6 +239,55 @@ class Order_Controllers
             return Zippy_Response_Handler::success($result, 'Order refunded successfully.');
         } catch (\Exception $e) {
             return Zippy_Response_Handler::error('An error occurred while processing the refund.');
+        }
+    }
+
+
+    public static function export_start(WP_REST_Request $request)
+    {
+        try {
+            $paramInfos = Zippy_Request_Helper::get_params($request);
+            $result = Batch_Export_Service::start_export($paramInfos);
+            
+            if (is_wp_error($result)) {
+                return Zippy_Response_Handler::error($result->get_error_message());
+            }
+
+            return Zippy_Response_Handler::success(['data' => $result], 'Export started.');
+        } catch (\Exception $e) {
+            return Zippy_Response_Handler::error($e->getMessage());
+        }
+    }
+
+    public static function export_process_chunk(WP_REST_Request $request)
+    {
+        try {
+            $paramInfos = Zippy_Request_Helper::get_params($request);
+            $result = Batch_Export_Service::process_chunk($paramInfos);
+            
+            if (is_wp_error($result)) {
+                return Zippy_Response_Handler::error($result->get_error_message());
+            }
+
+            return Zippy_Response_Handler::success(['data' => $result], 'Chunk processed.');
+        } catch (\Exception $e) {
+            return Zippy_Response_Handler::error($e->getMessage());
+        }
+    }
+
+    public static function export_finalize(WP_REST_Request $request)
+    {
+        try {
+            $export_id = $request->get_param('export_id');
+            $result = Batch_Export_Service::finalize_export($export_id);
+            
+            if (is_wp_error($result)) {
+                return Zippy_Response_Handler::error($result->get_error_message());
+            }
+
+            return Zippy_Response_Handler::success(['data' => $result], 'Export finalized.');
+        } catch (\Exception $e) {
+            return Zippy_Response_Handler::error($e->getMessage());
         }
     }
 }
