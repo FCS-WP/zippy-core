@@ -61,7 +61,7 @@ const OrderProductRow = ({
   return (
     <TableRow key={item_id}>
       <TableCell>
-        <img src={item.img_url} alt={item.name} width={50} />
+        <img src={item.img_url || ""} alt={item.name} width={50} />
       </TableCell>
       <TableCell>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -146,7 +146,7 @@ const OrderProductRow = ({
           </Box>
         )}
       </TableCell>
-      <TableCell>${unitPriceInclTax}</TableCell>
+      <TableCell>${unitPriceInclTax.toFixed(2)}</TableCell>
       <TableCell>
         {editingItemId === item_id ? (
           <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>

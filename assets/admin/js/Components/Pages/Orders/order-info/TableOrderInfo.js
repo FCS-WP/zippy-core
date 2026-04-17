@@ -90,9 +90,7 @@ const TableOrderInfo = ({ orderId, enableEdit }) => {
   const priceOrderInfo = orderInfo?.order_info || {};
 
   // Calculate totals per product
-  const subtotal = parseFloat(
-    (priceOrderInfo?.subtotal - priceOrderInfo?.tax_total).toFixed(2),
-  );
+  const subtotal = parseFloat(priceOrderInfo?.subtotal || 0);
 
   const gst = priceOrderInfo?.tax_total;
 

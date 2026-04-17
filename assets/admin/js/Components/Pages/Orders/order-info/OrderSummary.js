@@ -21,7 +21,7 @@ const OrderSummary = ({
     <Typography sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
       Subtotal:{" "}
       <Typography component="span" sx={{ fontWeight: "normal" }}>
-        ${subtotal}
+        ${Number(subtotal || 0).toFixed(2)}
       </Typography>
     </Typography>
 
@@ -29,7 +29,7 @@ const OrderSummary = ({
       <Typography sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
         Shipping:{" "}
         <Typography component="span" sx={{ fontWeight: "normal" }}>
-          ${shippingTotal.toFixed(2)}
+          ${Number(shippingTotal || 0).toFixed(2)}
         </Typography>
       </Typography>
     )}
@@ -37,7 +37,7 @@ const OrderSummary = ({
       <Typography sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
         Extra Fee:{" "}
         <Typography component="span" sx={{ fontWeight: "normal" }}>
-          ${feesTotal.toFixed(2)}
+          ${Number(feesTotal || 0).toFixed(2)}
         </Typography>
       </Typography>
     )}
@@ -45,18 +45,18 @@ const OrderSummary = ({
       <Typography sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
         Coupons:{" "}
         <Typography component="span" sx={{ fontWeight: "normal" }}>
-          -${couponsTotal.toFixed(2)}
+          -${Number(couponsTotal || 0).toFixed(2)}
         </Typography>
       </Typography>
     )}
     <Typography sx={{ fontWeight: "bold", fontSize: "0.85rem" }}>
       GST:{" "}
       <Typography component="span" sx={{ fontWeight: "normal" }}>
-        ${gst}
+        ${Number(gst || 0).toFixed(2)}
       </Typography>
     </Typography>
     <Typography variant="h6" sx={{ fontWeight: "bold", fontSize: "1rem" }}>
-      Total: ${total}
+      Total: ${Number(total || 0).toFixed(2)}
     </Typography>
   </Box>
 );
