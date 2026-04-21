@@ -11,6 +11,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use Exception;
 use Zippy_Core\Core_Settings;
+use WP_Error;
 
 class Order_Detail_Services
 {
@@ -77,6 +78,17 @@ class Order_Detail_Services
             }
         }
 
+        // Collect all child product IDs from combo parents (only planters)
+        $child_product_ids = [];
+        foreach ($items as $item) {
+            $combo_data = $item->get_meta('combo_sub_products');
+            if (!empty($combo_data)) {
+                if (isset($combo_data['planter_id'])) {
+                    $child_product_ids[] = (int) $combo_data['planter_id'];
+                }
+            }
+        }
+
         foreach ($items as $item_id => $item) {
             $product = $item->get_product();
             $price_total = Zippy_Wc_Calculate_Helper::round_price_wc($item->get_subtotal());
@@ -86,19 +98,37 @@ class Order_Detail_Services
             $refunded_qty = isset($refunded_items[$item_id]) ? $refunded_items[$item_id] : 0;
             $is_refunded = $refunded_qty > 0;
 
+            $is_show = self::check_is_show($item, $child_product_ids);
+
+            $product_sku = $product ? $product->get_sku() : '';
+            $always_show_categories = ['plants', 'faux-plants', 'planters'];
+
+            // If it's a combo parent and not in always show categories, use child's SKU
+            $combo_data = $item->get_meta('combo_sub_products');
+            if (!empty($combo_data) && isset($combo_data['planter_id'])) {
+                if (!self::is_category_in_list($product, $always_show_categories)) {
+                    $child_product = wc_get_product($combo_data['planter_id']);
+                    if ($child_product) {
+                        $product_sku = $child_product->get_sku();
+                    }
+                }
+            }
+
             $products[$item_id] = [
                 'product_id'        => $product ? $product->get_id() : 0,
                 'name'              => $product ? $product->get_name() : '',
                 'img_url'           => $product ? wp_get_attachment_url($product->get_image_id()) : '',
-                'sku'               => $product ? $product->get_sku() : '',
+                'sku'               => $product_sku,
                 'quantity'          => $item->get_quantity(),
                 'price_total'       => $price_total,
                 'tax_total'         => $tax_total,
                 'price_per_item'    => Zippy_Wc_Calculate_Helper::round_price_wc($item->get_subtotal() / max(1, $item->get_quantity())),
                 'tax_per_item'      => Zippy_Wc_Calculate_Helper::round_price_wc($item->get_subtotal_tax() / max(1, $item->get_quantity())),
-                'min_order'         => get_post_meta($product->get_id(), '_custom_minimum_order_qty', true) ?: 0,
+                'min_order'         => ($product && method_exists($product, 'get_id')) ? (get_post_meta($product->get_id(), '_custom_minimum_order_qty', true) ?: 0) : 0,
                 'refunded_qty'      => $refunded_qty,
                 'is_refunded'       => $is_refunded,
+                'is_show'           => $is_show,
+                'is_plant'          => self::is_category_in_list($product, ['faux-plants', 'plants']),
                 'planter_name'      => $item->get_meta('Planter'),
                 'gift_wrapping'     => $item->get_meta('Gift Wrapping'),
                 'gift_note'         => $item->get_meta('Gift Note'),
@@ -112,6 +142,66 @@ class Order_Detail_Services
 
         return [$products, $subtotal, $taxSubtotal];
     }
+
+    private static function check_is_show($item, $child_product_ids)
+    {
+        $product = $item->get_product();
+        if (!$product) {
+            return true;
+        }
+
+        // Categories that are always shown
+        $always_show_categories = ['plants', 'faux-plants', 'planters'];
+        if (self::is_category_in_list($product, $always_show_categories)) {
+            return true;
+        }
+
+        // If it's a combo parent, always show
+        $combo_data = $item->get_meta('combo_sub_products');
+        if (!empty($combo_data) && isset($combo_data['is_combo_parent']) && $combo_data['is_combo_parent']) {
+            return true;
+        }
+
+        // If it's a child product (listed in some parent's combo_sub_products), hide it
+        if (in_array((int) $product->get_id(), $child_product_ids)) {
+            // Also double check if it's an addon-like item (price usually 0 in these cases)
+            if (floatval($item->get_total()) == 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static function is_category_in_list($product, $category_slugs)
+    {
+        if (!$product) {
+            return false;
+        }
+
+        $terms = get_the_terms($product->get_id(), 'product_cat');
+        if ($terms && !is_wp_error($terms)) {
+            foreach ($terms as $term) {
+                // Check direct match
+                if (in_array($term->slug, $category_slugs)) {
+                    return true;
+                }
+
+                // Check ancestors (hierarchy support)
+                $ancestors = get_ancestors($term->term_id, 'product_cat');
+                if (!empty($ancestors)) {
+                    foreach ($ancestors as $ancestor_id) {
+                        $ancestor = get_term($ancestor_id, 'product_cat');
+                        if ($ancestor && !is_wp_error($ancestor) && in_array($ancestor->slug, $category_slugs)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 
     private static function get_shipping_info($shipping_items)
     {
@@ -561,7 +651,7 @@ class Order_Detail_Services
         }
 
         //Reset price for topping to 0
-        self::reset_price_for_addon_products([ ['item_id' => $topping->get_id()] ], $order);
+        self::reset_price_for_addon_products([['item_id' => $topping->get_id()]], $order);
     }
 
 

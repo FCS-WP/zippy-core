@@ -58,6 +58,7 @@ const OrderProductRow = ({
     }
   };
 
+  if (item.is_show === false) return null;
   return (
     <TableRow key={item_id}>
       <TableCell>
@@ -109,7 +110,7 @@ const OrderProductRow = ({
               color="text.secondary"
               sx={{ fontSize: "0.65rem" }}
             >
-              Planter: {item.planter_name}
+              {item.is_plant ? "Planter: " : "Product: "} {item.planter_name}
             </Typography>
           </Box>
         )}
