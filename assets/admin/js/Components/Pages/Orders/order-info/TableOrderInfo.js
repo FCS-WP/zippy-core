@@ -83,11 +83,16 @@ const TableOrderInfo = ({ orderId, enableEdit }) => {
     );
   }
 
+  const productsList = Object.values(orderInfo?.products || {});
   const products = Object.entries(orderInfo?.products || {});
   const shipping = orderInfo?.shipping || [];
   const fees = orderInfo?.fees || [];
   const coupons = orderInfo?.coupons || [];
   const priceOrderInfo = orderInfo?.order_info || {};
+
+  const hasGiftWrapping = productsList.some(
+    (p) => p.gift_wrapping && p.gift_wrapping.toLowerCase() === "yes",
+  );
 
   // Calculate totals per product
   const subtotal = parseFloat(priceOrderInfo?.subtotal || 0);

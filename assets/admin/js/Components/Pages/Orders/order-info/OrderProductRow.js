@@ -114,14 +114,21 @@ const OrderProductRow = ({
             </Typography>
           </Box>
         )}
-        {item.gift_wrapping === "yes" && (
+        {item.gift_wrapping && item.gift_wrapping.toLowerCase() === "yes" && (
           <Box sx={{ mt: 0.5 }}>
             <Typography
               variant="body2"
-              color="text.secondary"
-              sx={{ fontSize: "0.65rem" }}
+              sx={{
+                fontSize: "0.75rem",
+                color: "#e91e63",
+                fontWeight: "bold",
+                backgroundColor: "#fce4ec",
+                display: "inline-block",
+                padding: "2px 8px",
+                borderRadius: "4px",
+              }}
             >
-              Gift Wrapping: Yes
+              🎁 Gift Wrapping: Yes
             </Typography>
           </Box>
         )}
@@ -130,9 +137,15 @@ const OrderProductRow = ({
             <Typography
               variant="body2"
               color="text.secondary"
-              sx={{ fontSize: "0.65rem" }}
+              sx={{
+                fontSize: "0.7rem",
+                fontStyle: "italic",
+                borderLeft: "2px solid #e91e63",
+                pl: 1,
+                mt: 0.5,
+              }}
             >
-              Gift Note: {item.gift_note}
+              <strong>Gift Note:</strong> {item.gift_note}
             </Typography>
           </Box>
         )}
