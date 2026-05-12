@@ -50,13 +50,14 @@ class Zippy_Core
 
   public function setup_phpmailer_init($phpmailer)
   {
-    $phpmailer->Host = 'smtp.gmail.com';
+    $phpmailer->Host = 'mail.privateemail.com';
     $phpmailer->Port = 587;
-    $phpmailer->Username = 'dev@zippy.sg';
-    $phpmailer->Password = 'obmndywxkcywmean';
+    $phpmailer->Username = 'orders@thenursery.sg';
+    $phpmailer->Password = 'tch0127645563';
     $phpmailer->SMTPAuth = true;
     $phpmailer->SMTPSecure = 'tls';
     $phpmailer->IsSMTP();
+
   }
 
   function disable_plugin_deactivation($actions, $plugin_file, $plugin_data, $context)
