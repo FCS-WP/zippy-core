@@ -795,7 +795,7 @@ class Order_Detail_Services
         $data = [
             'store_logo' => $options_custom_value['invoice-logo']['value'] ?? '',
             'store_name' => $options_custom_value['store-name']['value'] ?? '',
-            'gst_reg' => $order->get_id(),
+            'gst_reg' => '202033173H',
             'bill_to' => $billing_to,
             'invoice_number' => $order->get_id(),
             'invoice_date' => date('F j, Y'),
