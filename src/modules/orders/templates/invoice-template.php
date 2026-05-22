@@ -172,7 +172,7 @@ use Zippy_Core\Utils\Zippy_String_Helpers;
                         <td><?= $data['payment_due'] ?></td>
                     </tr>
                     <tr class="amount-due">
-                        <td colspan="2"><strong>Amount Due (SGD):</strong> $<?= number_format($data['amount_due'], 2) ?></td>
+                        <td colspan="2"><strong>Amount Due (SGD):</strong> $<?= number_format($data['total'], 2) ?></td>
                     </tr>
                 </table>
             </td>
@@ -210,6 +210,24 @@ use Zippy_Core\Utils\Zippy_String_Helpers;
                 <td><strong>Subtotal:</strong></td>
                 <td>$<?= number_format($data['subtotal'], 2) ?></td>
             </tr>
+            <?php if (isset($data['coupons']) && floatval($data['coupons']) > 0): ?>
+                <tr>
+                    <td><strong>Discount:</strong></td>
+                    <td>-$<?= number_format($data['coupons'], 2) ?></td>
+                </tr>
+            <?php endif; ?>
+            <?php if (isset($data['shipping']) && floatval($data['shipping']) > 0): ?>
+                <tr>
+                    <td><strong>Shipping:</strong></td>
+                    <td>$<?= number_format($data['shipping'], 2) ?></td>
+                </tr>
+            <?php endif; ?>
+            <?php if (isset($data['fees']) && floatval($data['fees']) > 0): ?>
+                <tr>
+                    <td><strong>Fees:</strong></td>
+                    <td>$<?= number_format($data['fees'], 2) ?></td>
+                </tr>
+            <?php endif; ?>
             <tr>
                 <td><strong>GST 9%:</strong></td>
                 <td>$<?= number_format($data['gst'], 2) ?></td>
@@ -237,14 +255,13 @@ use Zippy_Core\Utils\Zippy_String_Helpers;
 
     <!-- NOTES -->
     <div class="notes">
-        <strong>Notes / Terms</strong><br />
-        FULL PAYMENT BEFORE DELIVERY<br />
-        Full payment must be made and verified by EPOS Finance Department before delivery of any goods or services.<br /><br />
-        Please kindly make payment via transfer to: <strong><?= $data['store_name'] ?></strong><br />
+        <strong>Terms & Conditions</strong><br />
+        • Please retain this receipt as <strong>proof of purchase</strong>.<br />
+        • Kindly refer to our <strong>Return & Exchange Policy</strong> on <strong>The Nursery</strong> website for full terms and conditions.<br />
+        • All returns and exchanges are subject to the sole discretion of <strong>The Nursery</strong>.<br />
+        • This receipt must be presented for any exchange or refund requests.<br /><br />
 
-        <? foreach ($footer_options as $key => $footer_option): ?>
-            <?= Zippy_String_Helpers::convert_slug_to_name($key) . ': ' . $footer_option ?> <br />
-        <? endforeach; ?>
+        Should you require any assistance regarding your purchase, please contact us via WhatsApp at <strong>+65 9278 0728</strong> or email us at <strong>orders@thenursery.sg</strong>.
     </div>
 </body>
 

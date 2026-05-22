@@ -151,7 +151,7 @@ class Order_Detail_Services
         }
 
         // Categories that are always shown
-        $always_show_categories = ['plants', 'faux-plants', 'planters'];
+        $always_show_categories = ['plants', 'faux-plants', 'planters', 'pots'];
         if (self::is_category_in_list($product, $always_show_categories)) {
             return true;
         }
@@ -211,7 +211,7 @@ class Order_Detail_Services
 
         foreach ($shipping_items as $ship_id => $item) {
             $amount = floatval($item->get_total());
-            $taxItem = Zippy_Wc_Calculate_Helper::get_tax_by_price_exclude_tax($amount);
+            $taxItem = floatval($item->get_total_tax());
 
             $amount += $taxItem;
             $shipping[] = [
@@ -235,7 +235,7 @@ class Order_Detail_Services
 
         foreach ($fee_items as $fee_id => $item) {
             $amount = floatval($item->get_total());
-            $taxItem = Zippy_Wc_Calculate_Helper::get_tax_by_price_exclude_tax($amount);
+            $taxItem = floatval($item->get_total_tax());
 
             $amount += $taxItem;
             $fees[] = [
@@ -780,6 +780,31 @@ class Order_Detail_Services
         $result = [];
 
         [$result['products'], $subtotalOrder, $taxTotalOrder] = self::get_products_info($items, $order);
+
+        // Filter out toppings from the invoice pdf items list
+        if (!empty($result['products'])) {
+            $topping_ids = [];
+            foreach ($result['products'] as $product_data) {
+                $pid = $product_data['product_id'];
+                if ($pid) {
+                    $tid = get_field('topping_product', $pid);
+                    if ($tid) {
+                        $topping_ids[] = intval($tid);
+                    }
+                }
+            }
+
+            $result['products'] = array_filter($result['products'], function ($product_data) use ($topping_ids) {
+                if (in_array(intval($product_data['product_id']), $topping_ids)) {
+                    return false;
+                }
+                if (isset($product_data['name']) && stripos($product_data['name'], 'topping') !== false && floatval($product_data['price_total']) == 0) {
+                    return false;
+                }
+                return true;
+            });
+        }
+        
         [$result['shipping'], $totalShipping, $taxShipping] = self::get_shipping_info($shipping_items);
         [$result['fees'], $totalFee, $taxFee] = self::get_fees_info($fee);
         [$result['coupons'], $totalCoupon] = self::get_coupons_info($coupon_items);
@@ -803,6 +828,9 @@ class Order_Detail_Services
             'amount_due' => $total_amounts,
             'items' => $result['products'],
             'subtotal' => $subtotalOrder,
+            'shipping' => $totalShipping,
+            'fees' => $totalFee,
+            'coupons' => $totalCoupon,
             'gst' => $taxTotal,
             'total' => $totalCalculated,
         ];
