@@ -229,10 +229,6 @@ use Zippy_Core\Utils\Zippy_String_Helpers;
                 </tr>
             <?php endif; ?>
             <tr>
-                <td><strong>GST 9%:</strong></td>
-                <td>$<?= number_format($data['gst'], 2) ?></td>
-            </tr>
-            <tr>
                 <td colspan="2">
                     <div class="line-row"></div>
                 </td>
@@ -240,6 +236,10 @@ use Zippy_Core\Utils\Zippy_String_Helpers;
             <tr>
                 <td><strong>Total:</strong></td>
                 <td><strong>$<?= number_format($data['total'], 2) ?></strong></td>
+            </tr>
+            <tr>
+                <td><strong>Inclusive 9% GST</strong></td>
+                <td>$<?= number_format($data['gst'], 2) ?></td>
             </tr>
             <tr>
                 <td colspan="2">
@@ -257,7 +257,7 @@ use Zippy_Core\Utils\Zippy_String_Helpers;
     <div class="notes">
         <strong>Terms & Conditions</strong><br />
         • Please retain this receipt as <strong>proof of purchase</strong>.<br />
-        • Kindly refer to our <strong>Return & Exchange Policy</strong> on <strong>The Nursery</strong> website for full terms and conditions.<br />
+        • Kindly refer to our <a href="https://www.thenursery.sg/shipping-returns/"><strong>Return & Exchange Policy</strong></a> on <strong>The Nursery</strong> website for full terms and conditions.<br />
         • All returns and exchanges are subject to the sole discretion of <strong>The Nursery</strong>.<br />
         • This receipt must be presented for any exchange or refund requests.<br /><br />
 
