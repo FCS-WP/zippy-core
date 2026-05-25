@@ -211,7 +211,7 @@ class Order_Detail_Services
 
         foreach ($shipping_items as $ship_id => $item) {
             $amount = floatval($item->get_total());
-            $taxItem = floatval($item->get_total_tax());
+            $taxItem = Zippy_Wc_Calculate_Helper::get_tax_by_price_exclude_tax($amount);
 
             $amount += $taxItem;
             $shipping[] = [
@@ -235,7 +235,7 @@ class Order_Detail_Services
 
         foreach ($fee_items as $fee_id => $item) {
             $amount = floatval($item->get_total());
-            $taxItem = floatval($item->get_total_tax());
+            $taxItem = Zippy_Wc_Calculate_Helper::get_tax_by_price_exclude_tax($amount);
 
             $amount += $taxItem;
             $fees[] = [
@@ -804,7 +804,7 @@ class Order_Detail_Services
                 return true;
             });
         }
-        
+
         [$result['shipping'], $totalShipping, $taxShipping] = self::get_shipping_info($shipping_items);
         [$result['fees'], $totalFee, $taxFee] = self::get_fees_info($fee);
         [$result['coupons'], $totalCoupon] = self::get_coupons_info($coupon_items);
