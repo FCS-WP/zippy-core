@@ -37,8 +37,6 @@ class Zippy_Core
     new Zippy_Admin;
     new Zippy_Optimise;
 
-    add_action('phpmailer_init', array($this, 'setup_phpmailer_init'));
-
     add_filter('login_headerurl', array($this, 'custom_loginlogo_url'));
 
     add_action('login_enqueue_scripts', array($this, 'my_login_stylesheet'));
@@ -46,17 +44,6 @@ class Zippy_Core
     add_filter('plugin_action_links', array($this, 'disable_plugin_deactivation'), 10, 4); //Prevent deactive
 
     add_filter('rest_authentication_errors',  array($this, 'remove_rest_api_users'));
-  }
-
-  public function setup_phpmailer_init($phpmailer)
-  {
-    $phpmailer->Host = 'smtp.gmail.com';
-    $phpmailer->Port = 587;
-    $phpmailer->Username = 'dev@zippy.sg';
-    $phpmailer->Password = 'obmndywxkcywmean';
-    $phpmailer->SMTPAuth = true;
-    $phpmailer->SMTPSecure = 'tls';
-    $phpmailer->IsSMTP();
   }
 
   function disable_plugin_deactivation($actions, $plugin_file, $plugin_data, $context)
