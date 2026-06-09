@@ -36,6 +36,7 @@ class Zippy_Woocommerce
 
     //load all class in here
     $this->set_hooks();
+    $this->load_modules();
   }
 
   protected function set_hooks()
@@ -43,6 +44,15 @@ class Zippy_Woocommerce
     add_filter('wc_get_template_part', array($this, 'override_woocommerce_template_part'), 1, 3);
     add_filter('woocommerce_locate_template', array($this, 'override_woocommerce_template'), 1, 3);
 
+  }
+
+  /**
+   * Load WooCommerce submodules.
+   * Each module is a self-contained class responsible for a specific concern.
+   */
+  protected function load_modules()
+  {
+    new Zippy_Woocommerce_Tax_Rounding();
   }
 
 
@@ -85,3 +95,4 @@ class Zippy_Woocommerce
   }
  
 }
+
