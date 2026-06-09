@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -lt \"/home/shin/Documents/fcs/Wordpress Project/all_trends/src/wp-content/uploads/wc-logs/\" | head -5)",
+      "Read(//home/shin/Documents/fcs/Wordpress Project/all_trends/src/wp-content/uploads/wc-logs/**)",
+      "Bash(rm \"/home/shin/Documents/fcs/Wordpress Project/all_trends/src/wp-content/uploads/wc-logs/\"*.log 2>/dev/null; echo \"logs cleared\")",
+      "Bash(rm \"/home/shin/Documents/fcs/Wordpress Project/all_trends/src/wp-content/uploads/wc-logs/\"*.log 2>/dev/null; echo \"cleared\")"
+    ],
+    "additionalDirectories": [
+      "/home/shin/Documents/fcs/Wordpress Project/all_trends/src/wp-content/uploads/wc-logs"
+    ]
+  }
+}
