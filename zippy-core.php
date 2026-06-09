@@ -2,7 +2,7 @@
 /*
 Plugin Name: ZippySG Core
 Plugin URI: https://zippy.sg/
-Description: Support change default URL Admin, provide Advanced Analytics Woocommrece, Remove thirt party default of Wordpress, Setting SMTP Mail Server, Optime Wordpress Core...
+Description: Support change default URL Admin, provide Advanced Analytics Woocommrece, Remove thirt party default of Wordpress, Optime Wordpress Core...
 Version: 8.0
 Author: Zippy SG
 Author URI: https://zippy.sg/
@@ -88,8 +88,6 @@ register_activation_hook(__FILE__, [Zippy_Activate::class, 'activate']);
 
 use  Zippy_Core\Src\Admin\Zippy_Admin_Setting;
 
-use  Zippy_Core\Src\Admin\Zippy_Admin_Url;
-
 use Zippy_Core\Src\Core\Zippy_Core;
 
 use Zippy_Core\Src\User\Zippy_MPDA_Consent;
@@ -107,8 +105,6 @@ use Zippy_Core\Src\Woocommerce\Zippy_Woocommerce;
 Zippy_Admin_Setting::get_instance();
 
 Zippy_Core::get_instance();
-
-Zippy_Admin_Url::get_instance();
 
 Zippy_MPDA_Consent::get_instance();
 

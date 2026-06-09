@@ -87,13 +87,20 @@ class Zippy_User_Account_Expiry
         $expiry_date = isset($_POST['expiry_date']) ? $_POST['expiry_date'] : '';
         $formatted_expiry_date = date('Y-m-d', strtotime(str_replace('/', '-', $expiry_date)));
 
+        $expiry_timestamp = strtotime($formatted_expiry_date);
+        $today_timestamp = strtotime(date('Y-m-d'));
+
+        if ($expiry_timestamp < $today_timestamp) {
+            return false; // Silently reject past dates
+        }
+
         update_user_meta($user_id, 'expiry_date', sanitize_text_field($formatted_expiry_date));
     }
 
     public function set_expiry_date_on_registration($user_id)
     {
         $retention_period = get_option('mpda_consent_time');
-        if ($retention_period === false) {
+        if ($retention_period === false || $retention_period <= 0) {
             $retention_period = 5;
             update_option('mpda_consent_time', $retention_period);
         }
@@ -195,7 +202,8 @@ class Zippy_User_Account_Expiry
         <script type="text/javascript">
             jQuery(document).ready(function($) {
                 $('.datepicker').datepicker({
-                    dateFormat: 'dd/mm/yy'
+                    dateFormat: 'dd/mm/yy',
+                    minDate: 0
                 });
             });
         </script>
