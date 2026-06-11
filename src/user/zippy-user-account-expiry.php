@@ -3,7 +3,9 @@
 namespace Zippy_Core\Src\User;
 
 defined('ABSPATH') or die();
+
 use Zippy_Core\Utils\Zippy_Utils_Core;
+
 class Zippy_User_Account_Expiry
 {
     protected static $_instance = null;
@@ -99,11 +101,13 @@ class Zippy_User_Account_Expiry
 
     public function set_expiry_date_on_registration($user_id)
     {
+        $retention_period_default = 3;
         $retention_period = get_option('mpda_consent_time');
-        if ($retention_period === false || $retention_period <= 0) {
-            $retention_period = 5;
+        if ($retention_period === false || $retention_period <= 0 || $retention_period > $retention_period_default) {
+            $retention_period = $retention_period_default;
             update_option('mpda_consent_time', $retention_period);
         }
+
         $user_info = get_userdata($user_id);
         $creation_date = $user_info->user_registered;
         $expiry_date = date('Y-m-d', strtotime($creation_date . ' + ' . $retention_period . ' years'));
@@ -198,7 +202,7 @@ class Zippy_User_Account_Expiry
 
     public function initialize_datepicker()
     {
-    ?>
+?>
         <script type="text/javascript">
             jQuery(document).ready(function($) {
                 $('.datepicker').datepicker({
