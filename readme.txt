@@ -3,7 +3,7 @@ Contributors: yourname
 Tags: something
 Requires at least: 5.0
 Tested up to: 6.5
-Stable tag: 1.2.0
+Stable tag: 8.1.0
 License: GPLv2 or later
 
 == Description ==

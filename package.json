@@ -1,6 +1,6 @@
 {
   "name": "zippy-wp-web-development",
-  "version": "1.0.0",
+  "version": "8.1.0",
   "description": "This project is WordPress theme with CSS/SASS and JavaScript compiled using webpack 5.",
   "main": "js/build/main.js",
   "scripts": {
